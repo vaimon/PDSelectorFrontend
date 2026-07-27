@@ -5,7 +5,10 @@ import { useEffect } from 'react';
 
 const LoginForm = () => {
   const handleLogin = () => {
-    window.location.href = 'http://localhost:8080/oauth2/authorization/azure';
+    // Same-origin by default (nginx proxies /oauth2 to the backend on teams.pd-mmcs.ru);
+    // VITE_BACKEND_URL overrides for cross-origin local dev.
+    const backendUrl = import.meta.env.VITE_BACKEND_URL ?? '';
+    window.location.href = `${backendUrl}/oauth2/authorization/azure`;
   };
 
   const getCookieValue = (name) => {
