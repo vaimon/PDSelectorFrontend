@@ -1,0 +1,101 @@
+/*
+ * Console design tokens — source of truth for E22 (team-selection ↔ core visual alignment).
+ * Extracted from CapstoneProjectSystem/docs/design/README.md. DO NOT re-derive values by eye —
+ * import this file and consume the variables. Updates flow one direction: core → this fork.
+ *
+ * Usage: import once at app entry (e.g. src/index.css: `@import './../design/theme.css';`
+ * or copy into src/). Then replace hard-coded colors/sizes in the 19 component CSS files
+ * with var(--token). Light is default; dark activates on <html data-theme="dark">.
+ */
+
+:root {
+  /* ---- Fonts (self-hosted via @fontsource — NOT Google Fonts CDN, 152-ФЗ) ---- */
+  --font-sans: 'Golos Text', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---- Metrics (theme-independent) ---- */
+  --r-sm: 4px;          /* small radius */
+  --r: 6px;             /* default radius (buttons, inputs) */
+  --r-lg: 8px;          /* cards */
+  --r-pill: 6px;        /* chips — Console chips are NOT round, 6px */
+  --fs: 13.5px;         /* base body / table */
+  --fs-lg: 15px;        /* control headings */
+  --ctrl-h: 34px;       /* button / input height (dense) */
+  --pad: 16px;          /* card padding */
+  --gap: 12px;          /* grid gaps */
+  --topbar-h: 56px;     /* header height */
+  --side-w: 238px;      /* sidebar / drawer width */
+  --track: .01em;       /* body letter-spacing */
+  --track-num: -.02em;  /* numeric (JetBrains Mono) letter-spacing */
+  /* Console has NO shadows — hairline borders instead. This is the only shadow, popovers only: */
+  --shadow-pop: 0 6px 24px -8px rgba(8, 12, 20, .28);
+
+  /* ---- Palette — Light (default) ---- */
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --inset: #f7f8fa;
+  --border: #e6e8ee;
+  --border-strong: #d4d8e0;
+  --hairline: #eef0f4;
+  --text: #111826;
+  --text-2: #535d6e;
+  --text-3: #8a93a3;
+  --accent: #2f6feb;
+  --accent-hover: #255ed3;
+  --accent-weak: #eaf1fe;
+  --accent-text: #1d55c4;
+  --accent-border: #c9dcfb;
+  --ok: #12805c;
+  --ok-bg: #e7f4ee;
+  --ok-border: #bfe4d4;
+  --warn: #a65a10;
+  --warn-bg: #fbf0e0;
+  --warn-border: #f0d9b8;
+  --bad: #c9342a;
+  --bad-bg: #fceceb;
+  --bad-border: #f4cdca;
+  --violet: #6d4ee0;
+  --violet-bg: #efeafc;
+  --overlay: rgba(17, 24, 38, .42);
+}
+
+/* ---- Palette — Dark (user toggle in header sets <html data-theme="dark">) ---- */
+[data-theme="dark"] {
+  --bg: #0c0f14;
+  --surface: #141922;
+  --surface-2: #1a212c;
+  --inset: #10151d;
+  --border: #242c39;
+  --border-strong: #33404f;
+  --hairline: #1e2530;
+  --text: #e8edf4;
+  --text-2: #9aa6b6;
+  --text-3: #68758a;
+  --accent: #5b8df0;
+  --accent-hover: #6f9bf2;
+  --accent-weak: #17233a;
+  --accent-text: #8fb4f6;
+  --accent-border: #2a3d5e;
+  --ok: #43b98a;
+  --ok-bg: #12271f;
+  --ok-border: #1d3d31;
+  --warn: #d68b3f;
+  --warn-bg: #281c10;
+  --warn-border: #3d2c15;
+  --bad: #ee7168;
+  --bad-bg: #2a1614;
+  --bad-border: #432020;
+  --violet: #9a86ef;
+  --violet-bg: #1c1730;
+  --overlay: rgba(0, 0, 0, .6);
+}
+
+/* Baseline the tokens actually take effect somewhere. Extend, don't treat as final. */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs);
+  letter-spacing: var(--track);
+}
