@@ -1,28 +1,31 @@
 import { useState, useEffect } from "react";
-import { fetchFilterParamsByTrackId } from "../api/apiTeamsController";
-import { getSavedTrackId } from "./cookieUtils";
+import { fetchStudentFilterParamsByTrackId } from "../api/apiStudentsController";
 
-const useStudentFilters = () => {
-  const [filterParams, setFilterParams] = useState([]);
+const useStudentFilters = (trackId) => {
+  const [filterParams, setFilterParams] = useState({
+    courses: [],
+    groups: [],
+    hasTeam: [],
+    isCaptain: [],
+    technologies: [],
+  });
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const loadFilters = async () => {
-      const trackId = getSavedTrackId();
-      if (!trackId) {
-        console.error("trackId отсутствует в куках");
-        return;
-      }
       try {
-        const params = await fetchFilterParamsByTrackId(trackId);
+        const params = await fetchStudentFilterParamsByTrackId(trackId, controller.signal);
         setFilterParams(params);
-        console.log("Полученные параметры фильтра:", params);
       } catch (error) {
+        if (error.name === "AbortError") return;
         console.error("Ошибка при получении параметров фильтра:", error);
       }
     };
 
-    loadFilters();
-  }, []);
+    if (trackId) loadFilters();
+    return () => controller.abort();
+  }, [trackId]);
 
   return filterParams;
 };

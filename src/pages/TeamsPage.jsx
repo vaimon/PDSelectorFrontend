@@ -10,6 +10,7 @@ import useTeams from "../hooks/useTeams";
 import { getCurrentStudentId } from "../api/apiStudentsController";
 import { createApplication } from "../api/apiApplication";
 import useSuccessMessage from "../hooks/useSuccessMessage";
+import Pagination from "../components/pagination/Pagination";
 
 
 
@@ -18,13 +19,20 @@ const TeamsPage = () => {
   const [searchInput, setSearchInput] = useState("");
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const [applicationsStatus, setApplicationsStatus] = useState({}); 
+  const [page, setPage] = useState(0);
 
   const trackId = getSavedTrackId();
-  const { teams, loading } = useTeams(filters, searchInput, trackId);
+  const { teams, pagination, loading, error } = useTeams(filters, searchInput, trackId, page);
   const filterParams = useTeamFilters(trackId);
 
-  const handleApplyFilters = (newFilters) => setFilters(newFilters);
-  const handleSearch = (input) => setSearchInput(input);
+  const handleApplyFilters = (newFilters) => {
+    setPage(0);
+    setFilters(newFilters);
+  };
+  const handleSearch = (input) => {
+    setPage(0);
+    setSearchInput(input);
+  };
 
   const handleApplicationSubmit = async (teamId) => {
     try {
@@ -79,11 +87,13 @@ const TeamsPage = () => {
               <p className="catalog-kicker">Проектная деятельность</p>
               <h1>Команды</h1>
             </div>
-            {!loading && <span className="catalog-count">{teams.length} результатов</span>}
+            {!loading && <span className="catalog-count">{pagination.totalElements} результатов</span>}
           </div>
           <div className="cards" aria-busy={loading}>
             {loading ? (
               <p className="loading-state">Загружаем команды…</p>
+            ) : error ? (
+              <p className="empty-state" role="alert">{error}</p>
             ) : teams.length > 0 ? (
               teams.map((team) => (
                 <Card
@@ -105,6 +115,11 @@ const TeamsPage = () => {
               </p>
             )}
           </div>
+          <Pagination
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={setPage}
+          />
         </MainContent>
       </main>
     </>

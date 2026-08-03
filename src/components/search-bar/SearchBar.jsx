@@ -9,36 +9,29 @@ const SearchBar = ({
 }) => {
   const [searchInput, setSearchInput] = useState("");
 
-  const handleSearch = () => {
-    onSearch(searchInput); 
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      handleSearch();
-    }
+  const handleSearch = (event) => {
+    event.preventDefault();
+    onSearch(searchInput.trim());
   };
 
   return (
     <div className="search-bar">
-      <div className="search-container">
+      <form className="search-container" role="search" onSubmit={handleSearch}>
         <input
           type="text"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)} 
-          onKeyDown={handleKeyDown}
+          onChange={(e) => setSearchInput(e.target.value)}
           placeholder={placeholder}
           aria-label={label}
         />
         <button
-          type="button"
+          type="submit"
           className="search-button"
-          onClick={handleSearch}
           aria-label="Выполнить поиск"
         >
           <FaSearch aria-hidden="true" />
         </button>
-      </div>
+      </form>
     </div>
   );
 };

@@ -2,36 +2,64 @@ import axios from 'axios';
 
 import { API_BASE_URL } from '../config/apiConfig';
 import { assertSuccessfulResponse } from './authRedirect';
-import { normalizeCollectionResponse } from './normalizeResponse';
-export const fetchStudents = async ({ input, trackId, course, groupNumber, hasTeam, technologies }) => {
+import { normalizePageResponse } from './normalizeResponse';
+export const fetchStudents = async ({
+  input,
+  trackId,
+  course,
+  groupNumber,
+  hasTeam,
+  isCaptain,
+  technologies,
+  page = 0,
+  size = 12,
+  signal,
+}) => {
   try {
     const queryParams = new URLSearchParams();
 
-    if (input) queryParams.append("input", input);
+    const normalizedInput = input?.trim();
+    if (normalizedInput) queryParams.append("input", normalizedInput);
     if (trackId) queryParams.append("track_id", trackId);
-    if (course) queryParams.append("course", course);
-    if (groupNumber) queryParams.append("group_number", groupNumber);
-    if (hasTeam !== undefined) queryParams.append("has_team", hasTeam);
+    if (Array.isArray(course)) course.forEach((value) => queryParams.append("course", value));
+    if (Array.isArray(groupNumber)) groupNumber.forEach((value) => queryParams.append("group_number", value));
+    if (typeof hasTeam === "boolean") queryParams.append("has_team", String(hasTeam));
+    if (typeof isCaptain === "boolean") queryParams.append("is_captain", String(isCaptain));
     if (technologies && technologies.length > 0) {
       technologies.forEach((tech) => queryParams.append("technologies", tech));
     }
+    queryParams.set("page", String(page));
+    queryParams.set("size", String(size));
 
 
     const response = await fetch(`${API_BASE_URL}/students/search?${queryParams.toString()}`, {
       method: "GET",
       credentials: "include",
+      signal,
     });
 
     await assertSuccessfulResponse(response);
 
 
     const data = await response.json();
-    console.log(data);
-    return normalizeCollectionResponse(data);
+    return normalizePageResponse(data);
   } catch (error) {
+    if (error.name === "AbortError") throw error;
     console.error("Error fetching students:", error);
     throw error; 
   }
+};
+
+export const fetchStudentFilterParamsByTrackId = async (trackId, signal) => {
+  const queryParams = new URLSearchParams({ track_id: String(trackId) });
+  const response = await fetch(`${API_BASE_URL}/students/filters?${queryParams}`, {
+    method: 'GET',
+    credentials: 'include',
+    signal,
+  });
+
+  await assertSuccessfulResponse(response);
+  return response.json();
 };
 
 export const createStudent = async (trackId, studentData) => {

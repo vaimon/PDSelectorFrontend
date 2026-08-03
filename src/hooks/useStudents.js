@@ -1,34 +1,58 @@
 import { useState, useEffect } from "react";
 import { fetchStudents } from "../api/apiStudentsController";
-import { getSavedTrackId } from "./cookieUtils";
 
-const useStudents = (filters, searchInput) => {
+const emptyPage = { page: 0, size: 12, totalElements: 0, totalPages: 0 };
+
+const useStudents = (filters, searchInput, trackId, page = 0) => {
   const [students, setStudents] = useState([]);
+  const [pagination, setPagination] = useState(emptyPage);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const loadStudents = async () => {
-      const trackId = getSavedTrackId();
-      if (!trackId) {
-        console.error("trackId отсутствует в куках");
-        setLoading(false);
-        return;
-      }
       try {
-        const data = await fetchStudents(trackId, { ...filters, input: searchInput });
-        setStudents(data);
-        console.log("Загруженные студенты:", data);
+        setLoading(true);
+        setError(null);
+        const data = await fetchStudents({
+          ...filters,
+          input: searchInput,
+          trackId,
+          page,
+          signal: controller.signal,
+        });
+        setStudents(data.items);
+        setPagination({
+          page: data.page,
+          size: data.size,
+          totalElements: data.totalElements,
+          totalPages: data.totalPages,
+        });
       } catch (error) {
+        if (error.name === "AbortError") return;
         console.error("Не удалось загрузить студентов:", error);
+        setStudents([]);
+        setPagination(emptyPage);
+        setError("Не удалось загрузить участников. Попробуйте ещё раз.");
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
-    loadStudents();
-  }, [filters, searchInput]);
+    if (trackId) {
+      loadStudents();
+    } else {
+      setStudents([]);
+      setPagination(emptyPage);
+      setLoading(false);
+    }
 
-  return { students, loading };
+    return () => controller.abort();
+  }, [filters, searchInput, trackId, page]);
+
+  return { students, pagination, loading, error };
 };
 
 export default useStudents;

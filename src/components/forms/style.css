@@ -7,8 +7,10 @@
   flex-direction: column;
   gap: var(--pad);
   width: 222px;
+  max-height: calc(100dvh - var(--topbar-h) - (var(--gap) * 2));
   margin: 0;
   padding: calc(var(--pad) - 2px);
+  overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -109,6 +111,34 @@
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+.filter-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--r-sm);
+}
+
+.reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
 .show-button:hover {
   border-color: var(--accent-hover);
   background: var(--accent-hover);
@@ -116,6 +146,7 @@
 }
 
 .show-button:focus-visible,
+.reset-button:focus-visible,
 .filter-toggle:focus-visible,
 .team-form button:focus-visible,
 .team-form input:focus-visible,
@@ -255,6 +286,8 @@
     position: static;
     flex-basis: auto;
     width: 100%;
+    max-height: none;
+    overflow-y: visible;
   }
 
   .filter-content {
@@ -262,7 +295,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .filter-content .show-button {
+  .filter-content .filter-actions {
     grid-column: 1 / -1;
   }
 }
@@ -289,7 +322,7 @@
     display: grid;
   }
 
-  .filter-content .show-button {
+  .filter-content .filter-actions {
     grid-column: auto;
   }
 }
