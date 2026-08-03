@@ -1,138 +1,132 @@
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  z-index: 1200;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000; 
+  justify-content: center;
+  width: 100%;
+  height: 100dvh;
+  padding: var(--pad);
   overflow: hidden;
+  background: var(--overlay);
 }
 
-
 .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 500px;
-  max-width: 90%;
-  max-height: 90%; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
   position: relative;
   display: flex;
   flex-direction: column;
+  width: min(100%, 500px);
+  max-height: calc(100dvh - (var(--pad) * 2));
   overflow: hidden;
+  padding: calc(var(--pad) * 2) var(--pad) var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  color: var(--text);
 }
-
 
 .modal-body {
-  overflow-y: auto; 
-  max-height: calc(90vh - 40px);
-  padding-right: 10px; 
-  box-sizing: border-box;
+  max-height: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-
 
 .modal-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: var(--r-sm);
+  right: var(--r-sm);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--ctrl-h);
+  height: var(--ctrl-h);
+  padding: 0;
+  border: 0;
   background: none;
-  border: none;
-  font-size: 24px; 
-  font-weight: bold; 
-  color: #333;
+  color: var(--text-2);
+  font-size: 20px;
   cursor: pointer;
-  z-index: 1100;
-  transition: transform 0.2s ease, color 0.3s ease;
 }
 
 .modal-close:hover {
-  color: var(--purple-light); 
-  transform: scale(1.2);
+  background: var(--surface-2);
+  color: var(--text);
 }
 
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  width: min(100%, 400px);
+  margin: 0 auto;
+  color: var(--text);
+}
 
-  /* Profile Form */
-  .profile-form {
-    display: flex;
-    flex-direction: column;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.profile-form label {
+  color: var(--text-2);
+  font-weight: 500;
+  text-align: left;
+}
+
+.profile-form input,
+.profile-form select {
+  width: 100%;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.profile-form input:focus,
+.profile-form select:focus {
+  border-color: var(--accent);
+}
+
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--gap);
+  margin-top: var(--pad);
+}
+
+.modal-footer button,
+.profile-form button[type="submit"] {
+  min-height: var(--ctrl-h);
+  padding: 0 var(--pad);
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-footer button:hover,
+.profile-form button[type="submit"]:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: var(--gap);
   }
-  
-  .profile-form label {
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-    text-align: left;
+
+  .modal-content {
+    max-height: calc(100dvh - (var(--gap) * 2));
   }
-  
-  .profile-form input,
-  .profile-form select {
-    margin-bottom: 16px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .profile-form button[type="submit"] {
-    padding: 12px;
-    background-color: var(--purple, #330036); /* Use a purple color from :root */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .profile-form button[type="submit"]:hover {
-    background-color: var(--purple-light, #815dac); /* Lighter purple */
-  }
-  
-  .profile-form input,
-  .profile-form select {
-    text-align: left;
-    outline: none;
-  }
-  
-  .profile-form input:focus,
-  .profile-form select:focus {
-    border-color: var(--purple, #330036);
-  }
-  
-  /* Modal Footer Buttons */
-  .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-  
+
   .modal-footer button {
-    padding: 10px 20px;
-    background-color: var(--purple, #330036); /* Use a purple color from :root */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    flex: 1 1 100%;
   }
-
-  .modal-footer input:focus,
-  .modal-footer select:focus {
-    border-color: var(--purple, #330036);
-  }
-  .modal-footer button:hover {
-    background-color: var(--purple-light, #815dac); /* Lighter purple */
-  }
-  
+}

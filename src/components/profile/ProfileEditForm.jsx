@@ -12,7 +12,14 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "fio") {
+      setFormData((current) => ({
+        ...current,
+        user: { ...current.user, fio: value },
+      }));
+      return;
+    }
+    setFormData((current) => ({ ...current, [name]: value }));
   };
 
   const handleRemoveTechnology = (idToRemove) => {
@@ -59,7 +66,7 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
           ФИО:
           <input
             type="text"
-            name="fullName"
+            name="fio"
             value={formData.user?.fio || ""}
             onChange={handleChange}
           />
@@ -79,7 +86,7 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
           Группа:
           <input
             type="text"
-            name="group"
+            name="group_number"
             value={formData.group_number || ""}
             onChange={handleChange}
           />
@@ -87,8 +94,7 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
 
         <label>
           О себе:
-          <input
-            type="text"
+          <textarea
             name="about_self"
             value={formData.about_self || ""}
             onChange={handleChange}
@@ -99,7 +105,7 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
           Контакты:
           <input
             type="text"
-            name="contact"
+            name="contacts"
             value={formData.contacts || ""}
             onChange={handleChange}
           />
@@ -112,12 +118,14 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
               formData.technologies.map((tech) => (
                 <span key={tech.id} className="card-tag">
                   {tech.name}
-                  <span
+                  <button
+                    type="button"
                     className="remove-icon"
                     onClick={() => handleRemoveTechnology(tech.id)}
+                    aria-label={`Удалить технологию ${tech.name}`}
                   >
-                    🗑
-                  </span>
+                    ×
+                  </button>
                 </span>
               ))
             ) : (
@@ -127,11 +135,11 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
         </label>
 
         <div className="form-buttons">
-          <button onClick={() => toggleModal("add")}>Добавить технологию</button>
-          <button className="save-button" onClick={handleSave}>
+          <button type="button" onClick={() => toggleModal("add")}>Добавить технологию</button>
+          <button type="button" className="save-button" onClick={handleSave}>
             Сохранить
           </button>
-          <button className="cancel-button" onClick={onCancel}>
+          <button type="button" className="cancel-button" onClick={onCancel}>
             Отменить
           </button>
         </div>

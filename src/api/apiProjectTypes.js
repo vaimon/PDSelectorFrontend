@@ -1,6 +1,5 @@
-import axios from "axios";
-
 import { API_BASE_URL } from '../config/apiConfig';
+import { assertSuccessfulResponse } from './authRedirect';
 
 export const fetchProjectTypes = async () => {
     try {
@@ -9,9 +8,7 @@ export const fetchProjectTypes = async () => {
         credentials: "include",
       });
   
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
-      }
+      await assertSuccessfulResponse(response);
       const data = await response.json();  
       return data;
     } catch (error) {

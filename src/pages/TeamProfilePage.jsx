@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft, FaInbox, FaUserCircle, FaUsers } from "react-icons/fa";
 import Navbar from "../components/navbar/Navbar";
 import Sidebar from "../components/sidebar/Sidebar";
 import Card from "../components/card/Card";
 import MainContent from "../components/main-section/MainSection";
-import EditableDescription from "../components/editable-text-field/EditableTextField";
-import { useParams } from "react-router-dom";
 import useCurrentUser from "../hooks/useCurrentUser";
 import useTeamData from "../hooks/useTeamData";
 import ApplicationCard from "../components/card/ApplicationCard";
@@ -15,16 +15,18 @@ import TeamEditForm from "../components/profile/TeamEditForm";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { useProjectTypes } from "../hooks/useProjectTypes";
 import { updateTeam } from "../api/apiTeamsController";
+import "./TeamProfilePage.css";
 const sidebarItems = [
-  { name: "Текущие участники" },
-  { name: "Заявки в команду" },
+  { name: "Текущие участники", icon: <FaUsers aria-hidden="true" /> },
+  { name: "Заявки в команду", icon: <FaInbox aria-hidden="true" /> },
 ];
 
 const TeamProfilePage = () => {
   const { teamId } = useParams();
+  const navigate = useNavigate();
   const [currentContent, setCurrentContent] = useState("Текущие участники");
   const [showEditForm, setShowEditForm] = useState(false);
-  const {allTypes, loadingTypes, errorTypes} = useProjectTypes();
+  const { allTypes } = useProjectTypes();
   const currentUser = useCurrentUser();
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const {
@@ -35,8 +37,7 @@ const TeamProfilePage = () => {
   } = useTeamData(teamId, currentUser, currentContent);
 
   
-  const { allTechnologies, loadingTechnologies, errorTechnologies } =
-    useTechnologies();
+  const { allTechnologies } = useTechnologies();
 
   const handleSave = async (updatedData) => {
     await updateTeam(updatedData, teamId);
@@ -68,10 +69,10 @@ const TeamProfilePage = () => {
                 key={item.id}
                 applicationId={item.id}
                 studentName={item.student?.fio || item.user?.fio}
-                teamName={name}
+                teamName={teamData.name}
                 teamId={teamId}
                 studentId={item.student?.id || item.user?.id}
-                teamDescription={description}
+                teamDescription={teamData.project_description || teamData.description}
                 technologies={item.technologies || []}
                 status={item.status || "Sent"}
                 showCaptainOptions={true}
@@ -96,7 +97,7 @@ const TeamProfilePage = () => {
             )
           )
         ) : (
-          <p>
+          <p className="empty-state">
             {currentContent === "Заявки в команду"
               ? "Нет доступных запросов."
               : "Нет участников."}
@@ -106,62 +107,123 @@ const TeamProfilePage = () => {
     );
   };
 
+  const captainName = teamData.captain?.fio
+    || teamData.captain?.user?.fio
+    || teamData.captainName
+    || "Не указан";
+
   return (
     <>
       <Navbar />
-      <h1>Профиль команды {teamData.name}</h1>
-      <div className="container">
-        {isCaptain && (
-          <Sidebar onItemClick={setCurrentContent} items={sidebarItems} />
-        )}
-        <MainContent>
-          <h2>Описание команды</h2>
-          {successMessage && (
-            <div className="success-message">{successMessage}</div>
-          )}
-          {isCaptain && (
-            <div>
-              <button onClick={() => setShowEditForm((prev) => !prev)}>
-                {showEditForm
-                  ? "Закрыть редактирование"
-                  : "Редактировать команду"}
-              </button>
-              {showEditForm && (
-               <TeamEditForm
-               teamData={{
-                 name: teamData.name,  
-                 project_description: teamData.project_description, 
-                 project_type: teamData.project_type || "", 
-                 technologies: teamData.technologies,  
-               }}
-               onSave={handleSave}
-               onCancel={() => setShowEditForm(false)}
-               allTechnologies={allTechnologies} 
-               projectTypes={allTypes}
-             />
-             
-              )}
-            </div>
-          )}
-
-          <div className="cards">
-            <Card
-              key={teamData.id}
-              name={teamData.name}
-              type={teamData.project_type?.name}
-              resume={teamData.description}
-              isCaptain={false}
-              tags={teamData.technologies}
-              showEditingOptions={teamData.isCaptain}
-            />
+      <main className="team-profile-page">
+        <header className={`team-profile-toolbar${isCaptain ? "" : " team-profile-toolbar--single"}`}>
+          <button type="button" className="team-back-button" onClick={() => navigate("/teams")}>
+            <FaArrowLeft aria-hidden="true" />
+            <span>Назад к командам</span>
+          </button>
+          <div className="team-profile-heading">
+            <p>Команды</p>
+            <h1>{teamData.name || "Профиль команды"}</h1>
           </div>
-          <p>
-            <strong>Капитан команды:</strong> {teamData.captainId || "Неизвестно"}
-          </p>
-          <h2>{currentContent}</h2>
-          {renderMainContent()}
-        </MainContent>
-      </div>
+        </header>
+
+        <div className={`team-profile-layout${isCaptain ? "" : " team-profile-layout--single"}`}>
+          {isCaptain && (
+            <Sidebar
+              onItemClick={setCurrentContent}
+              items={sidebarItems}
+              activeItem={currentContent}
+            />
+          )}
+          <MainContent>
+            {successMessage && <div className="success-message">{successMessage}</div>}
+
+            <section className="team-overview" aria-labelledby="team-overview-title">
+              <div className="team-section-head">
+                <div>
+                  <p className="team-section-kicker">Карточка проекта</p>
+                  <h2 id="team-overview-title">О команде</h2>
+                </div>
+                {isCaptain && (
+                  <button
+                    type="button"
+                    className="team-edit-toggle"
+                    aria-expanded={showEditForm}
+                    onClick={() => setShowEditForm((prev) => !prev)}
+                  >
+                    {showEditForm ? "Закрыть" : "Редактировать"}
+                  </button>
+                )}
+              </div>
+
+              {showEditForm && isCaptain ? (
+                <TeamEditForm
+                  teamData={{
+                    name: teamData.name,
+                    project_description: teamData.project_description,
+                    project_type: teamData.project_type || null,
+                    technologies: teamData.technologies || [],
+                  }}
+                  onSave={handleSave}
+                  onCancel={() => setShowEditForm(false)}
+                  allTechnologies={allTechnologies}
+                  projectTypes={allTypes}
+                />
+              ) : loading ? (
+                <p className="team-inline-state">Загрузка данных команды…</p>
+              ) : error ? (
+                <p className="team-inline-state team-inline-state--error">{error}</p>
+              ) : (
+                <div className="team-summary-grid">
+                  <article className="team-info-card">
+                    <div className="team-info-row">
+                      <span>Тип проекта</span>
+                      <strong>{teamData.project_type?.name || "Не указан"}</strong>
+                    </div>
+                    <div className="team-info-row team-info-row--description">
+                      <span>Описание</span>
+                      <p>{teamData.project_description || teamData.description || "Описание пока не добавлено"}</p>
+                    </div>
+                    <div className="team-info-row team-info-row--technologies">
+                      <span>Технологии</span>
+                      <div className="card-tags">
+                        {teamData.technologies?.length > 0 ? (
+                          teamData.technologies.map((technology) => (
+                            <span className="card-tag" key={technology.id || technology.name}>
+                              {technology.name || technology}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="no-tags">Не указаны</span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                  <aside className="team-captain">
+                    <FaUserCircle aria-hidden="true" />
+                    <div>
+                      <span>Капитан команды</span>
+                      <strong>{captainName}</strong>
+                    </div>
+                  </aside>
+                </div>
+              )}
+            </section>
+
+            {!loading && !error && (
+              <section className="team-members" aria-labelledby="team-members-title">
+                <div className="team-section-head">
+                  <div>
+                    <p className="team-section-kicker">Состав и обращения</p>
+                    <h2 id="team-members-title">{currentContent}</h2>
+                  </div>
+                </div>
+                {renderMainContent()}
+              </section>
+            )}
+          </MainContent>
+        </div>
+      </main>
     </>
   );
 };

@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./style.css";
-import { FaPlus, FaTrash, FaEdit, FaSave, FaChevronDown } from "react-icons/fa";
-import { isEqual } from "lodash";
+import { FaPlus, FaTrash, FaEdit, FaSave } from "react-icons/fa";
 import { fetchFilterParamsByTrackId } from "../../api/apiTeamsController";
 import { getSavedTrackId } from "../../hooks/cookieUtils";
 import DropDownTechnologies from "../drop-down-technologies/DropDownTechnologies";
 
 
 const EditableDescription = ({
-  initialDescription,
-  initialTechnologies,
+  initialDescription = "",
+  initialTechnologies = [],
   onSave,
   canEdit,
 }) => {
@@ -32,8 +31,6 @@ const EditableDescription = ({
       try {
         const params = await fetchFilterParamsByTrackId(trackId);
         setAllTechnologies(params.technologies);
-        console.log("Test: ", params.technologies);
-        console.log("Полученные параметры фильтра:", params);
       } catch (error) {
         console.error("Ошибка при получении параметров фильтра:", error);
       }
@@ -41,10 +38,6 @@ const EditableDescription = ({
 
     loadFilters();
   }, [initialDescription, initialTechnologies, isEditing]);
-
-  useEffect(() => {
-    
-  }, []);
 
   const handleSave = () => {
     setIsEditing(false);
@@ -71,7 +64,7 @@ const EditableDescription = ({
     setIsDropdownOpen((prev) => !prev);
   };
 
-  console.log("technologies: ", technologies);
+  const technologyLabel = (technology) => technology?.name || technology;
 
   return (
     <div className="editable-description">
@@ -86,13 +79,14 @@ const EditableDescription = ({
             <ul>
               {technologies.map((tech, index) => (
                 <li key={tech.id||index} className="technology-item">
-                  {console.log("TECH: ", tech)}
-                  {tech}
+                  {technologyLabel(tech)}
                   <button
+                    type="button"
                     className="button-remove-tech"
                     onClick={() => handleRemoveTechnology(index)}
+                    aria-label={`Удалить технологию ${technologyLabel(tech)}`}
                   >
-                    <FaTrash />
+                    <FaTrash aria-hidden="true" />
                   </button>
                 </li>
               ))}
@@ -109,13 +103,13 @@ const EditableDescription = ({
               {isDropdownOpen && (
                 <DropDownTechnologies technologies_all = {allTechnologies} dropDownOpenFlag={setIsDropdownOpen} setterForNewTech={setNewTech} techNew={newTech}/>
               )}
-              <button className="button-add-tech" onClick={handleAddTechnology}>
-                <FaPlus />
+              <button type="button" className="button-add-tech" onClick={handleAddTechnology} aria-label="Добавить технологию">
+                <FaPlus aria-hidden="true" />
               </button>
             </div>
           </div>
-          <button className="button-save" onClick={handleSave}>
-            <FaSave /> Сохранить
+          <button type="button" className="button-save" onClick={handleSave}>
+            <FaSave aria-hidden="true" /> Сохранить
           </button>
         </>
       ) : (
@@ -124,10 +118,10 @@ const EditableDescription = ({
           <div className="card-tags">
             <strong>Технологии:</strong>
 
-            {initialTechnologies.length > 0 ? (
+            {technologies.length > 0 ? (
               technologies.map((tech) => (
                 <span key={tech.id||tech} className="card-tag">
-                  {tech.name||tech}
+                  {technologyLabel(tech)}
                 </span>
               ))
             ) : (
@@ -135,8 +129,8 @@ const EditableDescription = ({
             )}
           </div>
           {canEdit && (
-            <button className="button-edit" onClick={() => setIsEditing(true)}>
-              <FaEdit /> Редактировать
+            <button type="button" className="button-edit" onClick={() => setIsEditing(true)}>
+              <FaEdit aria-hidden="true" /> Редактировать
             </button>
           )}
         </>

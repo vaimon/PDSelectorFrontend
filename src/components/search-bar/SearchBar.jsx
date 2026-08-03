@@ -1,12 +1,22 @@
-import React from 'react';
 import './style.css';
 import { useState } from 'react';
+import { FaSearch } from 'react-icons/fa';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({
+  onSearch,
+  placeholder = "Поиск по названию или описанию",
+  label = "Поиск",
+}) => {
   const [searchInput, setSearchInput] = useState("");
 
   const handleSearch = () => {
     onSearch(searchInput); 
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -16,10 +26,17 @@ const SearchBar = ({ onSearch }) => {
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)} 
-          placeholder="Поиск"
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          aria-label={label}
         />
-        <button className="search-button" onClick={handleSearch}>
-          🔍
+        <button
+          type="button"
+          className="search-button"
+          onClick={handleSearch}
+          aria-label="Выполнить поиск"
+        >
+          <FaSearch aria-hidden="true" />
         </button>
       </div>
     </div>

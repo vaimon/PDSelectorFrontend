@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/navbar/Navbar";
 import SearchBar from "../components/search-bar/SearchBar";
 import Filter from "../components/forms/Filter";
 import MainContent from "../components/main-section/MainSection";
 import Card from "../components/card/Card";
 import { getSavedTrackId } from "../hooks/cookieUtils";
-import useCurrentUser from "../hooks/useCurrentUser";
 import useTeamFilters from "../hooks/useTeamFilters";
 import useTeams from "../hooks/useTeams";
 import { getCurrentStudentId } from "../api/apiStudentsController";
@@ -22,6 +21,7 @@ const TeamsPage = () => {
 
   const trackId = getSavedTrackId();
   const { teams, loading } = useTeams(filters, searchInput, trackId);
+  const filterParams = useTeamFilters(trackId);
 
   const handleApplyFilters = (newFilters) => setFilters(newFilters);
   const handleSearch = (input) => setSearchInput(input);
@@ -70,14 +70,21 @@ const TeamsPage = () => {
     <>
       <Navbar />
       <SearchBar onSearch={handleSearch} />
-      <div className="container">
-        <Filter filterParams={useTeamFilters(trackId)} onApplyFilters={handleApplyFilters} />
+      <main className="container content-layout catalog-layout">
+        <Filter filterParams={filterParams} onApplyFilters={handleApplyFilters} />
         <MainContent>
-          <h1>Команды</h1>
-          <div className="cards">
+          {successMessage && <div className="success-message">{successMessage}</div>}
+          <div className="catalog-head">
+            <div>
+              <p className="catalog-kicker">Проектная деятельность</p>
+              <h1>Команды</h1>
+            </div>
+            {!loading && <span className="catalog-count">{teams.length} результатов</span>}
+          </div>
+          <div className="cards" aria-busy={loading}>
             {loading ? (
-              <p>Загрузка...</p>
-            ) : (
+              <p className="loading-state">Загружаем команды…</p>
+            ) : teams.length > 0 ? (
               teams.map((team) => (
                 <Card
                   key={team.id}
@@ -89,13 +96,17 @@ const TeamsPage = () => {
                   onCancel={() => console.log("Заявка отменена")}
                   tags={team.technologies}
                   profileLink={`/teams/${team.id}`}
-                  showApplyButton={applicationsStatus[team.id]} 
+                  showApplyButton={!applicationsStatus[team.id]}
                 />
               ))
+            ) : (
+              <p className="empty-state">
+                Команды не найдены. Попробуйте изменить поиск или фильтры.
+              </p>
             )}
           </div>
         </MainContent>
-      </div>
+      </main>
     </>
   );
 };

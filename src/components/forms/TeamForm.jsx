@@ -1,43 +1,10 @@
-import React from "react";
 function TeamForm({
   newTeam,
   technologies,
   projectTypes,
   onChange,
   onSubmit,
-  trackId,
 }) {
-  const handleTechnologyChange = (event) => {
-    const { value, checked } = event.target;
-
-    const selectedTech = technologies.find(
-      (tech) => tech.id.toString() === value
-    );
-
-    const updatedTechnologies = checked
-      ? [...newTeam.technologies, selectedTech]
-      : newTeam.technologies.filter((tech) => tech.id !== selectedTech.id);
-
-    onChange({
-      target: {
-        name: "technologies",
-        value: updatedTechnologies,
-      },
-    });
-  };
-
-  const handleProjectTypeChange = (event) => {
-    const { value } = event.target;
-  
-    handleChange({
-      target: {
-        name: "projectType",
-        value,
-      },
-    });
-  };
-  
-
   return (
     <form onSubmit={onSubmit} className="team-form">
       <label htmlFor="name">Название команды:</label>

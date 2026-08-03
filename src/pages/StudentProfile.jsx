@@ -1,5 +1,6 @@
-import React, { useState} from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft, FaFileAlt, FaLayerGroup, FaUser, FaUsers } from "react-icons/fa";
 import Sidebar from "../components/sidebar/Sidebar";
 import MainContent from "../components/main-section/MainSection";
 import Card from "../components/card/Card";
@@ -20,21 +21,22 @@ import { useModal } from "../hooks/useModal";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { updateStudent } from "../api/apiStudentsController";
 import { useProjectTypes } from "../hooks/useProjectTypes";
+import "./StudentProfile.css";
 const sidebarItems = [
-  { name: "Мои команды", icon: "👥" },
-  { name: "Мой профиль", icon: "👤" },
-  { name: "Мои заявки", icon: "📄" },
-  { name: "Созданные команды", icon: "⚙️" },
+  { name: "Мои команды", icon: <FaUsers aria-hidden="true" /> },
+  { name: "Мой профиль", icon: <FaUser aria-hidden="true" /> },
+  { name: "Мои заявки", icon: <FaFileAlt aria-hidden="true" /> },
+  { name: "Созданные команды", icon: <FaLayerGroup aria-hidden="true" /> },
 ];
 
 
 
 const StudentProfilePage = () => {
   const { studentId } = useParams();
+  const navigate = useNavigate();
   const currentUser = useCurrentUser();
-  const [message, setMessage] = useState("");
-  const {allTypes, loadingTypes, errorTypes} = useProjectTypes();
-  console.log('types', allTypes);
+  const profileStudentId = studentId || currentUser;
+  const { allTypes } = useProjectTypes();
   const {
     studentData,
     myTeams,
@@ -44,13 +46,12 @@ const StudentProfilePage = () => {
     error,
     isCurrentUser,
     refreshStudentData,
-    technologies
-  } = useStudentData(studentId, currentUser);
+  } = useStudentData(profileStudentId, currentUser);
    
 
-  const { allTechnologies, loadingTechnologies, errorTechnologies } = useTechnologies();
+  const { allTechnologies } = useTechnologies();
   const currentTrackId = Cookies.get("trackId");
-  const { newTeam, handleChange, handleSubmit } = useNewTeam(currentTrackId, studentId, allTechnologies, allTypes);
+  const { newTeam, handleChange, handleSubmit } = useNewTeam(currentTrackId, profileStudentId, allTechnologies, allTypes);
 
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const { showModal, toggleModal } = useModal();
@@ -62,14 +63,11 @@ const StudentProfilePage = () => {
 
   const handleProfileSave = async (updatedData) => {
     try {
-      await updateStudent(updatedData, studentId);
+      await updateStudent(updatedData, profileStudentId);
       setIsEditingProfile(false);
       refreshStudentData();
     } catch (error) {
       console.error("Ошибка при сохранении профиля:", error);
-    }
-    finally{
-
     }
   };
   
@@ -201,17 +199,49 @@ const StudentProfilePage = () => {
     }
   };
 
+  const sectionTitle = isCurrentUser ? currentContent : "Профиль";
+
   return (
     <>
       <Navbar />
-      <div className="container">
-        {isCurrentUser && <Sidebar onItemClick={setCurrentContent} items={sidebarItems} />}
-        <MainContent>
-          <h2>{currentContent}</h2>
-          {successMessage && <div className="success-message">{successMessage}</div>}
-          {renderMainContent()}
-        </MainContent>
-      </div>
+      <main className="student-profile-page">
+        <header className="student-profile-toolbar">
+          <button
+            type="button"
+            className="student-back-button"
+            onClick={() => navigate("/students")}
+          >
+            <FaArrowLeft aria-hidden="true" />
+            <span>Назад к участникам</span>
+          </button>
+          <div className="student-profile-heading">
+            <p>Участники</p>
+            <h1>{isCurrentUser ? "Личный кабинет" : "Профиль участника"}</h1>
+          </div>
+        </header>
+
+        <div className={`student-profile-layout${isCurrentUser ? "" : " student-profile-layout--single"}`}>
+          {isCurrentUser && (
+            <Sidebar
+              onItemClick={setCurrentContent}
+              items={sidebarItems}
+              activeItem={currentContent}
+            />
+          )}
+          <MainContent>
+            <section className="student-profile-section" aria-labelledby="student-section-title">
+              <div className="student-profile-section-head">
+                <h2 id="student-section-title">{sectionTitle}</h2>
+                {studentData?.user?.fio && (
+                  <span className="student-profile-person">{studentData.user.fio}</span>
+                )}
+              </div>
+              {successMessage && <div className="success-message">{successMessage}</div>}
+              {renderMainContent()}
+            </section>
+          </MainContent>
+        </div>
+      </main>
     </>
   );
 };

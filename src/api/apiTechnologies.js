@@ -1,6 +1,5 @@
-import axios from "axios";
-
 import { API_BASE_URL } from '../config/apiConfig';
+import { assertSuccessfulResponse } from './authRedirect';
 
 export const fetchTechnologies = async () => {
     try {
@@ -8,20 +7,15 @@ export const fetchTechnologies = async () => {
         method: "GET",
         credentials: "include",
       });
-  
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
-      }
+
+      await assertSuccessfulResponse(response);
       console.log('response', response);
       const data = await response.json();
       console.log('data',data);
-  
+
       return data;
     } catch (error) {
       console.error("Ошибка при получении технологий:", error);
       throw error;
     }
   };
-  
-  
-  

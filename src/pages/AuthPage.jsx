@@ -1,4 +1,3 @@
-import React from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -16,9 +15,13 @@ const AuthPage = () => {
     }
   }, [navigate]);
 
-  return <div>Авторизация...</div>;
+  return (
+    <main className="status-page" aria-live="polite">
+      <h1>Авторизация</h1>
+      <p>Проверяем данные и открываем профиль…</p>
+    </main>
+  );
 };
 
 export default AuthPage;
-
 

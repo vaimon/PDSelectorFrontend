@@ -1,11 +1,14 @@
 import axios from 'axios';
 
 import { API_BASE_URL } from '../config/apiConfig';
-export const fetchStudents = async ({ input, course, groupNumber, hasTeam, technologies }) => {
+import { assertSuccessfulResponse } from './authRedirect';
+import { normalizeCollectionResponse } from './normalizeResponse';
+export const fetchStudents = async ({ input, trackId, course, groupNumber, hasTeam, technologies }) => {
   try {
     const queryParams = new URLSearchParams();
 
     if (input) queryParams.append("input", input);
+    if (trackId) queryParams.append("track_id", trackId);
     if (course) queryParams.append("course", course);
     if (groupNumber) queryParams.append("group_number", groupNumber);
     if (hasTeam !== undefined) queryParams.append("has_team", hasTeam);
@@ -19,19 +22,12 @@ export const fetchStudents = async ({ input, course, groupNumber, hasTeam, techn
       credentials: "include",
     });
 
-    if (!response.ok) {
-      if (response.status === 401) {
-
-        window.location.href = "/login";
-        return;
-      } 
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
+    await assertSuccessfulResponse(response);
 
 
     const data = await response.json();
     console.log(data);
-    return data;
+    return normalizeCollectionResponse(data);
   } catch (error) {
     console.error("Error fetching students:", error);
     throw error; 
@@ -66,7 +62,8 @@ export const fetchStudentById = async (studentId) => {
       method: 'GET',
       credentials: 'include', 
     });
-   
+
+    await assertSuccessfulResponse(response);
     const data = await response.json(); 
     console.log('data', data);
     console.log(data);
@@ -92,6 +89,10 @@ export const updateStudent = async (studentData, studentId) => {
       body: JSON.stringify(studentData), 
       credentials: 'include', 
     });
+
+    if (response.status === 401) {
+      await assertSuccessfulResponse(response);
+    }
 
     if (!response.ok) {
       const errorText = await response.text(); 
@@ -133,5 +134,3 @@ export const getCurrentStudentId = async () => {
 
 
   
-
-

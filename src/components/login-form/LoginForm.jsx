@@ -2,6 +2,7 @@
 import './style.css'
 import { useEffect } from 'react';
 import ConsoleMark from '../logo/ConsoleMark';
+import ThemeToggle from '../header/Header';
 
 const LoginForm = () => {
   const handleLogin = () => {
@@ -31,6 +32,7 @@ const LoginForm = () => {
 
   return (
     <main className="background">
+      <div className="auth-theme-toggle"><ThemeToggle /></div>
       <div className="login-container">
         <div className="login-image">
           <ConsoleMark />

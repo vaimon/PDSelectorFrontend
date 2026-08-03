@@ -46,6 +46,7 @@
   --accent-weak: #eaf1fe;
   --accent-text: #1d55c4;
   --accent-border: #c9dcfb;
+  --on-accent: #ffffff;
   --ok: #12805c;
   --ok-bg: #e7f4ee;
   --ok-border: #bfe4d4;
@@ -77,6 +78,7 @@
   --accent-weak: #17233a;
   --accent-text: #8fb4f6;
   --accent-border: #2a3d5e;
+  --on-accent: #ffffff;
   --ok: #43b98a;
   --ok-bg: #12271f;
   --ok-border: #1d3d31;

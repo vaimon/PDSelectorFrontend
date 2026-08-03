@@ -1,0 +1,341 @@
+.team-profile-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--pad);
+  color: var(--text);
+  text-align: left;
+}
+
+.team-profile-toolbar {
+  display: grid;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--pad);
+  margin-bottom: var(--gap);
+}
+
+.team-profile-toolbar--single {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.team-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.team-back-button:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.team-back-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.team-profile-heading p,
+.team-section-kicker {
+  margin: 0 0 var(--r-sm);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--track-num);
+  text-transform: uppercase;
+}
+
+.team-profile-heading h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.team-profile-layout {
+  display: grid;
+  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--pad);
+}
+
+.team-profile-layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.team-profile-layout--single .main-content {
+  width: 100%;
+  margin: 0;
+}
+
+.team-overview,
+.team-members {
+  min-width: 0;
+}
+
+.team-members {
+  margin-top: calc(var(--pad) * 1.5);
+}
+
+.team-section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap);
+  border-bottom: 1px solid var(--border);
+}
+
+.team-section-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.team-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  align-items: stretch;
+  gap: var(--gap);
+  width: 100%;
+}
+
+.team-info-card {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--hairline);
+}
+
+.team-info-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--gap);
+  padding: var(--gap) var(--pad);
+  background: var(--surface);
+}
+
+.team-info-row > span,
+.team-captain span {
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+}
+
+.team-info-row strong {
+  color: var(--text);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.team-info-row p {
+  margin: 0;
+  color: var(--text-2);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.team-info-row .card-tags {
+  min-height: 0;
+  height: auto;
+  overflow: visible;
+}
+
+.team-captain {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text-2);
+}
+
+.team-captain > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.team-captain > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--r-sm);
+}
+
+.team-captain strong {
+  color: var(--text);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.team-members .card {
+  gap: var(--gap);
+}
+
+.team-members .cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+
+.team-members .card-header,
+.team-members .card-name,
+.team-members .card-resume,
+.team-members .card-tags {
+  min-height: 0;
+}
+
+@media (min-width: 641px) {
+  .team-members .card-name,
+  .team-members .card-resume,
+  .team-members .card-tags {
+    height: auto;
+  }
+
+  .team-members .card-resume {
+    min-height: calc(1.55em * 2);
+  }
+
+  .team-members .card-tags {
+    min-height: 24px;
+    overflow: visible;
+  }
+}
+
+.team-inline-state {
+  margin: 0;
+  padding: var(--pad);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--inset);
+  color: var(--text-2);
+}
+
+.team-inline-state--error {
+  border-color: var(--bad-border);
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+.team-overview > .profile-container {
+  margin-inline: 0;
+}
+
+@media (max-width: 900px) {
+  .team-profile-toolbar,
+  .team-profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .team-profile-layout .sidebar {
+    overflow-x: auto;
+  }
+
+  .team-profile-layout .sidebar-links {
+    display: flex;
+    flex-direction: row;
+    min-width: max-content;
+  }
+
+  .team-profile-layout .sidebar-links a {
+    white-space: nowrap;
+  }
+
+  .team-summary-grid {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+
+  .team-members .cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .team-profile-page {
+    padding: var(--gap);
+  }
+
+  .team-profile-toolbar,
+  .team-profile-layout {
+    gap: var(--gap);
+  }
+
+  .team-profile-heading h1 {
+    font-size: 20px;
+  }
+
+  .team-back-button {
+    min-height: 40px;
+  }
+
+  .team-profile-layout .sidebar {
+    margin-inline: calc(var(--gap) * -1);
+    width: calc(100% + (var(--gap) * 2));
+    padding: 0 var(--gap) var(--gap);
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: none;
+  }
+
+  .team-profile-layout .sidebar-links a {
+    min-height: 40px;
+    padding: 0 var(--gap);
+  }
+
+  .team-section-head {
+    align-items: flex-start;
+  }
+
+  .team-summary-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .team-info-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--r-sm);
+    padding: var(--gap);
+  }
+
+  .team-captain {
+    padding: var(--gap);
+  }
+}
+
+@media (max-width: 420px) {
+  .team-back-button,
+  .team-edit-toggle {
+    width: 100%;
+  }
+
+  .team-section-head {
+    flex-direction: column;
+  }
+}

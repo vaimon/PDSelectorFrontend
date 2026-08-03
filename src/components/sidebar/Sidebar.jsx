@@ -1,6 +1,5 @@
-import React from 'react';
 import './style.css';
-const Sidebar = ({ items, onItemClick }) => {
+const Sidebar = ({ items, onItemClick, activeItem }) => {
     return (
         <div className="sidebar">
             <ul className="sidebar-links">
@@ -12,7 +11,8 @@ const Sidebar = ({ items, onItemClick }) => {
                                 e.preventDefault(); // Чтобы предотвратить стандартное поведение ссылки, если используется onItemClick
                                 onItemClick(item.name);
                             }}
-                            className="sidebar-link"
+                            className={`sidebar-link${activeItem === item.name ? " active" : ""}`}
+                            aria-current={activeItem === item.name ? "page" : undefined}
                         >
                             <span className="sidebar-icon">{item.icon}</span> {/* Отображение иконки */}
                             <span className="sidebar-name">{item.name}</span>
@@ -25,4 +25,3 @@ const Sidebar = ({ items, onItemClick }) => {
 };
 
 export default Sidebar;
-

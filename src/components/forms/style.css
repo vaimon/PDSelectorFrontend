@@ -1,234 +1,295 @@
-
 .filter-section {
-    top: 20px;           
-    width: 250px;
-    padding: 20px;
-    margin:20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    z-index: 500;
-  }
-  
-
-.filter-section:hover {
-    transform: scale(1.02);     
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); 
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--gap));
+  z-index: 5;
+  display: flex;
+  flex: 0 0 222px;
+  flex-direction: column;
+  gap: var(--pad);
+  width: 222px;
+  margin: 0;
+  padding: calc(var(--pad) - 2px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .filter-section h2 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    color: var(--purple);
-    font-weight: 700;          
-    text-align: center;
-    border-bottom: 2px solid var(--purple-light);
-    padding-bottom: 10px;
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
 }
 
+.filter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.filter-toggle {
+  display: none;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filter-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pad);
+  min-width: 0;
+}
 
 .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;               
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--gap) - var(--r-sm));
 }
 
 .filter-group h3 {
-    font-size: 1.2rem;
-    color: var(--purple);               
-    font-weight: 600;
-    margin-bottom: 10px;
-    border-left: 4px solid var(--purple-light); 
-    padding-left: 10px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .filter-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;      
-    font-size: 1rem;
-    color: #333;
-    cursor: pointer;
-    transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap) - var(--r-sm));
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 0.5px);
+  line-height: 1.35;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .filter-group label:hover {
-    color: var(--purple);    
+  color: var(--text);
 }
 
-
-.filter-group input[type="radio"] {
-    margin-right: 8px;
-}
-
-
+.filter-group input[type="radio"],
 .filter-group input[type="checkbox"] {
-    accent-color: var(--purple); 
-    transform: scale(1.2);      
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--accent);
 }
-
-
-.price-range {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.price-range input[type="number"] {
-    width: 48%;
-    padding: 5px;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    text-align: center;
-    background-color: #f5f5f5;
-    transition: border-color 0.3s ease;
-}
-
-.price-range input[type="number"]:focus {
-    border-color: var(--purple-light); 
-    outline: none;
-}
-
-.slider {
-    width: 100%;
-    margin-top: 10px;
-    height: 6px;
-    background: var(--purple-light);
-    outline: none;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    border-radius: 5px;
-}
-
-.slider:hover {
-    opacity: 1;
-}
-
 
 .show-button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    background-color: var(--purple);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .show-button:hover {
-    background-color: var(--purple);
-    transform: scale(1.03); 
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  transform: none;
 }
 
+.show-button:focus-visible,
+.filter-toggle:focus-visible,
+.team-form button:focus-visible,
+.team-form input:focus-visible,
+.team-form select:focus-visible,
+.team-form textarea:focus-visible,
+.filter-years select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .filter-years {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: calc(var(--gap) - var(--r-sm));
+  width: 100%;
+  margin-top: var(--gap);
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.filter-years h3,
+.filter-years span {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 600;
+}
+
+.filter-years select,
+.team-form input,
+.team-form select,
+.team-form textarea {
+  width: 100%;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+}
+
+.team-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--gap) - var(--r-sm));
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.team-form label {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  text-align: left;
+}
+
+.team-form textarea {
+  min-height: calc(var(--ctrl-h) * 3);
+  padding-block: var(--gap);
+  resize: vertical;
+}
+
+.team-form input:focus,
+.team-form select:focus,
+.team-form textarea:focus,
+.filter-years select:focus {
+  border-color: var(--accent);
+}
+
+.team-form button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ctrl-h);
+  margin: var(--r-sm) 0 0;
+  padding: 0 var(--pad);
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.team-form button[type="submit"]:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  transform: none;
+}
+
+.player-list,
+.technologies-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) - var(--r-sm));
+  max-height: 200px;
+  margin: 0;
+  padding: var(--gap);
+  overflow-y: auto;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r);
+  background: var(--inset);
+}
+
+.technology-checkbox,
+.project-type-radio {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap) - var(--r-sm));
+}
+
+.technology-checkbox input,
+.project-type-radio input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .filter-section {
+    position: static;
+    flex-basis: auto;
     width: 100%;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: #333;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    margin-top: 20px;
-    gap: 10px;                 
+  }
+
+  .filter-content {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filter-content .show-button {
+    grid-column: 1 / -1;
+  }
 }
 
-.filter-years h3 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #555;
-    font-weight: 600;
-    border-left: 4px solid var(--purple-light);
-    padding-left: 10px;
-}
+@media (max-width: 640px) {
+  .filter-section {
+    gap: 0;
+    padding: var(--gap) var(--pad);
+  }
 
-form {
-    display: flex;
-    flex-direction: column;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  label {
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-    text-align: left;
-  }
-  
-  input, select {
-    margin-bottom: 16px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  button[type="submit"] {
-    padding: 12px;
-    background-color: var(--purple, #330036); 
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  button[type="submit"]:hover {
-    background-color: var(--purple);
-  }
-  
-  form input, form select {
-    text-align: left;
-    outline: none;
-  }
-  
-  form input:focus, form select:focus {
-    border-color: var(--purple, #330036);
-  }
-  
-  .player-list {
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 10px;
-  }
-  
-
-  .technologies-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    max-height: 200px; 
-    overflow-y: auto;  
-    padding-right: 10px; 
-  }
-  
-  
-  .technology-checkbox {
-    display: flex;
+  .filter-toggle {
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
   }
-  
-  .technology-checkbox input[type="checkbox"] {
-    margin-right: 10px;
+
+  .filter-content {
+    display: none;
+    grid-template-columns: 1fr;
+    padding-top: var(--pad);
   }
+
+  .filter-content.is-open {
+    display: grid;
+  }
+
+  .filter-content .show-button {
+    grid-column: auto;
+  }
+}

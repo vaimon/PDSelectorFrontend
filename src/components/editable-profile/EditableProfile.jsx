@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-import Modal from "../modal/Modal";
-import "../modal/style.css";
+import { useState, useEffect } from "react";
+import Modal from "../forms/modal/Modal";
 import "./style.css";
 import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import DropDownTechnologies from "../drop-down-technologies/DropDownTechnologies";
@@ -15,44 +14,37 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
   const [technologies, setTechnologies] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [allTechnologies, setAllTechnologies] = useState();
+  const [allTechnologies, setAllTechnologies] = useState([]);
   const [newTech, setNewTech] = useState("");
   const [technologiesNames, setTechnologiesNames] = useState([]);
 
 
   useEffect(() => {
     if (studentData) {
-      setFio(studentData.user.fio || "");
+      setFio(studentData.user?.fio || "");
       setCourse(studentData.course || "");
-      setGroup(studentData.group || "");
+      setGroup(studentData.group_number || "");
       setContacts(studentData.contacts || "");
       setTechnologies(studentData.technologies || []);
     }
 
     const loadFilters = async () => {
       const trackId = getSavedTrackId();
-      console.log("trackId", trackId);
       if (!trackId) return;
       try {
         const params = await fetchFilterParamsByTrackId(trackId);
         setAllTechnologies(params.technologies);
-        console.log("Test: ", params.technologies);
-        console.log("Полученные параметры фильтра:", params);
       } catch (error) {
         console.error("Ошибка при получении параметров фильтра:", error);
       }
     };
     loadFilters();
 
-    let names_of_technologies = [];
-
-    for (let i = 0; i < technologies.length; i++) {
-      names_of_technologies.push(technologies[i].name);
-    }
-    
-    setTechnologiesNames(names_of_technologies);
-
   }, [studentData]);
+
+  useEffect(() => {
+    setTechnologiesNames(technologies.map((technology) => technology.name || technology));
+  }, [technologies]);
 
   const handleSave = (e) => {
     e.preventDefault(); // Prevent form submission default behavior
@@ -68,9 +60,8 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
   };
 
   const renderTextField = (value, label) => (
-    <div className="form-group ">
+    <div className="form-group">
       <label>{label}</label>
-      {/*<p className={value ? "" : "empty"}>{value || "Не указано"}</p>*/}
       <p className="p-editable-profile">{value || "Не указано"}</p>
     </div>
   );
@@ -95,7 +86,7 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
   const renderModal = () => (
     <form onSubmit={handleSave} className="profile-form">
       <h3>Редактирование профиля</h3>
-      <div className="form-group-modal">
+      <div className="form-group-modal technology-picker">
         <label>ФИО </label>
         <input
           type="text"
@@ -145,8 +136,8 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
             techNew={newTech}
           />
         )}
-        <button className="button-add-tech" onClick={handleAddTechnology}>
-          <FaPlus />
+        <button type="button" className="button-add-tech" onClick={handleAddTechnology} aria-label="Добавить технологию">
+          <FaPlus aria-hidden="true" />
         </button>
         <ul>
           {technologiesNames.map((tech, index) => (
@@ -154,8 +145,10 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
               {tech}
               <button
                 className="button-remove-tech"
+                type="button"
+                aria-label={`Удалить технологию ${tech}`}
                 onClick={(e) => handleRemoveTechnology(e, index)}>
-                <FaTrash />
+                <FaTrash aria-hidden="true" />
               </button>
             </li>
           ))}
@@ -172,10 +165,7 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
 
   return (
     <div className="editable-profile">
-      {/*<h3>Профиль</h3>*/}
-
-      {/* Всегда отображаем полную информацию */}
-      <div className="profile-container">
+      <div className="editable-profile-fields">
         {renderTextField(fio, "ФИО")}
         {renderTextField(course, "Курс")}
         {renderTextField(group, "Группа")}
@@ -188,17 +178,15 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
         </div>
       </div>
 
-      {/* Если редактирование возможно, показываем кнопку */}
       {canEdit && (
         <div className="edit-button">
-          <button onClick={() => setIsModalOpen(true)}>
-            <FaEdit />
+          <button type="button" onClick={() => setIsModalOpen(true)}>
+            <FaEdit aria-hidden="true" />
             Редактировать
           </button>
         </div>
       )}
 
-      {/* Модальное окно для редактирования */}
       <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {renderModal()}
       </Modal>

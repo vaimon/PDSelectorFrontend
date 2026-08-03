@@ -1,70 +1,139 @@
 .editable-description {
-  width: calc(100% - 40px);
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--gap);
+  width: 100%;
   max-width: 800px;
-  background-color: #f9f9f9;
-  border-radius: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  margin: 0 0 var(--gap);
+  padding: var(--pad);
+  overflow: visible;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
   text-align: left;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid var(--purple-light);
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .description-text {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 10px;
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs);
+  line-height: 1.6;
 }
 
 .description-textarea {
-  width: calc(100% - 40px);
-  max-width: 800px;
-  height: 100px;
-  resize: none;
-  border-radius: 20px;
-  text-align: left;
-  padding: 20px;
-  margin-bottom: 20px;
-  margin-top: 10px;
-  border: 1px solid var(--purple-light);
-  font-size: 1rem;
-  color: #555;
+  width: 100%;
+  min-height: calc(var(--ctrl-h) * 3);
+  margin: 0;
+  padding: var(--gap);
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+  line-height: 1.55;
+}
+
+.description-textarea:focus {
+  border-color: var(--accent);
+}
+
+.button-edit,
+.button-save,
+.button-add-tech,
+.button-remove-tech {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--gap) - var(--r-sm));
+  min-height: 30px;
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .button-edit,
 .button-save {
-  background-color: var(--purple-light);
-  color: var(--purple);
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  float: right;
-  margin-top: 10px;
-  transition: background-color 0.3s, color 0.3s;
+  align-self: flex-end;
 }
 
 .button-edit:hover,
-.button-save:hover {
-  background-color: var(--purple);
-  color: #fff;
+.button-save:hover,
+.button-add-tech:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  transform: none;
 }
-.dropdown {
-  position: absolute;
-  top: 35px;
-  left: 0;
-  right: 0;
-  background-color: var(--white);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  z-index: 10;
-  padding: 10px 0;
-  display: block;
-  position: relative;
-  cursor: pointer;
-  margin-left: 20px;
+
+.button-remove-tech {
+  min-height: 24px;
+  padding: 0 var(--r-sm);
+  border-color: var(--bad-border);
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+.technologies,
+.technologies ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) / 2);
+  margin: 0;
+  padding: 0;
   list-style: none;
+}
+
+.technology-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--r-sm);
+  padding: 3px 5px 3px 9px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 11.5px;
+}
+
+.add-technology {
+  position: relative;
+  display: flex;
+  width: 100%;
+}
+
+.add-technology > input {
+  flex: 1;
+  min-width: 0;
+  height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r) 0 0 var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.add-technology > .button-add-tech {
+  border-left: 0;
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+.editable-description button:focus-visible,
+.editable-description input:focus-visible,
+.editable-description textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

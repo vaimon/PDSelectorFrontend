@@ -1,6 +1,8 @@
 import axios from "axios";
 
 import { API_BASE_URL } from '../config/apiConfig';
+import { assertSuccessfulResponse } from './authRedirect';
+import { normalizeCollectionResponse } from './normalizeResponse';
 
 export const fetchTeams = async ({ input, trackId, isFull, projectType, technologies }) => {
   try {
@@ -20,14 +22,12 @@ export const fetchTeams = async ({ input, trackId, isFull, projectType, technolo
       credentials: "include",
     });
 
-    if (!response.ok) {
-      throw new Error(`Ошибка HTTP: ${response.status}`);
-    }
+    await assertSuccessfulResponse(response);
     console.log('response', response);
     const data = await response.json();
     console.log('data',data);
 
-    return data;
+    return normalizeCollectionResponse(data);
   } catch (error) {
     console.error("Ошибка при получении данных команд:", error);
     throw error;
@@ -45,6 +45,7 @@ export const fetchTeamById = async (teamId) => {
         credentials: 'include', 
       });
 
+      await assertSuccessfulResponse(response);
       return response.json();
     } catch (error) {
       console.error("Ошибка при получении данных команды:", error);
@@ -60,6 +61,7 @@ export const fetchFilterParamsByTrackId = async (trackId) => {
         credentials: 'include', 
       });
 
+      await assertSuccessfulResponse(response);
       return response.json();
     } catch (error) {
       console.error("Ошибка при получении данных:", error);
@@ -80,10 +82,8 @@ export const fetchFilterParamsByTrackId = async (trackId) => {
         body: JSON.stringify(teamData), 
         credentials: "include", 
       });
-  
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
-      }
+
+      await assertSuccessfulResponse(response);
   
       return response.json();
     } catch (error) {
@@ -122,7 +122,7 @@ export const deleteTeam = async (teamId) => {
      
       console.log("Отправляемые данные команды:", teamData);
   
-      const response = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
+    const response = await fetch(`${API_BASE_URL}/teams/${teamId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -130,9 +130,13 @@ export const deleteTeam = async (teamId) => {
         },
         body: JSON.stringify(teamData), 
         credentials: 'include', 
-      });
-  
-      if (!response.ok) {
+    });
+
+    if (response.status === 401) {
+      await assertSuccessfulResponse(response);
+    }
+
+    if (!response.ok) {
         const errorText = await response.text(); 
         throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
       }
@@ -143,6 +147,3 @@ export const deleteTeam = async (teamId) => {
       throw error;
     }
   };
-
-
-

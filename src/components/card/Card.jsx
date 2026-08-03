@@ -1,7 +1,6 @@
-import React from 'react';
 import "./style.css"
 import { useState } from "react";
-import { getCurrentStudentId } from '../../api/apiStudentsController';
+import { Link } from "react-router-dom";
 
 
 const Card = ({
@@ -9,7 +8,7 @@ const Card = ({
   type,
   resume,
   tags = [],
-  profileLink = "#",
+  profileLink,
   showActionsForStudent = true,
   onApply,
   applyText = "Подать заявку",
@@ -21,12 +20,11 @@ const Card = ({
   const [currentName, setCurrentName] = useState(name);
   const [currentType, setCurrentType] = useState(type);
   const [currentResume, setCurrentResume] = useState(resume);
-  const [currentTags, setCurrentTags] = useState(tags.map(tag => tag.name));
-  const [hasApplied, setHasApplied] = useState(false);
-
+  const [currentTags, setCurrentTags] = useState(
+    tags.map((tag) => typeof tag === 'string' ? tag : tag.name),
+  );
   const handleApply = () => {
     if (onApply) onApply();
-    setHasApplied(true);
   };
 
   const handleSave = () => {
@@ -34,8 +32,12 @@ const Card = ({
     setIsEditing(false);
   };
 
+  const showApplyAction = showActionsForStudent && showApplyButton && onApply;
+  const showViewAction = Boolean(profileLink);
+  const hasActions = showApplyAction || showViewAction || showEditingOptions;
+
   return (
-    <div className="card">
+    <div className={`card ${currentType ? 'card--with-type' : 'card--person'}`}>
       <div className="card-header">
         {isEditing ? (
           <input
@@ -45,7 +47,7 @@ const Card = ({
             className="card-name-input"
           />
         ) : (
-          <h3 className="card-name">{currentName}</h3>
+          <h3 className="card-name" title={currentName}>{currentName}</h3>
         )}
         {currentType && (
           <p className="card-type">
@@ -65,7 +67,7 @@ const Card = ({
       </div>
       <div className="card-body">
         {currentResume && (
-          <p className="card-resume">
+          <p className="card-resume" title={currentResume}>
             <span className="type-capture">Резюме: </span>
             {isEditing ? (
               <textarea
@@ -100,15 +102,18 @@ const Card = ({
           )}
         </div>
       </div>
-      <div className="card-actions">
-        {showActionsForStudent && showApplyButton && (
+      {hasActions && <div className="card-actions">
+        {showApplyAction && (
           <button className="action-button apply" onClick={handleApply}>
             {applyText}
           </button>
         )}
-        <a href={profileLink} className="action-link" rel="noopener noreferrer">
-          <button className="action-button view">{viewText}</button>
-        </a>
+        {showViewAction && <Link
+          to={profileLink}
+          className="action-button view action-link"
+        >
+          {viewText}
+        </Link>}
         {showEditingOptions && <button className="action-button edit" onClick={() => {
           if (isEditing) handleSave(); 
           setIsEditing(!isEditing); 
@@ -116,7 +121,7 @@ const Card = ({
           {isEditing ? "Сохранить" : "Редактировать"}
         </button>}
         
-      </div>
+      </div>}
     </div>
   );
 };

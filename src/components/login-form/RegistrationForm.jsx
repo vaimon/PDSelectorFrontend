@@ -1,6 +1,7 @@
 import { useState } from "react";
 import './style.css'
 import ConsoleMark from '../logo/ConsoleMark';
+import ThemeToggle from '../header/Header';
 
 const RegistrationForm = ({ onSubmit, onSkip }) => {
     const [formData, setFormData] = useState({
@@ -23,7 +24,8 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
       }));
     };
   
-    const handleSubmit = () => {
+    const handleSubmit = (event) => {
+      event.preventDefault();
       const newErrors = {
         course: !formData.course,
         groupNumber: !formData.groupNumber,
@@ -49,15 +51,18 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
     };
   
     return (
-      <div className="background">
-        <div className="login-container">
+      <main className="background">
+        <div className="auth-theme-toggle"><ThemeToggle /></div>
+        <div className="login-container registration-container">
           <div className="login-image">
             <ConsoleMark />
           </div>
-          <div className="login-content">
+          <div className="login-content registration-content">
+            <p className="login-operator">ЮФУ · ФИИТ</p>
             <h2 className="welcome-text">Создание аккаунта студента</h2>
+            <p className="login-purpose">Заполните данные, которые увидят команды и другие участники.</p>
   
-            <form className="registration-form">
+            <form className="registration-form" onSubmit={handleSubmit}>
               <label htmlFor="course">Курс</label>
               <input
                 type="number"
@@ -67,13 +72,15 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
                 onChange={handleChange}
                 placeholder="Введите курс"
                 className={errors.course ? "input-error" : ""}
+                min="1"
+                max="6"
                 required
               />
               {errors.course && <p className="error-text">Курс обязателен</p>}
   
               <label htmlFor="groupNumber">Номер группы</label>
               <input
-                type="number"
+                type="text"
                 id="groupNumber"
                 name="groupNumber"
                 value={formData.groupNumber}
@@ -106,9 +113,8 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
   
               <div className="form-buttons">
                 <button
-                  type="button"
+                  type="submit"
                   className="register-button"
-                  onClick={handleSubmit}
                 >
                   Завершить регистрацию
                 </button>
@@ -123,7 +129,7 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
             </form>
           </div>
         </div>
-      </div>
+      </main>
     );
   };
 

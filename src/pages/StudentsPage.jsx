@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/navbar/Navbar";
 import SearchBar from "../components/search-bar/SearchBar";
 import Card from "../components/card/Card";
@@ -6,15 +6,13 @@ import Filter from "../components/forms/Filter";
 import MainContent from "../components/main-section/MainSection";
 import { fetchStudents } from "../api/apiStudentsController";
 import { getSavedTrackId } from "../hooks/cookieUtils";
-import { fetchFilterParamsByTrackId } from "../api/apiTeamsController";
 import useStudentFilters from "../hooks/useStudentFilters";
 const StudentsPage = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
   const [filters, setFilters] = useState({});
-  const [filterParams, setFilterParams] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const filterParams = useStudentFilters();
 
   const handleApplyFilters = (newFilters) => {
     setFilters(newFilters);
@@ -33,7 +31,11 @@ const StudentsPage = () => {
         return;
       }
       try {
-        const data = await fetchStudents(trackId, { ...filters, input: searchInput }); 
+        const data = await fetchStudents({
+          trackId,
+          ...filters,
+          input: searchInput,
+        });
         setStudents(data);
         console.log("Загруженные студенты:", data);
       } catch (error) {
@@ -41,21 +43,8 @@ const StudentsPage = () => {
       }
     };
 
-    const loadFilters = async () => {
-      const trackId = getSavedTrackId();
-      console.log('trackId', trackId);
-      if (!trackId) return;
-      try {
-        const params = await useStudentFilters(trackId);
-        setFilterParams(params);
-        console.log("Полученные параметры фильтра:", params);
-      } catch (error) {
-        console.error("Ошибка при получении параметров фильтра:", error);
-      }
-    };
-
-    setLoading(true); 
-    Promise.all([loadStudents(), loadFilters()]).finally(() => {
+    setLoading(true);
+    loadStudents().finally(() => {
       setLoading(false);
     });
   }, [filters, searchInput]); 
@@ -63,15 +52,29 @@ const StudentsPage = () => {
   return (
     <>
       <Navbar />
-      <SearchBar onSearch={handleSearch} /> 
-      <div className="container">
-        <Filter filterParams={filterParams} onApplyFilters={handleApplyFilters} /> {/* Pass filter parameters */}
+      <SearchBar
+        onSearch={handleSearch}
+        placeholder="Поиск по ФИО или резюме"
+        label="Поиск участников"
+      />
+      <main className="container content-layout catalog-layout">
+        <Filter
+          filterParams={filterParams}
+          onApplyFilters={handleApplyFilters}
+          variant="students"
+        />
         <MainContent>
-          <h1>Участники</h1>
-          <div className="cards">
+          <div className="catalog-head">
+            <div>
+              <p className="catalog-kicker">Проектная деятельность</p>
+              <h1>Участники</h1>
+            </div>
+            {!loading && <span className="catalog-count">{students.length} результатов</span>}
+          </div>
+          <div className="cards" aria-busy={loading}>
             {loading ? (
-              <p>Загрузка...</p>
-            ) : (
+              <p className="loading-state">Загружаем участников…</p>
+            ) : students.length > 0 ? (
               students.map((student) => (
                 <Card
                   key={student.id}
@@ -83,10 +86,14 @@ const StudentsPage = () => {
                   profileLink={`/students/${student.id}`}
                 />
               ))
+            ) : (
+              <p className="empty-state">
+                Участники не найдены. Попробуйте изменить поиск или фильтры.
+              </p>
             )}
           </div>
         </MainContent>
-      </div>
+      </main>
     </>
   );
 };

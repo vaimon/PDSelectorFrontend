@@ -25,7 +25,7 @@ const useStudentData = (studentId, currentUser) => {
           setIsCurrentUser(true);
         }
   
-        setMyTeams(fetchedStudent.team || []);
+        setMyTeams(fetchedStudent.teams || []);
         setSubmittedRequests(fetchedStudent.applications || []);
         setCreatedTeams(fetchedStudent.current_team?[fetchedStudent.current_team]: []);
       } catch (error) {

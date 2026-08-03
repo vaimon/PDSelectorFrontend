@@ -4,7 +4,7 @@ import './style.css';
 
 const THEME_STORAGE_KEY = 'console-theme';
 
-const Header = () => {
+const ThemeToggle = () => {
   const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme || 'light',
   );
@@ -27,20 +27,20 @@ const Header = () => {
   };
 
   return (
-    <header className="console-header">
-      <button
-        type="button"
-        className="theme-toggle"
-        onClick={toggleTheme}
-        aria-label={toggleLabel}
-        aria-pressed={isDark}
-        title={toggleLabel}
-      >
-        {isDark ? <FaSun aria-hidden="true" /> : <FaMoon aria-hidden="true" />}
-        <span>{isDark ? 'Светлая тема' : 'Тёмная тема'}</span>
-      </button>
-    </header>
+    <button
+      type="button"
+      className="theme-toggle"
+      onClick={toggleTheme}
+      aria-label={toggleLabel}
+      aria-pressed={isDark}
+      title={toggleLabel}
+    >
+      {isDark ? <FaSun aria-hidden="true" /> : <FaMoon aria-hidden="true" />}
+      <span className="theme-toggle-label">
+        {isDark ? 'Светлая тема' : 'Тёмная тема'}
+      </span>
+    </button>
   );
 };
 
-export default Header;
+export default ThemeToggle;

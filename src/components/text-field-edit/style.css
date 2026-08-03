@@ -1,71 +1,89 @@
 .my-resume {
-    width: calc(100% - 40px);
-    max-width: 800px;
-    background-color: #f9f9f9;
-    border-radius: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    text-align: left;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid var(--purple-light);
-    transition: transform 0.3s, box-shadow 0.3s;
+  width: min(100%, 800px);
+  min-width: 0;
+  margin: 0 0 var(--pad);
+  padding: var(--pad);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
 }
 
 .my-resume-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--purple);
-    margin-bottom: 10px;
+  margin: 0 0 var(--gap);
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
 }
 
 .main-info {
-    font-size: 1rem;
-    color: #555;
-    margin-bottom: 10px;
+  margin: 0 0 var(--gap);
+  color: var(--text-2);
+  font-size: var(--fs);
+  line-height: 1.55;
 }
 
-.button-input{
-    background-color: var(--purple-light);
-    color: var(--purple);
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    float: right;
+.button-input {
+  float: right;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-size: var(--fs);
 }
 
-.info{
-    width: calc(100% - 40px);
-    max-width: 800px;
-    height: 100px;
-    resize: none;
-    border-radius: 20px;
-    text-align: left;
-    padding: 20px;
-    margin-bottom: 20px;
-    margin-top: 10px;
+.info,
+.tags-input {
+  width: min(100%, 800px);
+  margin: var(--gap) 0 var(--pad);
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
 }
 
-.tags-input{
-    width: calc(100% - 40px);
-    max-width: 800px;
-    border-radius: 20px;
-    text-align: left;
-    padding: 20px;
-    margin-bottom: 20px;
-    margin-top: 10px;
+.tags-input {
+  min-height: var(--ctrl-h);
+  padding-block: 0;
+}
+
+.info:focus-visible,
+.tags-input:focus-visible,
+.button-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.info {
+  min-height: 100px;
+  resize: vertical;
 }
 
 .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap) - var(--r-sm));
 }
 
 .card-tag {
-    background-color: var(--purple-light);
-    color: var(--purple);
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8rem;
+  padding: var(--r-sm) calc(var(--gap) - 2px);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+}
+
+@media (max-width: 480px) {
+  .button-input {
+    float: none;
+    width: 100%;
+  }
 }

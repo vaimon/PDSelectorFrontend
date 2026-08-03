@@ -1,4 +1,5 @@
 .background {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,6 +8,23 @@
   padding: calc(var(--pad) * 2) var(--pad);
   background: var(--bg);
   color: var(--text);
+}
+
+.auth-theme-toggle {
+  position: absolute;
+  top: var(--gap);
+  right: max(var(--pad), calc((100vw - 1200px) / 2 + var(--pad)));
+}
+
+@media (max-width: 720px) {
+  .auth-theme-toggle .theme-toggle {
+    width: auto;
+    padding-inline: var(--gap);
+  }
+
+  .auth-theme-toggle .theme-toggle-label {
+    display: inline;
+  }
 }
 
 .login-container {
@@ -93,7 +111,7 @@
   border: 1px solid var(--accent);
   border-radius: var(--r);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   font: inherit;
   font-size: var(--fs);
   font-weight: 600;
@@ -159,6 +177,15 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.registration-container {
+  min-height: 0;
+}
+
+.registration-content {
+  justify-content: flex-start;
+  gap: var(--gap);
 }
 
 .registration-form label {
@@ -231,7 +258,7 @@
 .registration-form .register-button {
   border-color: var(--accent);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .registration-form .register-button:hover {
@@ -254,7 +281,7 @@
 @media (max-width: 640px) {
   .background {
     align-items: flex-start;
-    padding: var(--pad);
+    padding: calc(var(--ctrl-h) + var(--pad) + var(--gap)) var(--pad) var(--pad);
   }
 
   .login-container {
@@ -274,5 +301,24 @@
 
   .login-content {
     padding: calc(var(--pad) + 8px);
+  }
+
+  .registration-container {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .background {
+    padding: calc(var(--ctrl-h) + (var(--gap) * 2)) var(--gap) var(--gap);
+  }
+
+  .login-content {
+    padding: var(--pad);
+  }
+
+  .login-button,
+  .registration-form button {
+    width: 100%;
   }
 }

@@ -70,8 +70,6 @@ const TeamEditForm = ({
     setFormData({ ...formData, technologies: updatedTechnologies });
   };
 
-  const currentProjectType = projectTypes.find(type => type.id === formData.project_type);
-
   return (
     <div className="profile-container">
       <div className="profile-edit-form">
@@ -89,8 +87,7 @@ const TeamEditForm = ({
 
         <label>
           Описание проекта:
-          <input
-            type="text"
+          <textarea
             name="project_description"
             value={formData.project_description || ""}
             onChange={handleChange}
@@ -108,7 +105,7 @@ const TeamEditForm = ({
                     id={`projectType-${type.id}`}
                     name="project_type" 
                     value={type.id} 
-                    checked={formData.project_type.id.toString() === type.id.toString()} 
+                    checked={formData.project_type?.id?.toString() === type.id.toString()}
                     onChange={handleProjectTypeChange}
                   />
                   <label htmlFor={`projectType-${type.id}`}>{type.name}</label>
@@ -126,12 +123,14 @@ const TeamEditForm = ({
               formData.technologies.map((tech) => (
                 <span key={tech.id} className="card-tag">
                   {tech.name}
-                  <span
+                  <button
+                    type="button"
                     className="remove-icon"
                     onClick={() => handleRemoveTechnology(tech.id)}
+                    aria-label={`Удалить технологию ${tech.name}`}
                   >
-                    🗑
-                  </span>
+                    ×
+                  </button>
                 </span>
               ))
             ) : (
@@ -141,13 +140,13 @@ const TeamEditForm = ({
         </label>
 
         <div className="form-buttons">
-          <button onClick={() => toggleModal("add")}>
+          <button type="button" onClick={() => toggleModal("add")}>
             Добавить технологию
           </button>
-          <button className="save-button" onClick={handleSave}>
+          <button type="button" className="save-button" onClick={handleSave}>
             Сохранить
           </button>
-          <button className="cancel-button" onClick={onCancel}>
+          <button type="button" className="cancel-button" onClick={onCancel}>
             Отменить
           </button>
         </div>

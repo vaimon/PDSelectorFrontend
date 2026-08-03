@@ -47,40 +47,40 @@ const ApplicationCard = ({
     const getStatusDetails = (status) => {
       switch (status) {
         case "Sent":
-          return { text: "Отправлена", color: "#FFD700" }; 
+          return { text: "Отправлена", tone: "warn" };
         case "Accepted":
-          return { text: "Принята", color: "#32CD32" };
+          return { text: "Принята", tone: "ok" };
         case "Rejected":
-          return { text: "Отклонена", color: "#FF4500" };
+          return { text: "Отклонена", tone: "bad" };
         case "Cancelled":
-          return { text: "Отменена", color: "#FF4500" }; 
+          return { text: "Отменена", tone: "bad" };
         default:
-          return { text: "Неизвестный", color: "#999" }; 
+          return { text: "Неизвестный", tone: "neutral" };
       }
     };
   
-    const { text: statusText, color: statusColor } = getStatusDetails(applicationStatus);
+    const { text: statusText, tone: statusTone } = getStatusDetails(applicationStatus);
   
     return (
-      <div className="card">
+      <div className="card card--application">
         <div className="card-header">
-          <h3 className="card-type"><h3 className="type-capture">Студент: </h3> {studentName}</h3>
+          <h3 className="card-name" title={studentName}>{studentName}</h3>
           {teamName && (
             <p className="card-type">
-              <strong><h3 className="type-capture">Команда:</h3> </strong>
+              <span className="type-capture">Команда:</span>
               {teamName}
             </p>
           )}
         </div>
         <div className="card-body">
           {teamDescription && (
-            <p className="card-resume">
-              <h3 className="type-capture">Описание команды: </h3>
+            <p className="card-resume" title={teamDescription}>
+              <span className="type-capture">Описание команды:</span>
               {teamDescription}
             </p>
           )}
           <div className="card-tags">
-            <h3 className="text-capture">Технологии: </h3>
+            <span className="text-capture">Технологии:</span>
             {technologies.length > 0 ? (
               technologies.map((tech, index) => (
                 <span key={index} className="card-tag">
@@ -91,7 +91,7 @@ const ApplicationCard = ({
               <p className="no-tags">-</p>
             )}
           </div>
-          <p className="card-tag" style={{ backgroundColor: statusColor }}>
+          <p className={`status-badge status-${statusTone}`}>
             <strong>Статус: </strong>
             {statusText}
           </p>
@@ -124,11 +124,19 @@ const ApplicationCard = ({
                 </>
             )
           }
-          <a href={`/teams/${teamId}`} className="action-link" rel="noopener noreferrer">
-            <button className="action-button view">Перейти к команде</button>
+          <a
+            href={`/teams/${teamId}`}
+            className="action-button view action-link"
+            rel="noopener noreferrer"
+          >
+            Перейти к команде
           </a>
-          <a href={`/students/${studentId}`} className="action-link" rel="noopener noreferrer">
-            <button className="action-button view">Перейти к студенту</button>
+          <a
+            href={`/students/${studentId}`}
+            className="action-button view action-link"
+            rel="noopener noreferrer"
+          >
+            Перейти к студенту
           </a>
         </div>
       </div>
@@ -136,4 +144,3 @@ const ApplicationCard = ({
   };
   
   export default ApplicationCard;
-  

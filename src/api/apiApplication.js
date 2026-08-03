@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from '../config/apiConfig';
+import { assertSuccessfulResponse } from './authRedirect';
 
 // Получение всех заявок
 export const fetchApplications = async (trackId) => {
@@ -24,11 +25,8 @@ export const fetchApplicationById = async (applicationId) => {
       },
       credentials: 'include',
     });
-    
-    if (!response.ok) {
-      throw new Error(`Ошибка сервера: ${response.statusText}`);
-    }
-    
+
+    await assertSuccessfulResponse(response);
     return await response.json(); 
   } catch (error) {
     console.error("Ошибка при получении заявки:", error);
@@ -59,11 +57,8 @@ export const createApplication = async (applicationData) => {
       body: JSON.stringify(applicationData), 
       credentials: 'include',
     });
-    
-    if (!response.ok) {
-      throw new Error(`Ошибка сервера: ${response.statusText}`);
-    }
-    
+
+    await assertSuccessfulResponse(response);
     return await response.json(); 
   } catch (error) {
     console.error("Ошибка при создании заявки:", error);
@@ -97,11 +92,8 @@ export const updateApplication = async (applicationData) => {
       body: JSON.stringify(applicationData), 
       credentials: 'include',
     });
-    
-    if (!response.ok) {
-      throw new Error(`Ошибка сервера: ${response.statusText}`);
-    }
-    
+
+    await assertSuccessfulResponse(response);
     return await response.json(); 
   } catch (error) {
     console.error("Ошибка при обновлении заявки:", error);

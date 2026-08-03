@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import "./style.css";
 /*
 const Resume = () => {
@@ -69,7 +69,7 @@ const TextFieldEdit = () => {
                 </div>
                 </>
             )}
-            <button className="button-input" onClick={toggleEdit}>
+            <button type="button" className="button-input" onClick={toggleEdit}>
                 {isEditing ? 'Сохранить' : 'Редактировать'}
             </button>
         </div>

@@ -1,15 +1,3 @@
-.console-header {
-  width: 100%;
-  min-height: var(--topbar-h);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 var(--pad);
-  background: var(--surface);
-  color: var(--text);
-  border-bottom: 1px solid var(--border);
-}
-
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -36,4 +24,18 @@
 .theme-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .theme-toggle {
+    width: var(--ctrl-h);
+    height: var(--ctrl-h);
+    padding: 0;
+    justify-content: center;
+    font-size: calc(var(--fs) - 1px);
+  }
+
+  .theme-toggle-label {
+    display: none;
+  }
 }
