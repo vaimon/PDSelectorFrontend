@@ -2,133 +2,277 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
-  background: url('/images/back-reg.jpg') no-repeat center center;
-  background-size: cover;
-  box-sizing: border-box;
+  min-height: calc(100vh - var(--topbar-h));
+  width: 100%;
+  padding: calc(var(--pad) * 2) var(--pad);
+  background: var(--bg);
+  color: var(--text);
 }
 
 .login-container {
-  display: flex;
-  max-width: 80vw;
-  width: 800px;
-  background-color: #fff;
-  border-radius: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  width: min(100%, 640px);
+  min-height: 380px;
   overflow: hidden;
-  min-height: 500px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
 }
 
 .login-image {
-  flex: 1.5;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: calc(var(--pad) * 2);
+  background: var(--accent-weak);
+  border-right: 1px solid var(--accent-border);
 }
 
 .login-image .console-mark {
-  width: 100%;
-  max-width: 250px;
-  height: auto;
   display: block;
+  width: 100%;
+  max-width: 190px;
+  height: auto;
 }
 
 .login-content {
-  flex: 2;
-  padding: 50px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  text-align: center;
+  align-items: stretch;
+  gap: calc(var(--gap) + 6px);
+  padding: calc(var(--pad) * 2);
+  text-align: left;
 }
 
+.login-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-operator {
+  margin: 0;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: var(--track-num);
+  text-transform: uppercase;
+}
 
 .welcome-text {
-  font-size: 2rem;
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 20px;
   font-weight: 600;
-  color: var(--purple);
-  margin-bottom: 30px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.login-purpose {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs);
+  line-height: 1.55;
+}
+
+.login-authentication {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .login-button {
-  width: 100%;
-  padding: 16px;
-  font-size: 1.2rem;
-  font-weight: 600;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--pad);
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--accent);
   color: #fff;
-  background-color: var(--purple);
-  border: none;
-  border-radius: 10px;
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .login-button:hover {
-  background-color: var(--purple-light);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: none;
+}
+
+.login-button:focus-visible,
+.login-trust-link:focus-visible,
+.registration-form button:focus-visible,
+.registration-form input:focus-visible,
+.registration-form textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.login-auth-note {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.login-auth-note strong {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.login-trust-link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: fit-content;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.login-trust-link span {
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.login-trust-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-border);
+  text-underline-offset: 3px;
+}
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.registration-form label {
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 600;
 }
 
 .registration-form input,
 .registration-form textarea {
   width: 100%;
-  padding: 12px;
-  margin: 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-  transition: border-color 0.3s ease;
-  
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+  transition: border-color 0.2s ease;
+}
+
+.registration-form input {
+  min-height: var(--ctrl-h);
+}
+
+.registration-form textarea {
+  min-height: calc(var(--ctrl-h) * 2);
+  padding-block: 9px;
+  resize: vertical;
+}
+
+.registration-form input::placeholder,
+.registration-form textarea::placeholder {
+  color: var(--text-3);
 }
 
 .registration-form input:focus,
 .registration-form textarea:focus {
-  border-color: var(--purple);
-  outline: none;
-  box-shadow: 0 0 8px rgba(106, 27, 154, 0.2);
+  border-color: var(--accent);
 }
 
-.registration-form textarea {
-  resize: none;
+.registration-form .input-error {
+  border-color: var(--bad);
 }
 
 .form-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .registration-form button {
-  padding: 12px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 30px;
+  justify-content: center;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--pad);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.register-button {
-  background-color: var(--purple);
+.registration-form .register-button {
+  border-color: var(--accent);
+  background: var(--accent);
   color: #fff;
 }
 
-.register-button:hover {
-  background-color: #4b007d;
+.registration-form .register-button:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  transform: none;
 }
 
-.login-jury-button {
-  background-color: #ff5722;
-  color: #fff;
-}
-
-.login-jury-button:hover {
-  background-color: #e64a19;
+.registration-form .login-jury-button:hover {
+  background: var(--surface-2);
+  transform: none;
 }
 
 .error-text {
-  color: red;
+  margin: 0;
+  color: var(--bad);
   font-size: 12px;
-  margin-top: -10px;
+}
+
+@media (max-width: 640px) {
+  .background {
+    align-items: flex-start;
+    padding: var(--pad);
+  }
+
+  .login-container {
+    grid-template-columns: 1fr;
+  }
+
+  .login-image {
+    min-height: 112px;
+    padding: var(--pad);
+    border-right: 0;
+    border-bottom: 1px solid var(--accent-border);
+  }
+
+  .login-image .console-mark {
+    max-width: 150px;
+  }
+
+  .login-content {
+    padding: calc(var(--pad) + 8px);
+  }
 }

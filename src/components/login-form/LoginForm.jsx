@@ -30,17 +30,47 @@ const LoginForm = () => {
   }, []);
 
   return (
-    <div className="background">
+    <main className="background">
       <div className="login-container">
         <div className="login-image">
           <ConsoleMark />
         </div>
         <div className="login-content">
-          <h2 className="welcome-text">Добро пожаловать на портал выбора команд ПД</h2>
-          <button className="login-button" onClick={handleLogin}>Войти</button>
+          <div className="login-identity">
+            <p className="login-operator">ЮФУ · ФИИТ</p>
+            <h1 className="welcome-text">Проектная деятельность</h1>
+            <p className="login-purpose">
+              Портал выбора команд проектной деятельности
+            </p>
+          </div>
+
+          <div className="login-authentication">
+            <button
+              type="button"
+              className="login-button"
+              onClick={handleLogin}
+              aria-describedby="login-auth-note"
+            >
+              Войти с аккаунтом ЮФУ
+            </button>
+            <p className="login-auth-note" id="login-auth-note">
+              Вы будете направлены на <strong>login.microsoftonline.com</strong>.
+              {' '}Пароль вводится на Microsoft, не здесь.
+            </p>
+          </div>
+
+          <a
+            className="login-trust-link"
+            href="https://mmcs.sfedu.ru/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Институт математики, механики и компьютерных наук ЮФУ
+            <span>mmcs.sfedu.ru</span>
+          </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 export default LoginForm;
