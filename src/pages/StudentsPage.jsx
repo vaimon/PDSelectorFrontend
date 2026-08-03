@@ -5,7 +5,6 @@ import Card from "../components/card/Card";
 import Filter from "../components/forms/Filter";
 import MainContent from "../components/main-section/MainSection";
 import { fetchStudents } from "../api/apiStudentsController";
-import Header from "../components/header/Header";
 import { getSavedTrackId } from "../hooks/cookieUtils";
 import { fetchFilterParamsByTrackId } from "../api/apiTeamsController";
 import useStudentFilters from "../hooks/useStudentFilters";
@@ -63,7 +62,6 @@ const StudentsPage = () => {
 
   return (
     <>
-      <Header />
       <Navbar />
       <SearchBar onSearch={handleSearch} /> 
       <div className="container">

@@ -10,8 +10,8 @@
 }
 
 body {
-  background-color: #f5efed;
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
   display: flex;
   flex-direction: column;
   align-items: center;
