@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import './style.css'
+import ConsoleMark from '../logo/ConsoleMark';
 
 const RegistrationForm = ({ onSubmit, onSkip }) => {
     const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
       <div className="background">
         <div className="login-container">
           <div className="login-image">
-            <img src="/images/logo3.png" alt="Logo" />
+            <ConsoleMark />
           </div>
           <div className="login-content">
             <h2 className="welcome-text">Создание аккаунта студента</h2>
@@ -114,7 +115,7 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
                 <button
                   type="button"
                   className="login-jury-button"
-                  onClick={handleSkip} 
+                  onClick={handleSkip}
                 >
                   Продолжить без регистрации студента
                 </button>
@@ -125,6 +126,5 @@ const RegistrationForm = ({ onSubmit, onSkip }) => {
       </div>
     );
   };
-  
+
   export default RegistrationForm;
-  

@@ -28,10 +28,11 @@
   padding: 40px;
 }
 
-.login-image img {
+.login-image .console-mark {
   width: 100%;
   max-width: 250px;
-  border-radius: 15px;
+  height: auto;
+  display: block;
 }
 
 .login-content {
@@ -131,4 +132,3 @@
   font-size: 12px;
   margin-top: -10px;
 }
-

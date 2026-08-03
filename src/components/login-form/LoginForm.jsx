@@ -1,7 +1,7 @@
 
 import './style.css'
-import React from 'react';
 import { useEffect } from 'react';
+import ConsoleMark from '../logo/ConsoleMark';
 
 const LoginForm = () => {
   const handleLogin = () => {
@@ -33,7 +33,7 @@ const LoginForm = () => {
     <div className="background">
       <div className="login-container">
         <div className="login-image">
-          <img src="/images/logo3.png" alt="Login Illustration" />
+          <ConsoleMark />
         </div>
         <div className="login-content">
           <h2 className="welcome-text">Добро пожаловать на портал выбора команд ПД</h2>
@@ -46,4 +46,3 @@ const LoginForm = () => {
 export default LoginForm;
 
  
-

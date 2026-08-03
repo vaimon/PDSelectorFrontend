@@ -30,11 +30,11 @@
   padding: 0;
 }
 
-.navbar .logo img {
+.navbar .logo .console-mark {
   max-width: 120px;
   height: auto;
-  width: auto;
-  object-fit: contain;
+  width: 120px;
+  display: block;
 }
 
 .navbar .nav-links {

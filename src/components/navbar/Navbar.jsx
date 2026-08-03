@@ -1,10 +1,11 @@
-import React, {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import './style.css';
 import { NavLink } from 'react-router-dom';
 import { FaChevronDown } from 'react-icons/fa';
 import useTracks from '../../hooks/useTracks';
 import { saveTrackId } from '../../hooks/cookieUtils';
 import { getCurrentStudentId } from '../../api/apiStudentsController';
+import ConsoleMark from '../logo/ConsoleMark';
 const Navbar = () => {
   const { tracks, selectedTrack, setSelectedTrack } = useTracks();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -34,7 +35,7 @@ const Navbar = () => {
 
   return (
       <div className="navbar">
-          <div className="logo"><img src="/images/logo4.png" alt="Logo" /></div>
+          <div className="logo"><ConsoleMark /></div>
           <div className="nav-links">
               <NavLink
                   to="/teams"
