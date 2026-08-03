@@ -13,10 +13,10 @@
 .theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: calc(var(--gap) - var(--r-sm));
   height: var(--ctrl-h);
   margin: 0;
-  padding: 0 12px;
+  padding: 0 var(--gap);
   border: 1px solid var(--border-strong);
   border-radius: var(--r);
   background: var(--surface-2);
