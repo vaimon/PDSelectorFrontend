@@ -6,7 +6,8 @@ import StudentProfilePage from "./pages/StudentProfile";
 import AdminPage from './pages/AdminPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
-import AuthPage from './pages/AuthPage';
+import ApplicationsPage from './pages/ApplicationsPage';
+import { RequireAdmin, RequireParticipant } from './components/route-guards/RouteGuards';
 
 const routes = [
   // No page lives at "/" and there's no client-side auth guard; send the bare domain and any
@@ -26,31 +27,33 @@ const routes = [
   },
   {
     path: '/teams',
-    element: <TeamsPage />
+    element: <RequireParticipant><TeamsPage /></RequireParticipant>
   },
   {
+    // Deliberately unguarded: this is where an account without a questionnaire is sent, and the
+    // page itself explains that state and links to the form.
     path: '/profile',
     element: <StudentProfilePage />
   },
   {
+    path: '/applications',
+    element: <RequireParticipant><ApplicationsPage /></RequireParticipant>
+  },
+  {
     path: '/admin',
-    element: <AdminPage />
+    element: <RequireAdmin><AdminPage /></RequireAdmin>
   },
   {
     path: '/teams/:teamId',
-    element: <TeamProfilePage />
+    element: <RequireParticipant><TeamProfilePage /></RequireParticipant>
   },
   {
     path: '/students/:studentId',
-    element: <StudentProfilePage />
+    element: <RequireParticipant><StudentProfilePage /></RequireParticipant>
   },
   {
     path: '/students',
-    element: <StudentsPage />
-  },
-  {
-    path: '/auth',
-    element: <AuthPage />
+    element: <RequireParticipant><StudentsPage /></RequireParticipant>
   },
   {
     path: '*',

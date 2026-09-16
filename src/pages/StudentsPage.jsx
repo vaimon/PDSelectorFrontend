@@ -4,17 +4,21 @@ import SearchBar from "../components/search-bar/SearchBar";
 import Card from "../components/card/Card";
 import Filter from "../components/forms/Filter";
 import MainContent from "../components/main-section/MainSection";
-import { getSavedTrackId } from "../hooks/cookieUtils";
 import useStudentFilters from "../hooks/useStudentFilters";
 import useStudents from "../hooks/useStudents";
+import { useIdentity } from "../context/identityContext";
 import Pagination from "../components/pagination/Pagination";
 const StudentsPage = () => {
   const [filters, setFilters] = useState({});
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(0);
-  const trackId = getSavedTrackId();
-  const filterParams = useStudentFilters(trackId);
-  const { students, pagination, loading, error } = useStudents(filters, searchInput, trackId, page);
+  const { activeTrack, loading: identityLoading } = useIdentity();
+
+  // The catalogue always shows the current selection, so there is nothing to show between two.
+  const selectionRunning = activeTrack != null;
+  const catalogEnabled = !identityLoading && selectionRunning;
+  const filterParams = useStudentFilters(catalogEnabled);
+  const { students, pagination, loading, error } = useStudents(filters, searchInput, page, catalogEnabled);
 
   const handleApplyFilters = (newFilters) => {
     setPage(0);
@@ -48,8 +52,14 @@ const StudentsPage = () => {
             </div>
             {!loading && <span className="catalog-count">{pagination.totalElements} результатов</span>}
           </div>
-          <div className="cards" aria-busy={loading}>
-            {loading ? (
+          <div className="cards" aria-busy={loading || identityLoading}>
+            {identityLoading ? (
+              <p className="loading-state">Загружаем участников…</p>
+            ) : !selectionRunning ? (
+              <p className="empty-state">
+                Отбор сейчас не идёт. Участники появятся, когда начнётся новый набор.
+              </p>
+            ) : loading ? (
               <p className="loading-state">Загружаем участников…</p>
             ) : error ? (
               <p className="empty-state" role="alert">{error}</p>

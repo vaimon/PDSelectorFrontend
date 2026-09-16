@@ -5,20 +5,27 @@ import routes from './routes';
 import { Provider } from 'react-redux';
 import store from './store';
 import IdentityProvider from './context/IdentityProvider';
+import NotificationProvider from './context/NotificationProvider';
+import ApplicationsProvider from './context/ApplicationsProvider';
 function App() {
   return (
     <Provider store={store}>
-      <IdentityProvider>
-        <div className="App">
-          <Router>
-            <Routes>
-              {routes.map((route, index) => (
-                <Route key={index} path={route.path} element={route.element} />
-              ))}
-            </Routes>
-          </Router>
-        </div>
-      </IdentityProvider>
+      <NotificationProvider>
+        <IdentityProvider>
+          <div className="App">
+            <Router>
+              {/* Inside the router: the counter refreshes on every navigation. */}
+              <ApplicationsProvider>
+                <Routes>
+                  {routes.map((route, index) => (
+                    <Route key={index} path={route.path} element={route.element} />
+                  ))}
+                </Routes>
+              </ApplicationsProvider>
+            </Router>
+          </div>
+        </IdentityProvider>
+      </NotificationProvider>
     </Provider>
   );
 }

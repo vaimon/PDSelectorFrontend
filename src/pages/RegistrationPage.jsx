@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { API_BASE_URL } from "../config/apiConfig";
+import { createStudent } from "../api/apiStudentsController";
 import RegistrationForm from "../components/login-form/RegistrationForm";
 import { useIdentity } from "../context/identityContext";
 
@@ -19,18 +18,15 @@ const Registration = () => {
     try {
       // A student record belongs to the account that fills it in, hence the user id here — this is
       // the one place where it is the right identifier.
-      const studentData = { ...formData, user_id: user.id };
-      await axios.post(`${API_BASE_URL}/students`, studentData, {
-        withCredentials: true,
-      });
+      await createStudent({ ...formData, user_id: user.id });
 
       // The account has a student record now, so every screen has to see the new student id.
       await refresh();
       alert("Регистрация завершена!");
       navigate("/teams");
     } catch (error) {
+      // The shared client already showed what went wrong.
       console.error("Ошибка при регистрации студента:", error);
-      alert("Произошла ошибка. Попробуйте снова.");
     }
   };
 

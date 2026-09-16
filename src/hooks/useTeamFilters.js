@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { fetchFilterParamsByTrackId } from "../api/apiTeamsController";
+import { fetchTeamFilterParams } from "../api/apiTeamsController";
 
-const useTeamFilters = (trackId) => {
+const useTeamFilters = (enabled = true) => {
   const [filterParams, setFilterParams] = useState({ projectTypes: [], technologies: [] });
 
   useEffect(() => {
@@ -9,7 +9,7 @@ const useTeamFilters = (trackId) => {
 
     const loadFilters = async () => {
       try {
-        const params = await fetchFilterParamsByTrackId(trackId, controller.signal);
+        const params = await fetchTeamFilterParams(controller.signal);
         setFilterParams(params);
       } catch (error) {
         if (error.name === "AbortError") return;
@@ -17,9 +17,9 @@ const useTeamFilters = (trackId) => {
       }
     };
 
-    if (trackId) loadFilters();
+    if (enabled) loadFilters();
     return () => controller.abort();
-  }, [trackId]);
+  }, [enabled]);
 
   return filterParams;
 };

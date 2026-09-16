@@ -1,0 +1,44 @@
+.applications {
+  display: grid;
+  gap: calc(var(--pad) + var(--r-sm));
+}
+
+.applications-section h2 {
+  margin: 0 0 var(--gap);
+  font-size: var(--fs-lg);
+}
+
+.applications-list {
+  display: grid;
+  gap: var(--r-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.application-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.application-subject {
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.application-subject:hover {
+  color: var(--accent-text);
+}
+
+.application-status {
+  color: var(--text-3);
+  font-size: 12px;
+}

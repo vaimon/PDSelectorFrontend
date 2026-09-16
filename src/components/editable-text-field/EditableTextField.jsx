@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import "./style.css";
 import { FaPlus, FaTrash, FaEdit, FaSave } from "react-icons/fa";
-import { fetchFilterParamsByTrackId } from "../../api/apiTeamsController";
-import { getSavedTrackId } from "../../hooks/cookieUtils";
+import { fetchTeamFilterParams } from "../../api/apiTeamsController";
 import DropDownTechnologies from "../drop-down-technologies/DropDownTechnologies";
 
 
@@ -25,11 +24,8 @@ const EditableDescription = ({
       setTechnologies(initialTechnologies);
     }
     const loadFilters = async () => {
-      const trackId = getSavedTrackId();
-      console.log("trackId", trackId);
-      if (!trackId) return;
       try {
-        const params = await fetchFilterParamsByTrackId(trackId);
+        const params = await fetchTeamFilterParams();
         setAllTechnologies(params.technologies);
       } catch (error) {
         console.error("Ошибка при получении параметров фильтра:", error);

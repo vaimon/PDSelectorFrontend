@@ -38,9 +38,11 @@
   font-size: var(--fs);
 }
 
-.navbar .nav-links a {
+.navbar .nav-links a,
+.navbar .nav-menu-dropdown a {
   display: inline-flex;
   align-items: center;
+  gap: calc(var(--gap) - var(--r-sm));
   min-height: var(--ctrl-h);
   padding: 0 var(--gap);
   border-radius: var(--r);
@@ -50,29 +52,41 @@
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.navbar .nav-links a:hover {
+.navbar .nav-links a:hover,
+.navbar .nav-menu-dropdown a:hover {
   background: var(--surface-2);
   color: var(--text);
   transform: none;
 }
 
-.navbar .nav-links a.active-link {
+.navbar .nav-links a.active-link,
+.navbar .nav-menu-dropdown a.active-link {
   background: var(--accent-weak);
   color: var(--accent-text);
   font-weight: 600;
 }
 
 .navbar .nav-links a:focus-visible,
+.navbar .nav-menu-dropdown a:focus-visible,
 .navbar .select-icon:focus-visible,
-.navbar .dropdown li:focus-visible {
+.navbar .account-logout:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.navbar .track-selector {
-  position: relative;
-  min-width: 0;
-  cursor: pointer;
+.navbar .nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .navbar .navbar-actions {
@@ -81,6 +95,51 @@
   gap: calc(var(--gap) - var(--r-sm));
   min-width: 0;
   margin-left: auto;
+}
+
+.navbar .selection-state {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.navbar .selection-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar .selection-note {
+  color: var(--text-3);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.navbar .selection-open .selection-note {
+  color: var(--ok);
+}
+
+.navbar .selection-closed .selection-note,
+.navbar .selection-none {
+  color: var(--text-3);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.navbar .account-menu,
+.navbar .nav-menu {
+  position: relative;
+  min-width: 0;
+}
+
+/* The links are in the bar itself until it gets tight; below that they move into this menu. */
+.navbar .nav-menu {
+  display: none;
 }
 
 .navbar .select-icon {
@@ -101,6 +160,12 @@
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+.navbar .select-icon span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .navbar .select-icon:hover,
 .navbar .select-icon.open {
   border-color: var(--border-strong);
@@ -114,8 +179,13 @@
   transition: transform 0.2s ease;
 }
 
-.navbar .select-icon.open svg {
+/* The chevron flips; the menu button's bars are not a chevron and must stay put. */
+.navbar .account-menu .select-icon.open svg {
   transform: rotate(180deg);
+}
+
+.navbar .nav-menu-button svg {
+  font-size: 14px;
 }
 
 .navbar .dropdown {
@@ -133,175 +203,113 @@
   box-shadow: var(--shadow-pop);
 }
 
-.navbar .dropdown ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.navbar .nav-menu-dropdown {
+  display: grid;
+  gap: 2px;
+  min-width: 220px;
+  padding: var(--r-sm);
 }
 
-.navbar .dropdown li {
+.navbar .nav-menu-dropdown a {
+  justify-content: space-between;
+}
+
+.navbar .account-dropdown {
+  min-width: 240px;
+  padding: var(--r-sm);
+}
+
+.navbar .account-identity {
+  display: grid;
+  gap: 2px;
+  margin: 0;
   padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar .account-name {
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 600;
+}
+
+.navbar .account-email {
+  overflow: hidden;
+  color: var(--text-3);
+  font-size: 12px;
+  text-overflow: ellipsis;
+}
+
+.navbar .account-logout {
+  display: block;
+  width: 100%;
+  margin-top: var(--r-sm);
+  padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  border: none;
+  border-radius: var(--r);
+  background: none;
   color: var(--text-2);
   font-size: var(--fs);
-  line-height: 1.35;
-  white-space: nowrap;
+  text-align: left;
   cursor: pointer;
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.navbar .dropdown li:hover {
+.navbar .account-logout:hover {
   background: var(--surface-2);
   color: var(--text);
 }
 
-/* react-burger-menu shell states */
-.bm-burger-button {
-  position: fixed;
-  top: var(--pad);
-  right: var(--pad);
-  width: var(--ctrl-h);
-  height: calc(var(--ctrl-h) - var(--r-sm));
-}
-
-.bm-burger-bars,
-.bm-cross {
-  background: var(--text-2);
-}
-
-.bm-burger-bars-hover {
-  background: var(--accent);
-}
-
-.bm-cross-button {
-  width: calc(var(--pad) + var(--r-lg));
-  height: calc(var(--pad) + var(--r-lg));
-}
-
-.bm-menu {
-  padding: calc(var(--pad) * 2.5) var(--pad) 0;
-  border-left: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-size: var(--fs);
-}
-
-.bm-item-list {
-  padding: var(--gap);
-  color: var(--text-2);
-}
-
-.bm-item {
-  display: block;
-  padding: calc(var(--gap) - var(--r-sm));
-  border-radius: var(--r);
-  color: var(--text-2);
-  text-decoration: none;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.bm-item:hover {
-  background: var(--surface-2);
-  color: var(--text);
-}
-
-.bm-overlay {
-  background: var(--overlay);
-}
-
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .navbar {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: calc(var(--gap) - var(--r-sm)) var(--gap);
-    min-height: 0;
-    padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+    gap: var(--gap);
+    padding-inline: var(--gap);
   }
 
   .navbar .nav-links {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-row: 2;
-    grid-template-columns: repeat(3, minmax(96px, 1fr));
-    gap: var(--r-sm);
-    width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .navbar .nav-links::-webkit-scrollbar {
     display: none;
   }
 
-  .navbar .nav-links a {
-    justify-content: center;
-    min-width: max-content;
-    padding-inline: var(--gap);
+  /* Anchored to the bar, not to the button: a 220px panel hanging off a button this far right
+     would start outside the viewport on a phone. */
+  .navbar .nav-menu {
+    position: static;
+    display: block;
   }
 
-  .navbar .navbar-actions {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
-    max-width: 100%;
-    width: 100%;
-    margin-left: 0;
+  .navbar .nav-menu-dropdown {
+    right: var(--gap);
+    max-width: calc(100vw - var(--gap) * 2);
   }
 
-  .navbar .track-selector {
-    flex: 1;
-    min-width: 0;
-    max-width: min(100%, var(--side-w));
+  .navbar .nav-menu-button {
+    position: relative;
   }
 
-  .navbar .select-icon {
-    width: 100%;
+  .navbar .nav-menu-button .nav-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
   }
 
-  .navbar .logo {
-    grid-column: 1;
-    grid-row: 1;
-    justify-self: start;
-  }
-
-  .navbar .select-icon span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .navbar .dropdown {
-    width: max-content;
-    min-width: 100%;
-    max-width: calc(100vw - (var(--gap) * 2));
+  .navbar .selection-state {
+    max-width: 40vw;
   }
 }
 
-@media (max-width: 460px) {
-  .navbar .nav-links {
-    display: flex;
-    margin-inline: calc(var(--gap) * -1);
-    width: calc(100% + (var(--gap) * 2));
-    padding-inline: var(--gap);
+@media (max-width: 600px) {
+  .navbar .selection-state,
+  .navbar .theme-toggle-label {
+    display: none;
   }
 
-  .navbar .nav-links a {
-    flex: 1 0 auto;
-    min-width: 104px;
+  .navbar .account-menu .select-icon {
+    max-width: 40vw;
   }
 }
 
 @media (max-width: 400px) {
   .navbar .logo .console-mark {
     height: 22px;
-  }
-
-  .navbar .select-icon {
-    max-width: 210px;
-  }
-}
-
-@media (min-width: 769px) {
-  .bm-burger-button {
-    display: none;
   }
 }

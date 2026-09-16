@@ -1,6 +1,5 @@
 
 import './style.css'
-import { useEffect } from 'react';
 import ConsoleMark from '../logo/ConsoleMark';
 import ThemeToggle from '../header/Header';
 
@@ -11,24 +10,6 @@ const LoginForm = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL ?? '';
     window.location.href = `${backendUrl}/oauth2/authorization/azure`;
   };
-
-  const getCookieValue = (name) => {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
-  };
-
-  useEffect(() => {
-    const cookieNames = ['trackId', 'userId', 'JSESSIONID', 'SessionId'];
-    cookieNames.forEach((cookieName) => {
-      const cookieValue = getCookieValue(cookieName);
-      if (cookieValue) {
-        localStorage.setItem(cookieName, cookieValue);
-        console.log(`Кука ${cookieName} перемещена в localStorage: ${cookieValue}`);
-      } else {
-        console.warn(`Кука ${cookieName} не найдена.`);
-      }
-    });
-  }, []);
 
   return (
     <main className="background">
