@@ -3,7 +3,9 @@ import { fetchTeams } from "../api/apiTeamsController";
 
 const emptyPage = { page: 0, size: 12, totalElements: 0, totalPages: 0 };
 
-const useTeams = (filters, searchInput, trackId, page = 0) => {
+// `enabled` is false while identity is loading and between selections: the catalogue answers for
+// the current selection, and there is nothing to ask for when none is running.
+const useTeams = (filters, searchInput, page = 0, enabled = true) => {
   const [teams, setTeams] = useState([]);
   const [pagination, setPagination] = useState(emptyPage);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,6 @@ const useTeams = (filters, searchInput, trackId, page = 0) => {
         const data = await fetchTeams({
           ...filters,
           input: searchInput,
-          trackId,
           page,
           signal: controller.signal,
         });
@@ -41,7 +42,7 @@ const useTeams = (filters, searchInput, trackId, page = 0) => {
       }
     };
 
-    if (trackId) {
+    if (enabled) {
       loadTeams();
     } else {
       setTeams([]);
@@ -50,7 +51,7 @@ const useTeams = (filters, searchInput, trackId, page = 0) => {
     }
 
     return () => controller.abort();
-  }, [filters, searchInput, trackId, page]);
+  }, [filters, searchInput, page, enabled]);
 
   return { teams, pagination, loading, error };
 };

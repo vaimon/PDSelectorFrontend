@@ -3,8 +3,7 @@ import Modal from "../forms/modal/Modal";
 import "./style.css";
 import { FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import DropDownTechnologies from "../drop-down-technologies/DropDownTechnologies";
-import { fetchFilterParamsByTrackId } from "../../api/apiTeamsController";
-import { getSavedTrackId } from "../../hooks/cookieUtils";
+import { fetchTeamFilterParams } from "../../api/apiTeamsController";
 
 const EditableProfile = ({ studentData, canEdit, onSave }) => {
   const [fio, setFio] = useState("");
@@ -29,10 +28,8 @@ const EditableProfile = ({ studentData, canEdit, onSave }) => {
     }
 
     const loadFilters = async () => {
-      const trackId = getSavedTrackId();
-      if (!trackId) return;
       try {
-        const params = await fetchFilterParamsByTrackId(trackId);
+        const params = await fetchTeamFilterParams();
         setAllTechnologies(params.technologies);
       } catch (error) {
         console.error("Ошибка при получении параметров фильтра:", error);

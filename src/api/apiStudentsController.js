@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 import { API_BASE_URL } from '../config/apiConfig';
+import apiClient from './apiClient';
 import { assertSuccessfulResponse } from './authRedirect';
 import { normalizePageResponse } from './normalizeResponse';
+
+// Reads without track_id answer for the current selection (StudentService.resolveTrackId).
 export const fetchStudents = async ({
   input,
-  trackId,
   course,
   groupNumber,
   hasTeam,
@@ -20,7 +22,6 @@ export const fetchStudents = async ({
 
     const normalizedInput = input?.trim();
     if (normalizedInput) queryParams.append("input", normalizedInput);
-    if (trackId) queryParams.append("track_id", trackId);
     if (Array.isArray(course)) course.forEach((value) => queryParams.append("course", value));
     if (Array.isArray(groupNumber)) groupNumber.forEach((value) => queryParams.append("group_number", value));
     if (typeof hasTeam === "boolean") queryParams.append("has_team", String(hasTeam));
@@ -46,13 +47,12 @@ export const fetchStudents = async ({
   } catch (error) {
     if (error.name === "AbortError") throw error;
     console.error("Error fetching students:", error);
-    throw error; 
+    throw error;
   }
 };
 
-export const fetchStudentFilterParamsByTrackId = async (trackId, signal) => {
-  const queryParams = new URLSearchParams({ track_id: String(trackId) });
-  const response = await fetch(`${API_BASE_URL}/students/filters?${queryParams}`, {
+export const fetchStudentFilterParams = async (signal) => {
+  const response = await fetch(`${API_BASE_URL}/students/filters`, {
     method: 'GET',
     credentials: 'include',
     signal,
@@ -62,76 +62,31 @@ export const fetchStudentFilterParamsByTrackId = async (trackId, signal) => {
   return response.json();
 };
 
-export const createStudent = async (trackId, studentData) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/students?trackId=${trackId}`, studentData);
-      return response.data;
-    } catch (error) {
-      console.error('Ошибка при создании студента:', error);
-      throw error;
-    }
-  };
-
-
-export const deleteStudent = async (studentId) => {
-    try {
-      const response = await axios.delete(`${API_BASE_URL}/students/${studentId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Ошибка при удалении команды:", error);
-      throw error;
-    }
-  };
-
-
 export const fetchStudentById = async (studentId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
       method: 'GET',
-      credentials: 'include', 
+      credentials: 'include',
     });
 
     await assertSuccessfulResponse(response);
-    const data = await response.json(); 
-    console.log('data', data);
-    console.log(data);
-    return data;
+    return await response.json();
   } catch (error) {
     console.error("Ошибка при получении данных студента:", error);
     throw error;
   }
 };
 
-// Обновление заявки
+// Создание анкеты участника
+export const createStudent = async (studentData) => {
+  const response = await apiClient.post('/students', studentData);
+  return response.data;
+};
+
+// Обновление анкеты участника
 export const updateStudent = async (studentData, studentId) => {
-  try {
-   
-    console.log("Отправляемые данные студента:", studentData);
-
-    const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',  
-      },
-      body: JSON.stringify(studentData), 
-      credentials: 'include', 
-    });
-
-    if (response.status === 401) {
-      await assertSuccessfulResponse(response);
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text(); 
-      throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
-    }
-
-    return await response.json(); 
-  } catch (error) {
-    console.error("Ошибка при обновлении студента:", error);
-    throw error;
-  }
+  const response = await apiClient.put(`/students/${studentId}`, studentData);
+  return response.data;
 };
 
 
@@ -153,7 +108,3 @@ export const getCurrentStudentId = async () => {
   // An account without a student record gets an empty body, which axios reports as "".
   return response.data === "" || response.data == null ? null : response.data;
 };
-
-
-
-  

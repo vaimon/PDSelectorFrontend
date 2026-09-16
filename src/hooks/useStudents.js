@@ -3,7 +3,8 @@ import { fetchStudents } from "../api/apiStudentsController";
 
 const emptyPage = { page: 0, size: 12, totalElements: 0, totalPages: 0 };
 
-const useStudents = (filters, searchInput, trackId, page = 0) => {
+// `enabled` is false while identity is loading and between selections — see useTeams.
+const useStudents = (filters, searchInput, page = 0, enabled = true) => {
   const [students, setStudents] = useState([]);
   const [pagination, setPagination] = useState(emptyPage);
   const [loading, setLoading] = useState(true);
@@ -19,7 +20,6 @@ const useStudents = (filters, searchInput, trackId, page = 0) => {
         const data = await fetchStudents({
           ...filters,
           input: searchInput,
-          trackId,
           page,
           signal: controller.signal,
         });
@@ -41,7 +41,7 @@ const useStudents = (filters, searchInput, trackId, page = 0) => {
       }
     };
 
-    if (trackId) {
+    if (enabled) {
       loadStudents();
     } else {
       setStudents([]);
@@ -50,7 +50,7 @@ const useStudents = (filters, searchInput, trackId, page = 0) => {
     }
 
     return () => controller.abort();
-  }, [filters, searchInput, trackId, page]);
+  }, [filters, searchInput, page, enabled]);
 
   return { students, pagination, loading, error };
 };

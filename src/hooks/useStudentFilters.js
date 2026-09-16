@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { fetchStudentFilterParamsByTrackId } from "../api/apiStudentsController";
+import { fetchStudentFilterParams } from "../api/apiStudentsController";
 
-const useStudentFilters = (trackId) => {
+const useStudentFilters = (enabled = true) => {
   const [filterParams, setFilterParams] = useState({
     courses: [],
     groups: [],
@@ -15,7 +15,7 @@ const useStudentFilters = (trackId) => {
 
     const loadFilters = async () => {
       try {
-        const params = await fetchStudentFilterParamsByTrackId(trackId, controller.signal);
+        const params = await fetchStudentFilterParams(controller.signal);
         setFilterParams(params);
       } catch (error) {
         if (error.name === "AbortError") return;
@@ -23,9 +23,9 @@ const useStudentFilters = (trackId) => {
       }
     };
 
-    if (trackId) loadFilters();
+    if (enabled) loadFilters();
     return () => controller.abort();
-  }, [trackId]);
+  }, [enabled]);
 
   return filterParams;
 };
