@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { createTeam } from '../api/apiTeamsController';
+import { useIdentity } from '../context/identityContext';
 
 
-export const useNewTeam = (currentTrackId, studentId, technologies, projectTypes) => {
+// A team is always created by the signed-in student, in the selection that is currently open —
+// neither of those is the caller's to choose.
+export const useNewTeam = (technologies, projectTypes) => {
+  const { studentId, activeTrack } = useIdentity();
+  const currentTrackId = activeTrack?.id ?? null;
   const [newTeam, setNewTeam] = useState({
     name: "",
-    projectDescription: "", 
-    projectType: null, 
-    technologies: [], 
-    currentTrackId: currentTrackId || null,
-    captainId: studentId || null,
+    projectDescription: "",
+    projectType: null,
+    technologies: [],
   });
 
   const handleChange = (e) => {
@@ -36,7 +39,6 @@ export const useNewTeam = (currentTrackId, studentId, technologies, projectTypes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('nt', newTeam);
 
     if (!newTeam.name || !newTeam.projectDescription || !newTeam.projectType || !newTeam.technologies.length) {
       alert("Заполните все обязательные поля.");
@@ -59,11 +61,9 @@ export const useNewTeam = (currentTrackId, studentId, technologies, projectTypes
 
       setNewTeam({
         name: "",
-        projectDescription: "", 
+        projectDescription: "",
         projectType: null,
         technologies: [],
-        currentTrackId: currentTrackId || null,
-        captainId: studentId || null, 
       });
     } catch (error) {
       console.error("Ошибка при создании команды:", error);

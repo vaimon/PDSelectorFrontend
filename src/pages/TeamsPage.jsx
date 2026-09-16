@@ -7,7 +7,7 @@ import Card from "../components/card/Card";
 import { getSavedTrackId } from "../hooks/cookieUtils";
 import useTeamFilters from "../hooks/useTeamFilters";
 import useTeams from "../hooks/useTeams";
-import { getCurrentStudentId } from "../api/apiStudentsController";
+import { useIdentity } from "../context/identityContext";
 import { createApplication } from "../api/apiApplication";
 import useSuccessMessage from "../hooks/useSuccessMessage";
 import Pagination from "../components/pagination/Pagination";
@@ -20,6 +20,8 @@ const TeamsPage = () => {
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const [applicationsStatus, setApplicationsStatus] = useState({}); 
   const [page, setPage] = useState(0);
+
+  const { studentId, isParticipant } = useIdentity();
 
   const trackId = getSavedTrackId();
   const { teams, pagination, loading, error } = useTeams(filters, searchInput, trackId, page);
@@ -36,7 +38,6 @@ const TeamsPage = () => {
 
   const handleApplicationSubmit = async (teamId) => {
     try {
-      const studentId = await getCurrentStudentId();
       const applicationDto = { student_id: studentId, team_id: teamId, status: "Sent" };
       await createApplication(applicationDto);
       showSuccessMessage("Заявка в команду подана");
@@ -50,29 +51,18 @@ const TeamsPage = () => {
 
 
   useEffect(() => {
-    const fetchApplicationStatuses = async () => {
-      try {
-        const studentId = await getCurrentStudentId();
-        const statuses = {};
+    if (loading || studentId == null) return;
 
-  
-        teams.forEach((team) => {
-          const hasApplied = team.applications?.some(
-            (application) => application.student_id === studentId
-          );
-          statuses[team.id] = hasApplied || false;
-        });
+    const statuses = {};
+    teams.forEach((team) => {
+      const hasApplied = team.applications?.some(
+        (application) => application.student_id === studentId
+      );
+      statuses[team.id] = hasApplied || false;
+    });
 
-        setApplicationsStatus(statuses);
-      } catch (err) {
-        console.error("Ошибка загрузки статусов заявок:", err);
-      }
-    };
-
-    if (!loading && teams.length > 0) {
-      fetchApplicationStatuses();
-    }
-  }, [teams, loading]);
+    setApplicationsStatus(statuses);
+  }, [teams, loading, studentId]);
 
   return (
     <>
@@ -106,7 +96,7 @@ const TeamsPage = () => {
                   onCancel={() => console.log("Заявка отменена")}
                   tags={team.technologies}
                   profileLink={`/teams/${team.id}`}
-                  showApplyButton={!applicationsStatus[team.id]}
+                  showApplyButton={isParticipant && !applicationsStatus[team.id]}
                 />
               ))
             ) : (

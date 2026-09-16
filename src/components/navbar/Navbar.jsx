@@ -4,30 +4,13 @@ import { NavLink } from 'react-router-dom';
 import { FaChevronDown } from 'react-icons/fa';
 import useTracks from '../../hooks/useTracks';
 import { saveTrackId } from '../../hooks/cookieUtils';
-import { getCurrentStudentId } from '../../api/apiStudentsController';
+import { useIdentity } from '../../context/identityContext';
 import ConsoleMark from '../logo/ConsoleMark';
 import ThemeToggle from '../header/Header';
 const Navbar = () => {
   const { tracks, selectedTrack, setSelectedTrack } = useTracks();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentStudentId, setCurrentStudentId] = useState(null);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const userId = await getCurrentStudentId(); 
-        if (userId) {
-            setCurrentStudentId(userId); 
-        }
-      } catch (error) {
-        if (error.response?.status !== 401) {
-          console.error("Не удалось загрузить профиль пользователя:", error);
-        }
-      }
-    };
-    
-    fetchUserId(); 
-}, []); 
+  const { studentId: currentStudentId } = useIdentity();
 
   const dropdownRef = useRef(null);
 

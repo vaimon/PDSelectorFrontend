@@ -135,20 +135,14 @@ export const updateStudent = async (studentData, studentId) => {
 };
 
 
+// The signed-in account: id, fio, email, role and a summary of its student record — but not the
+// student id, that one only comes from getCurrentStudentId. A 401 is handled by the global axios
+// interceptor installed in main.jsx.
 export const fetchCurrentUser = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/users/me`, {
-      withCredentials: true, 
-    });
-    return response.data.id;
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      window.location.href = '/login';
-    } else {
-      console.error("Error fetching user ID:", error);
-      throw error;
-    }
-  }
+  const response = await axios.get(`${API_BASE_URL}/users/me`, {
+    withCredentials: true,
+  });
+  return response.data;
 };
 
 
@@ -156,7 +150,8 @@ export const getCurrentStudentId = async () => {
   const response = await axios.get(`${API_BASE_URL}/students/me`, {
     withCredentials: true,
   });
-  return response.data;
+  // An account without a student record gets an empty body, which axios reports as "".
+  return response.data === "" || response.data == null ? null : response.data;
 };
 
 

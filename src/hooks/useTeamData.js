@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { fetchTeamById } from "../api/apiTeamsController";
-import { fetchStudentById } from "../api/apiStudentsController";
-import TeamDto from "../dto/TeamDTO";
-import StudentDto from "../dto/StudentDTO";
-const useTeamData = (teamId, currentUser) => {
+import { useIdentity } from "../context/identityContext";
+const useTeamData = (teamId) => {
+  const { studentId: currentStudentId } = useIdentity();
   const [teamData, setTeamData] = useState({
     name: "",
     description: "",
@@ -14,19 +13,17 @@ const useTeamData = (teamId, currentUser) => {
     captainName: null,
     isCaptain: false,
   });
-  const [isCaptain, setIsCaptain] = useState(true);
+  const [isCaptain, setIsCaptain] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!currentUser) return;
-
     const loadTeamData = async () => {
       setLoading(true);
       try {
         const fetchedTeam = await fetchTeamById(teamId);
-        const isCurrentUserCaptain = fetchedTeam.captain.id === currentUser;
-        setIsCaptain(isCurrentUserCaptain);
+        // captain.id is a student id, so it is only ever comparable to the current student id.
+        setIsCaptain(currentStudentId != null && fetchedTeam.captain.id === currentStudentId);
         setTeamData(fetchedTeam);
       } catch (err) {
         setError("Ошибка при загрузке данных команды.");
@@ -37,11 +34,7 @@ const useTeamData = (teamId, currentUser) => {
     };
 
     loadTeamData();
-  }, [teamId, currentUser]);
-
-  useEffect(() => {
-    console.log('teamdata', teamData);
-  }, [teamData]); 
+  }, [teamId, currentStudentId]);
 
   return { teamData, isCaptain, loading, error };
 };
