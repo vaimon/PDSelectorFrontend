@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaFileAlt, FaLayerGroup, FaUser, FaUsers } from "react-icons/fa";
 import Sidebar from "../components/sidebar/Sidebar";
 import MainContent from "../components/main-section/MainSection";
 import Card from "../components/card/Card";
 import Navbar from "../components/navbar/Navbar";
 import useStudentData from "../hooks/useStudentData";
-import useCurrentUser from "../hooks/useCurrentUser";
+import { useIdentity } from "../context/identityContext";
 import ProfileCard from "../components/profile/ProfileCard";
 import ProfileEditForm from "../components/profile/ProfileEditForm";
 import ApplicationCard from "../components/card/ApplicationCard";
@@ -15,7 +15,6 @@ import { updateApplication } from "../api/apiApplication";
 import { fetchApplicationById } from "../api/apiApplication";
 import TeamForm from "../components/forms/TeamForm";
 import { useNewTeam } from "../hooks/useNewTeam";
-import Cookies from "js-cookie";
 import Modal from "../components/forms/modal/Modal";
 import { useModal } from "../hooks/useModal";
 import { useTechnologies } from "../hooks/useTechnologies";
@@ -34,8 +33,9 @@ const sidebarItems = [
 const StudentProfilePage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const currentUser = useCurrentUser();
-  const profileStudentId = studentId || currentUser;
+  const { studentId: currentStudentId, isParticipant, loading: identityLoading } = useIdentity();
+  // /profile shows the signed-in student; /students/:studentId shows someone else's profile.
+  const profileStudentId = studentId || currentStudentId;
   const { allTypes } = useProjectTypes();
   const {
     studentData,
@@ -46,12 +46,10 @@ const StudentProfilePage = () => {
     error,
     isCurrentUser,
     refreshStudentData,
-  } = useStudentData(profileStudentId, currentUser);
-   
+  } = useStudentData(profileStudentId);
 
   const { allTechnologies } = useTechnologies();
-  const currentTrackId = Cookies.get("trackId");
-  const { newTeam, handleChange, handleSubmit } = useNewTeam(currentTrackId, profileStudentId, allTechnologies, allTypes);
+  const { newTeam, handleChange, handleSubmit } = useNewTeam(allTechnologies, allTypes);
 
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const { showModal, toggleModal } = useModal();
@@ -164,13 +162,12 @@ const StudentProfilePage = () => {
               onSubmit={handleTeamCreate}
               onCancel={() => setIsCreatingTeam(false)}
               technologies={allTechnologies}
-              currentTrackId={currentTrackId}
               projectTypes={allTypes}
             />
           )}
         </Modal>
       )}
-      <button onClick={handleCreateTeamClick}>Создать команду</button>
+      {isParticipant && <button onClick={handleCreateTeamClick}>Создать команду</button>}
       {createdTeams.length > 0 ? (
         createdTeams.map((team) => (
           <Card key={team.id} name={team.name} type={team.project_type.name} resume={team.project_description} tags={team.technologies} profileLink={`/teams/${team.id}`} />
@@ -182,7 +179,16 @@ const StudentProfilePage = () => {
   );
 
   const renderMainContent = () => {
-    
+    if (identityLoading) return <p>Загрузка...</p>;
+    // Signed in, but no participant questionnaire: a normal state for an admin or a newcomer.
+    if (!profileStudentId) {
+      return (
+        <p className="empty-state">
+          Анкета участника не заполнена, поэтому личного кабинета пока нет.{" "}
+          <Link to="/registration">Заполнить анкету</Link>
+        </p>
+      );
+    }
     if (error) return <p>{error}</p>;
     if (loading) return <p>Загрузка...</p>;
     switch (currentContent) {

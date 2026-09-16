@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { fetchStudentById } from "../api/apiStudentsController";
+import { useIdentity } from "../context/identityContext";
 
 
-const useStudentData = (studentId, currentUser) => {
+const useStudentData = (studentId) => {
+    const { studentId: currentStudentId } = useIdentity();
     const [studentData, setStudentData] = useState(null);
     const [myTeams, setMyTeams] = useState([]);
     const [createdTeams, setCreatedTeams] = useState([]);
@@ -19,12 +21,8 @@ const useStudentData = (studentId, currentUser) => {
       try {
         const fetchedStudent = await fetchStudentById(studentId);
         setStudentData(fetchedStudent);
-        console.log('curr',currentUser);
-        console.log('st', fetchedStudent);
-        if (currentUser && currentUser === fetchedStudent.id) {
-          setIsCurrentUser(true);
-        }
-  
+        setIsCurrentUser(currentStudentId != null && currentStudentId === fetchedStudent.id);
+
         setMyTeams(fetchedStudent.teams || []);
         setSubmittedRequests(fetchedStudent.applications || []);
         setCreatedTeams(fetchedStudent.current_team?[fetchedStudent.current_team]: []);
@@ -47,7 +45,7 @@ const useStudentData = (studentId, currentUser) => {
         setLoading(true);
         setError(null);
       };
-    }, [studentId, currentUser]);
+    }, [studentId, currentStudentId]);
   
     const refreshStudentData = () => {
       loadStudentData(); 

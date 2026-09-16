@@ -4,18 +4,21 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import routes from './routes';
 import { Provider } from 'react-redux';
 import store from './store';
+import IdentityProvider from './context/IdentityProvider';
 function App() {
   return (
     <Provider store={store}>
-      <div className="App">
-        <Router>
-          <Routes>
-            {routes.map((route, index) => (
-              <Route key={index} path={route.path} element={route.element} />
-            ))}
-          </Routes>
-        </Router>
-      </div>
+      <IdentityProvider>
+        <div className="App">
+          <Router>
+            <Routes>
+              {routes.map((route, index) => (
+                <Route key={index} path={route.path} element={route.element} />
+              ))}
+            </Routes>
+          </Router>
+        </div>
+      </IdentityProvider>
     </Provider>
   );
 }

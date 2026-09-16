@@ -5,7 +5,6 @@ import Navbar from "../components/navbar/Navbar";
 import Sidebar from "../components/sidebar/Sidebar";
 import Card from "../components/card/Card";
 import MainContent from "../components/main-section/MainSection";
-import useCurrentUser from "../hooks/useCurrentUser";
 import useTeamData from "../hooks/useTeamData";
 import ApplicationCard from "../components/card/ApplicationCard";
 import { fetchApplicationById } from "../api/apiApplication";
@@ -27,14 +26,13 @@ const TeamProfilePage = () => {
   const [currentContent, setCurrentContent] = useState("Текущие участники");
   const [showEditForm, setShowEditForm] = useState(false);
   const { allTypes } = useProjectTypes();
-  const currentUser = useCurrentUser();
   const { successMessage, showSuccessMessage } = useSuccessMessage();
   const {
     teamData,
     isCaptain,
     loading,
     error,
-  } = useTeamData(teamId, currentUser, currentContent);
+  } = useTeamData(teamId);
 
   
   const { allTechnologies } = useTechnologies();
