@@ -1,40 +1,108 @@
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
 import { createStudent } from "../api/apiStudentsController";
+import { logout } from "../api/apiAuth";
 import RegistrationForm from "../components/login-form/RegistrationForm";
+import AuthShell from "../components/login-form/AuthShell";
+import useStudentData from "../hooks/useStudentData";
+import { useTechnologies } from "../hooks/useTechnologies";
 import { useIdentity } from "../context/identityContext";
+import { useNotifications } from "../context/notificationContext";
+import "../components/login-form/style.css";
+
+// Only the first course counts as a first-year place (TeamComposition.isFirstYear), the rest share
+// the second-year ones; the list just keeps an impossible course from being picked.
+const coursesFor = (trackType) => (trackType === "master" ? [1, 2] : [1, 2, 3, 4]);
+
+const Notice = ({ title, children }) => (
+  <AuthShell title={title}>
+    <div className="login-purpose">{children}</div>
+  </AuthShell>
+);
 
 const Registration = () => {
   const navigate = useNavigate();
-  const { user, refresh } = useIdentity();
+  const { user, studentId, isAdmin, activeTrack, loading, refresh } = useIdentity();
+  const { notify } = useNotifications();
+  const { allTechnologies } = useTechnologies();
+  // A returning student already has a record; its fields prefill the form.
+  const { studentData, loading: studentLoading } = useStudentData(studentId);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleFormSubmit = async (formData) => {
-    // The form can be submitted before the identity request comes back; a student record without
-    // its account is worse than asking to try again.
-    if (!user?.id) {
-      alert("Не удалось определить пользователя. Обновите страницу и попробуйте снова.");
-      return;
-    }
+  // A fresh object on every render would restart the form's prefill effect endlessly.
+  const initialValues = useMemo(() => (studentData ? {
+    course: studentData.course ?? "",
+    groupNumber: studentData.group_number ?? "",
+    contacts: studentData.contacts ?? "",
+    aboutSelf: studentData.about_self ?? "",
+    technologies: studentData.technologies ?? [],
+  } : null), [studentData]);
 
+  const handleLeave = async () => {
     try {
-      // A student record belongs to the account that fills it in, hence the user id here — this is
-      // the one place where it is the right identifier.
-      await createStudent({ ...formData, user_id: user.id });
-
-      // The account has a student record now, so every screen has to see the new student id.
-      await refresh();
-      alert("Регистрация завершена!");
-      navigate("/teams");
+      await logout();
+      window.location.assign("/login");
     } catch (error) {
-      // The shared client already showed what went wrong.
-      console.error("Ошибка при регистрации студента:", error);
+      console.error("Не удалось выйти:", error);
     }
   };
 
-  const handleSkip = () => {
-    navigate("/teams");
+  const handleSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      // The questionnaire belongs to the account filling it in, and the backend joins it to the
+      // active selection itself — a track id in the body is ignored.
+      await createStudent({ ...values, user_id: user.id });
+      // The account is a participant now, so the shell has to see it.
+      await refresh();
+      notify({ type: "success", text: "Анкета сохранена" });
+      navigate("/profile");
+    } catch (error) {
+      // The shared client already showed the backend's reason; the form keeps what was typed.
+      console.error("Не удалось сохранить анкету:", error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  return <RegistrationForm onSubmit={handleFormSubmit} onSkip={handleSkip} />;
+  // The returning student's record has to be here before the form is: otherwise it would land in
+  // the middle of typing and overwrite it.
+  if (loading || (studentId != null && studentLoading)) {
+    return <Notice title="Загрузка"><p>Проверяем данные учётной записи…</p></Notice>;
+  }
+
+  if (isAdmin) {
+    return (
+      <Notice title="Администратор не участвует в наборе">
+        <p>
+          Анкета участника нужна только студентам.{" "}
+          <Link to="/admin">Перейти в администрирование</Link>
+        </p>
+      </Notice>
+    );
+  }
+
+  if (!activeTrack) {
+    return (
+      <Notice title="Отбор не идёт">
+        <p>Сейчас нет активного набора. Анкету можно будет заполнить, когда начнётся следующий.</p>
+      </Notice>
+    );
+  }
+
+  return (
+    <RegistrationForm
+      user={user}
+      courses={coursesFor(activeTrack.type)}
+      technologies={allTechnologies}
+      initialValues={initialValues}
+      isReturning={studentId != null}
+      submitting={submitting}
+      onSubmit={handleSubmit}
+      onLeave={handleLeave}
+    />
+  );
 };
 
 export default Registration;
