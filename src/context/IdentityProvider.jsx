@@ -52,6 +52,9 @@ const IdentityProvider = ({ children }) => {
       ...state,
       role: user?.role ?? null,
       isAdmin: user?.role === 'ADMIN',
+      // The backend refuses every student mutation outside the window (SelectionWindowService),
+      // so the UI reads its state instead of deriving the rule from the dates a second time.
+      isSelectionOpen: activeTrack?.windowState === 'OPEN',
       // A student row survives from one selection to the next, so having one is not the same as
       // taking part in the current one — the questionnaire has to point at the active track.
       isParticipant:

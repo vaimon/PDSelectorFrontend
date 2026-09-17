@@ -2,13 +2,39 @@ import { Link } from 'react-router-dom';
 
 import Navbar from '../components/navbar/Navbar';
 import MainContent from '../components/main-section/MainSection';
+import ConfirmDialog from '../components/confirm-dialog/ConfirmDialog';
 import { useApplications } from '../context/applicationsContext';
-import { describeApplicationStatus } from '../utils/applicationStatus';
+import { useIdentity } from '../context/identityContext';
+import {
+  acceptApplication,
+  cancelApplication,
+  rejectApplication,
+} from '../api/apiApplication';
+import { describeApplicationStatus, isPendingApplication } from '../utils/applicationStatus';
+import { selectionClosedReason } from '../utils/selectionWindow';
+import { useConfirmAction } from '../hooks/useConfirmAction';
 import './ApplicationsPage.css';
 
+
 const ApplicationsPage = () => {
-  const { invites, requests, myRequests, loading } = useApplications();
+  const { invites, requests, myRequests, loading, refresh } = useApplications();
+  const { activeTrack, isSelectionOpen } = useIdentity();
+  const { ask, confirmProps } = useConfirmAction(refresh);
+
+  const closedReason = selectionClosedReason(activeTrack);
   const isEmpty = invites.length === 0 && requests.length === 0 && myRequests.length === 0;
+
+  const renderAction = (label, variant, request) => (
+    <button
+      type="button"
+      className={`application-action application-action--${variant}`}
+      onClick={() => ask(request)}
+      disabled={!isSelectionOpen}
+      title={closedReason ?? undefined}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <>
@@ -21,6 +47,10 @@ const ApplicationsPage = () => {
               <h1>Заявки</h1>
             </div>
           </div>
+
+          {closedReason && !loading && (
+            <p className="applications-window" role="status">{closedReason}</p>
+          )}
 
           {loading ? (
             <p className="loading-state">Загружаем заявки…</p>
@@ -59,7 +89,22 @@ const ApplicationsPage = () => {
                         >
                           {request.student?.fio ?? 'Участник'}
                         </Link>
-                        <span className="application-status">Ожидает вашего решения</span>
+                        <span className="application-actions">
+                          {renderAction('Принять', 'accept', {
+                            heading: 'Принять в команду?',
+                            description: `${request.student?.fio} войдёт в состав команды. Решение необратимо.`,
+                            confirmText: 'Принять',
+                            successText: 'Заявка принята',
+                            run: () => acceptApplication(request),
+                          })}
+                          {renderAction('Отклонить', 'reject', {
+                            heading: 'Отклонить заявку?',
+                            description: `${request.student?.fio} не войдёт в команду. Отправить заявку заново сможет только он сам.`,
+                            confirmText: 'Отклонить',
+                            successText: 'Заявка отклонена',
+                            run: () => rejectApplication(request),
+                          })}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -77,8 +122,17 @@ const ApplicationsPage = () => {
                           <Link to={`/teams/${request.team?.id}`} className="application-subject">
                             {request.team?.name ?? 'Команда'}
                           </Link>
-                          <span className={`application-status application-status--${status.tone}`}>
-                            {status.text}
+                          <span className="application-actions">
+                            <span className={`application-status application-status--${status.tone}`}>
+                              {status.text}
+                            </span>
+                            {isPendingApplication(request) && renderAction('Отменить', 'cancel', {
+                              heading: 'Отменить заявку?',
+                              description: `Заявка в «${request.team?.name}» будет отменена. Отправить её снова можно будет из каталога.`,
+                              confirmText: 'Отменить заявку',
+                              successText: 'Заявка отменена',
+                              run: () => cancelApplication(request),
+                            })}
                           </span>
                         </li>
                       );
@@ -90,6 +144,8 @@ const ApplicationsPage = () => {
           )}
         </MainContent>
       </main>
+
+      <ConfirmDialog {...confirmProps} />
     </>
   );
 };

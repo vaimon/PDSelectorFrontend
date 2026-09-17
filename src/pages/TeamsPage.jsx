@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Navbar from "../components/navbar/Navbar";
 import SearchBar from "../components/search-bar/SearchBar";
 import Filter from "../components/forms/Filter";
 import MainContent from "../components/main-section/MainSection";
 import Card from "../components/card/Card";
+import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import useTeamFilters from "../hooks/useTeamFilters";
 import useTeams from "../hooks/useTeams";
+import { useTeamRequests } from "../hooks/useTeamRequests";
 import { useIdentity } from "../context/identityContext";
-import { createApplication } from "../api/apiApplication";
-import useSuccessMessage from "../hooks/useSuccessMessage";
 import Pagination from "../components/pagination/Pagination";
 
 
@@ -16,11 +16,10 @@ import Pagination from "../components/pagination/Pagination";
 const TeamsPage = () => {
   const [filters, setFilters] = useState({});
   const [searchInput, setSearchInput] = useState("");
-  const { successMessage, showSuccessMessage } = useSuccessMessage();
-  const [applicationsStatus, setApplicationsStatus] = useState({}); 
   const [page, setPage] = useState(0);
 
-  const { studentId, isParticipant, activeTrack, loading: identityLoading } = useIdentity();
+  const { activeTrack, loading: identityLoading } = useIdentity();
+  const { applyActionFor, confirmProps } = useTeamRequests();
 
   // The catalogue always shows the current selection, so there is nothing to show between two.
   const selectionRunning = activeTrack != null;
@@ -37,33 +36,25 @@ const TeamsPage = () => {
     setSearchInput(input);
   };
 
-  const handleApplicationSubmit = async (teamId) => {
-    try {
-      const applicationDto = { student_id: studentId, team_id: teamId, status: "Sent" };
-      await createApplication(applicationDto);
-      showSuccessMessage("Заявка в команду подана");
+  const renderTeam = (team) => {
+    const applyAction = applyActionFor(team);
 
-
-      setApplicationsStatus((prev) => ({ ...prev, [teamId]: true }));
-    } catch (err) {
-      console.error("Ошибка отправки заявки:", err);
-    }
+    return (
+      <Card
+        key={team.id}
+        name={team.name}
+        type={team.project_type.name}
+        resume={team.project_description}
+        tags={team.technologies}
+        profileLink={`/teams/${team.id}`}
+        showApplyButton={Boolean(applyAction)}
+        applyText={applyAction?.label}
+        applyDisabled={applyAction?.disabled}
+        applyTitle={applyAction?.title}
+        onApply={applyAction?.onClick}
+      />
+    );
   };
-
-
-  useEffect(() => {
-    if (loading || studentId == null) return;
-
-    const statuses = {};
-    teams.forEach((team) => {
-      const hasApplied = team.applications?.some(
-        (application) => application.student_id === studentId
-      );
-      statuses[team.id] = hasApplied || false;
-    });
-
-    setApplicationsStatus(statuses);
-  }, [teams, loading, studentId]);
 
   return (
     <>
@@ -72,7 +63,6 @@ const TeamsPage = () => {
       <main className="container content-layout catalog-layout">
         <Filter filterParams={filterParams} onApplyFilters={handleApplyFilters} />
         <MainContent>
-          {successMessage && <div className="success-message">{successMessage}</div>}
           <div className="catalog-head">
             <div>
               <p className="catalog-kicker">Проектная деятельность</p>
@@ -92,20 +82,7 @@ const TeamsPage = () => {
             ) : error ? (
               <p className="empty-state" role="alert">{error}</p>
             ) : teams.length > 0 ? (
-              teams.map((team) => (
-                <Card
-                  key={team.id}
-                  name={team.name}
-                  type={team.project_type.name}
-                  resume={team.project_description}
-                  isCaptain={false}
-                  onApply={() => handleApplicationSubmit(team.id)}
-                  onCancel={() => console.log("Заявка отменена")}
-                  tags={team.technologies}
-                  profileLink={`/teams/${team.id}`}
-                  showApplyButton={isParticipant && !applicationsStatus[team.id]}
-                />
-              ))
+              teams.map(renderTeam)
             ) : (
               <p className="empty-state">
                 Команды не найдены. Попробуйте изменить поиск или фильтры.
@@ -119,6 +96,8 @@ const TeamsPage = () => {
           />
         </MainContent>
       </main>
+
+      <ConfirmDialog {...confirmProps} />
     </>
   );
 };

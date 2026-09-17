@@ -5,11 +5,11 @@ import { fetchStudentById } from '../api/apiStudentsController';
 import { fetchTeamById } from '../api/apiTeamsController';
 import { ApplicationsContext } from './applicationsContext';
 import { useIdentity } from './identityContext';
+import { isPendingApplication } from '../utils/applicationStatus';
 
 // Enums travel as SENT/INVITE while the database keeps them lower case, so nothing here compares
 // raw strings.
 const equalsIgnoreCase = (value, expected) => String(value).toLowerCase() === expected;
-const isPending = (application) => equalsIgnoreCase(application.status, 'sent');
 
 const EMPTY = { invites: [], requests: [], myRequests: [] };
 
@@ -42,7 +42,7 @@ const ApplicationsProvider = ({ children }) => {
       const student = await fetchStudentById(studentId);
       const myApplications = student.applications ?? [];
       const invites = myApplications.filter(
-        (application) => isPending(application) && equalsIgnoreCase(application.type, 'invite'),
+        (application) => isPendingApplication(application) && equalsIgnoreCase(application.type, 'invite'),
       );
       // Sent by the student, in any state: they are the answer to "what did I apply to".
       const myRequests = myApplications.filter(
@@ -53,7 +53,7 @@ const ApplicationsProvider = ({ children }) => {
       const teamId = student.is_captain ? student.current_team?.id : null;
       const team = teamId ? await fetchTeamById(teamId) : null;
       const requests = (team?.applications ?? []).filter(
-        (application) => isPending(application) && equalsIgnoreCase(application.type, 'request'),
+        (application) => isPendingApplication(application) && equalsIgnoreCase(application.type, 'request'),
       );
 
       if (loadId === latestLoad.current) {

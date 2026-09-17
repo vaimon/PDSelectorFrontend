@@ -222,6 +222,21 @@
   color: var(--bad);
 }
 
+.action-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.action-button:disabled:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.action-button.apply:disabled:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
 .action-button:focus-visible,
 .card input:focus-visible,
 .card textarea:focus-visible {
