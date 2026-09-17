@@ -58,3 +58,59 @@
 .application-status--neutral {
   color: var(--text-3);
 }
+
+.application-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--r-sm);
+}
+
+.application-action {
+  min-height: calc(var(--ctrl-h) - 6px);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.application-action:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.application-action--accept:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.application-action--accept:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: var(--on-accent);
+}
+
+.application-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.application-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.applications-window {
+  margin: 0 0 var(--gap);
+  padding: var(--gap);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: calc(var(--fs) - 1px);
+}

@@ -1,32 +1,24 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaInbox, FaUserCircle, FaUsers } from "react-icons/fa";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft, FaUserCircle } from "react-icons/fa";
 import Navbar from "../components/navbar/Navbar";
-import Sidebar from "../components/sidebar/Sidebar";
 import Card from "../components/card/Card";
 import MainContent from "../components/main-section/MainSection";
+import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import useTeamData from "../hooks/useTeamData";
-import ApplicationCard from "../components/card/ApplicationCard";
-import { fetchApplicationById } from "../api/apiApplication";
-import { updateApplication } from "../api/apiApplication";
-import useSuccessMessage from "../hooks/useSuccessMessage";
+import { useTeamRequests } from "../hooks/useTeamRequests";
+import { useApplications } from "../context/applicationsContext";
 import TeamEditForm from "../components/profile/TeamEditForm";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { useProjectTypes } from "../hooks/useProjectTypes";
 import { updateTeam } from "../api/apiTeamsController";
 import "./TeamProfilePage.css";
-const sidebarItems = [
-  { name: "Текущие участники", icon: <FaUsers aria-hidden="true" /> },
-  { name: "Заявки в команду", icon: <FaInbox aria-hidden="true" /> },
-];
 
 const TeamProfilePage = () => {
   const { teamId } = useParams();
   const navigate = useNavigate();
-  const [currentContent, setCurrentContent] = useState("Текущие участники");
   const [showEditForm, setShowEditForm] = useState(false);
   const { allTypes } = useProjectTypes();
-  const { successMessage, showSuccessMessage } = useSuccessMessage();
   const {
     teamData,
     isCaptain,
@@ -34,75 +26,17 @@ const TeamProfilePage = () => {
     error,
   } = useTeamData(teamId);
 
-  
   const { allTechnologies } = useTechnologies();
+  const { applyActionFor, confirmProps } = useTeamRequests();
+  const { requests } = useApplications();
+
+  const applyAction = applyActionFor(teamData?.id ? teamData : null);
+  // Requests to this team are answered in one place, «Заявки», where the navbar counter points.
+  const pendingForThisTeam = isCaptain ? requests.length : 0;
 
   const handleSave = async (updatedData) => {
     await updateTeam(updatedData, teamId);
     window.location.reload();
-  };
-  const handleApplicationStatusChange = async (applicationId, status) => {
-    try {
-      const applicationData = await fetchApplicationById(applicationId);
-      applicationData.status = status;
-      await updateApplication(applicationData);
-      showSuccessMessage(`Заявка успешно ${status.toLowerCase()}`);
-    } catch (err) {
-      console.error(`Ошибка изменения статуса заявки: ${status}`, err);
-    }
-  };
-
-  const renderMainContent = () => {
-    if (loading) return <p>Загрузка...</p>;
-    if (error) return <p>{error}</p>;
-
-    const data = currentContent === "Текущие участники" ? teamData.students : teamData.applications;
-
-    return (
-      <div className="cards">
-        {data.length > 0 ? (
-          data.map((item) =>
-            currentContent === "Заявки в команду" ? (
-              <ApplicationCard
-                key={item.id}
-                applicationId={item.id}
-                studentName={item.student?.fio || item.user?.fio}
-                teamName={teamData.name}
-                teamId={teamId}
-                studentId={item.student?.id || item.user?.id}
-                teamDescription={teamData.project_description || teamData.description}
-                technologies={item.technologies || []}
-                status={item.status || "Sent"}
-                showCaptainOptions={true}
-                onApprove={() =>
-                  handleApplicationStatusChange(item.id, "Accepted")
-                }
-                onReject={() =>
-                  handleApplicationStatusChange(item.id, "Rejected")
-                }
-                onCancel={() =>
-                  handleApplicationStatusChange(item.id, "Cancelled")
-                }
-                onSending={(id) => console.log("Re-sent:", id)}
-              />
-            ) : (
-              <Card
-                key={item.id}
-                name={item.student?.fio || item.user?.fio}
-                resume={item.about_self || "Нет описания"}
-                tags={item.technologies || []}
-              />
-            )
-          )
-        ) : (
-          <p className="empty-state">
-            {currentContent === "Заявки в команду"
-              ? "Нет доступных запросов."
-              : "Нет участников."}
-          </p>
-        )}
-      </div>
-    );
   };
 
   const captainName = teamData.captain?.fio
@@ -110,11 +44,35 @@ const TeamProfilePage = () => {
     || teamData.captainName
     || "Не указан";
 
+  const renderMembers = () => {
+    if (loading) return <p className="team-inline-state">Загрузка…</p>;
+    if (error) return <p className="team-inline-state team-inline-state--error">{error}</p>;
+
+    const members = teamData.students ?? [];
+    if (members.length === 0) {
+      return <p className="empty-state">Нет участников.</p>;
+    }
+
+    return (
+      <div className="cards">
+        {members.map((member) => (
+          <Card
+            key={member.id}
+            name={member.user?.fio || member.fio}
+            resume={member.about_self || "Нет описания"}
+            tags={member.technologies || []}
+            profileLink={`/students/${member.id}`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
       <Navbar />
       <main className="team-profile-page">
-        <header className={`team-profile-toolbar${isCaptain ? "" : " team-profile-toolbar--single"}`}>
+        <header className="team-profile-toolbar team-profile-toolbar--single">
           <button type="button" className="team-back-button" onClick={() => navigate("/teams")}>
             <FaArrowLeft aria-hidden="true" />
             <span>Назад к командам</span>
@@ -125,24 +83,15 @@ const TeamProfilePage = () => {
           </div>
         </header>
 
-        <div className={`team-profile-layout${isCaptain ? "" : " team-profile-layout--single"}`}>
-          {isCaptain && (
-            <Sidebar
-              onItemClick={setCurrentContent}
-              items={sidebarItems}
-              activeItem={currentContent}
-            />
-          )}
+        <div className="team-profile-layout team-profile-layout--single">
           <MainContent>
-            {successMessage && <div className="success-message">{successMessage}</div>}
-
             <section className="team-overview" aria-labelledby="team-overview-title">
               <div className="team-section-head">
                 <div>
                   <p className="team-section-kicker">Карточка проекта</p>
                   <h2 id="team-overview-title">О команде</h2>
                 </div>
-                {isCaptain && (
+                {isCaptain ? (
                   <button
                     type="button"
                     className="team-edit-toggle"
@@ -150,6 +99,16 @@ const TeamProfilePage = () => {
                     onClick={() => setShowEditForm((prev) => !prev)}
                   >
                     {showEditForm ? "Закрыть" : "Редактировать"}
+                  </button>
+                ) : applyAction && (
+                  <button
+                    type="button"
+                    className="team-edit-toggle team-apply-button"
+                    onClick={applyAction.onClick}
+                    disabled={applyAction.disabled}
+                    title={applyAction.title}
+                  >
+                    {applyAction.label}
                   </button>
                 )}
               </div>
@@ -212,16 +171,24 @@ const TeamProfilePage = () => {
               <section className="team-members" aria-labelledby="team-members-title">
                 <div className="team-section-head">
                   <div>
-                    <p className="team-section-kicker">Состав и обращения</p>
-                    <h2 id="team-members-title">{currentContent}</h2>
+                    <p className="team-section-kicker">Состав</p>
+                    <h2 id="team-members-title">Текущие участники</h2>
                   </div>
+                  {isCaptain && (
+                    <Link to="/applications" className="team-edit-toggle">
+                      Заявки в команду
+                      {pendingForThisTeam > 0 && ` (${pendingForThisTeam})`}
+                    </Link>
+                  )}
                 </div>
-                {renderMainContent()}
+                {renderMembers()}
               </section>
             )}
           </MainContent>
         </div>
       </main>
+
+      <ConfirmDialog {...confirmProps} />
     </>
   );
 };

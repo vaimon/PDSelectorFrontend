@@ -115,6 +115,25 @@
   outline-offset: 2px;
 }
 
+.team-edit-toggle:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.team-edit-toggle:disabled:hover {
+  background: var(--surface);
+}
+
+.team-apply-button:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.team-apply-button:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 272px), 1fr));

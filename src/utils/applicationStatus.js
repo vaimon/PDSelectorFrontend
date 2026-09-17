@@ -10,3 +10,8 @@ const LABELS = {
 export const describeApplicationStatus = (status) => (
   LABELS[String(status).toLowerCase()] ?? { text: String(status), tone: 'neutral' }
 );
+
+// Waiting for an answer — the only state in which anything can be accepted, rejected or cancelled.
+export const isPendingApplication = (application) => (
+  String(application?.status).toLowerCase() === 'sent'
+);

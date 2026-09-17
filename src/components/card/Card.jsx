@@ -12,6 +12,8 @@ const Card = ({
   showActionsForStudent = true,
   onApply,
   applyText = "Подать заявку",
+  applyDisabled = false,
+  applyTitle,
   viewText = "Перейти",
   showApplyButton,
   showEditingOptions
@@ -104,7 +106,12 @@ const Card = ({
       </div>
       {hasActions && <div className="card-actions">
         {showApplyAction && (
-          <button className="action-button apply" onClick={handleApply}>
+          <button
+            className="action-button apply"
+            onClick={handleApply}
+            disabled={applyDisabled}
+            title={applyTitle}
+          >
             {applyText}
           </button>
         )}
