@@ -267,9 +267,115 @@
   transform: none;
 }
 
-.registration-form .login-jury-button:hover {
+.registration-form .register-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.registration-form select {
+  width: 100%;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+}
+
+.registration-form select:focus {
+  border-color: var(--accent);
+}
+
+.questionnaire-identity {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.questionnaire-link {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.registration-form .questionnaire-link {
+  min-height: var(--ctrl-h);
+  border: 0;
+  background: none;
+  color: var(--text-3);
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+.registration-form .questionnaire-link:hover {
+  color: var(--text);
+  background: none;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.questionnaire-technologies {
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.questionnaire-technologies legend {
+  padding: 0;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.technologies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 4px 12px;
+  margin-top: 8px;
+}
+
+.technology-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.technology-option input {
+  width: 16px;
+  min-height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.questionnaire-note {
+  margin: 4px 0 0;
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
   background: var(--surface-2);
-  transform: none;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .error-text {
@@ -282,6 +388,17 @@
   .background {
     align-items: flex-start;
     padding: calc(var(--ctrl-h) + var(--pad) + var(--gap)) var(--pad) var(--pad);
+  }
+
+  /* The questionnaire is filled in from a phone, straight from a chat link, so its controls get a
+     finger-sized target instead of the desktop control height. */
+  .registration-form input,
+  .registration-form select,
+  .registration-form textarea,
+  .registration-form button,
+  .registration-form .questionnaire-link,
+  .technology-option {
+    min-height: 44px;
   }
 
   .login-container {
