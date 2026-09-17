@@ -1,211 +1,30 @@
-import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaFileAlt, FaLayerGroup, FaUser, FaUsers } from "react-icons/fa";
-import Sidebar from "../components/sidebar/Sidebar";
-import MainContent from "../components/main-section/MainSection";
-import Card from "../components/card/Card";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
+
 import Navbar from "../components/navbar/Navbar";
-import useStudentData from "../hooks/useStudentData";
-import { useIdentity } from "../context/identityContext";
+import MainContent from "../components/main-section/MainSection";
 import ProfileCard from "../components/profile/ProfileCard";
-import ProfileEditForm from "../components/profile/ProfileEditForm";
-import ApplicationCard from "../components/card/ApplicationCard";
-import useSuccessMessage from "../hooks/useSuccessMessage";
-import { updateApplication } from "../api/apiApplication";
-import { fetchApplicationById } from "../api/apiApplication";
-import TeamForm from "../components/forms/TeamForm";
-import { useNewTeam } from "../hooks/useNewTeam";
-import Modal from "../components/forms/modal/Modal";
-import { useModal } from "../hooks/useModal";
-import { useTechnologies } from "../hooks/useTechnologies";
-import { updateStudent } from "../api/apiStudentsController";
-import { useProjectTypes } from "../hooks/useProjectTypes";
+import useStudentData from "../hooks/useStudentData";
 import "./StudentProfile.css";
-const sidebarItems = [
-  { name: "Мои команды", icon: <FaUsers aria-hidden="true" /> },
-  { name: "Мой профиль", icon: <FaUser aria-hidden="true" /> },
-  { name: "Мои заявки", icon: <FaFileAlt aria-hidden="true" /> },
-  { name: "Созданные команды", icon: <FaLayerGroup aria-hidden="true" /> },
-];
 
-
-
+// Someone else's profile, reached from the catalogue. The signed-in student's own cabinet is a
+// separate page (CabinetPage): it has sections, editing and a team, and none of that belongs here.
 const StudentProfilePage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
-  const { studentId: currentStudentId, isParticipant, loading: identityLoading } = useIdentity();
-  // /profile shows the signed-in student; /students/:studentId shows someone else's profile.
-  const profileStudentId = studentId || currentStudentId;
-  const { allTypes } = useProjectTypes();
-  const {
-    studentData,
-    myTeams,
-    createdTeams,
-    submittedRequests,
-    loading,
-    error,
-    isCurrentUser,
-    refreshStudentData,
-  } = useStudentData(profileStudentId);
+  const { studentData, loading, error } = useStudentData(studentId);
 
-  const { allTechnologies } = useTechnologies();
-  const { newTeam, handleChange, handleSubmit } = useNewTeam(allTechnologies, allTypes);
-
-  const { successMessage, showSuccessMessage } = useSuccessMessage();
-  const { showModal, toggleModal } = useModal();
-
-  const [currentContent, setCurrentContent] = useState("Мой профиль");
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [isCreatingTeam, setIsCreatingTeam] = useState(false);
-
-
-  const handleProfileSave = async (updatedData) => {
-    try {
-      await updateStudent(updatedData, profileStudentId);
-      setIsEditingProfile(false);
-      refreshStudentData();
-    } catch (error) {
-      console.error("Ошибка при сохранении профиля:", error);
+  const renderContent = () => {
+    if (loading) {
+      return <p className="loading-state">Загрузка…</p>;
     }
-  };
-  
 
-  const handleProfileEdit = () => setIsEditingProfile(true);
-  const handleProfileCancel = () => setIsEditingProfile(false);
-
-
-  const handleApplicationStatusChange = async (applicationId, status) => {
-    try {
-      const applicationData = await fetchApplicationById(applicationId);
-      applicationData.status = status;
-      await updateApplication(applicationData);
-      showSuccessMessage(`Заявка успешно ${status.toLowerCase()}`);
-      refreshStudentData();
-    } catch (err) {
-      console.error(`Ошибка изменения статуса заявки: ${status}`, err);
+    if (error) {
+      return <p className="empty-state" role="alert">{error}</p>;
     }
+
+    return <ProfileCard studentData={studentData} isCurrentUser={false} />;
   };
-
-
-  const handleTeamCreate = async (e) => {
-    e.preventDefault();
-
-    try {
-      await handleSubmit(e);
-      setIsCreatingTeam(false);
-      showSuccessMessage("Команда успешно создана");
-      toggleModal(); 
-      refreshStudentData();
-    } catch (err) {
-      console.error("Ошибка создания команды", err);
-      alert("Не удалось создать команду");
-    }
-  };
-
-  const handleCreateTeamClick = () => {
-    setIsCreatingTeam(true);
-    toggleModal(); 
-  };
-
-  const renderProfileContent = () => {
-    if (isCurrentUser&&isEditingProfile) {
-      return <ProfileEditForm studentData={studentData} onSave={handleProfileSave} onCancel={handleProfileCancel} allTechnologies={allTechnologies}/>;
-    }
-    return <ProfileCard studentData={studentData} onEdit={handleProfileEdit} isCurrentUser={isCurrentUser}/>;
-  };
-
-  const renderMyTeams = () => (
-    <div className="cards">
-      {myTeams.length > 0 ? (
-        myTeams.map((team) => (
-          <Card key={team.id} name={team.name} type={team.project_type.name} resume={team.project_description} tags={team.technologies} profileLink={`/teams/${team.id}`} />
-        ))
-      ) : (
-        <p>У вас нет команд</p>
-      )}
-    </div>
-  );
-
-  const renderApplications = () => (
-    <div className="cards">
-      {submittedRequests.length > 0 ? (
-        submittedRequests.map((request) => (
-          <ApplicationCard
-            key={request.id}
-            applicationId={request.id}
-            studentName={request.student.fio}
-            teamName={request.team.name}
-            teamDescription={request.team.project_description}
-            technologies={request.team.technologies}
-            status={request.status}
-            studentId={request.student.id}
-            teamId={request.team.id}
-            onReject={() => handleApplicationStatusChange(request.id, "Rejected")}
-            onCancel={() => handleApplicationStatusChange(request.id, "Cancelled")}
-            onSending={() => handleApplicationStatusChange(request.id, "Sent")}
-          />
-        ))
-      ) : (
-        <p>Нет поданных заявок</p>
-      )}
-    </div>
-  );
-
-  const renderCreatedTeams = () => (
-    <div className="cards">
-      {showModal && (
-        <Modal show={showModal} onClose={toggleModal}>
-          {isCreatingTeam && (
-            <TeamForm
-              newTeam={newTeam}
-              onChange={handleChange}
-              onSubmit={handleTeamCreate}
-              onCancel={() => setIsCreatingTeam(false)}
-              technologies={allTechnologies}
-              projectTypes={allTypes}
-            />
-          )}
-        </Modal>
-      )}
-      {isParticipant && <button onClick={handleCreateTeamClick}>Создать команду</button>}
-      {createdTeams.length > 0 ? (
-        createdTeams.map((team) => (
-          <Card key={team.id} name={team.name} type={team.project_type.name} resume={team.project_description} tags={team.technologies} profileLink={`/teams/${team.id}`} />
-        ))
-      ) : (
-        <p>Вы не создали команд.</p>
-      )}
-    </div>
-  );
-
-  const renderMainContent = () => {
-    if (identityLoading) return <p>Загрузка...</p>;
-    // Signed in, but no participant questionnaire: a normal state for an admin or a newcomer.
-    if (!profileStudentId) {
-      return (
-        <p className="empty-state">
-          Анкета участника не заполнена, поэтому личного кабинета пока нет.{" "}
-          <Link to="/registration">Заполнить анкету</Link>
-        </p>
-      );
-    }
-    if (error) return <p>{error}</p>;
-    if (loading) return <p>Загрузка...</p>;
-    switch (currentContent) {
-      case "Мой профиль":
-        return renderProfileContent();
-      case "Мои команды":
-        return renderMyTeams();
-      case "Мои заявки":
-        return renderApplications();
-      case "Созданные команды":
-        return renderCreatedTeams();
-      default:
-        return null;
-    }
-  };
-
-  const sectionTitle = isCurrentUser ? currentContent : "Профиль";
 
   return (
     <>
@@ -222,28 +41,20 @@ const StudentProfilePage = () => {
           </button>
           <div className="student-profile-heading">
             <p>Участники</p>
-            <h1>{isCurrentUser ? "Личный кабинет" : "Профиль участника"}</h1>
+            <h1>Профиль участника</h1>
           </div>
         </header>
 
-        <div className={`student-profile-layout${isCurrentUser ? "" : " student-profile-layout--single"}`}>
-          {isCurrentUser && (
-            <Sidebar
-              onItemClick={setCurrentContent}
-              items={sidebarItems}
-              activeItem={currentContent}
-            />
-          )}
+        <div className="student-profile-layout">
           <MainContent>
             <section className="student-profile-section" aria-labelledby="student-section-title">
               <div className="student-profile-section-head">
-                <h2 id="student-section-title">{sectionTitle}</h2>
+                <h2 id="student-section-title">Профиль</h2>
                 {studentData?.user?.fio && (
                   <span className="student-profile-person">{studentData.user.fio}</span>
                 )}
               </div>
-              {successMessage && <div className="success-message">{successMessage}</div>}
-              {renderMainContent()}
+              {renderContent()}
             </section>
           </MainContent>
         </div>

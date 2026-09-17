@@ -11,13 +11,14 @@ import { useIdentity } from './identityContext';
 const equalsIgnoreCase = (value, expected) => String(value).toLowerCase() === expected;
 const isPending = (application) => equalsIgnoreCase(application.status, 'sent');
 
-const EMPTY = { invites: [], requests: [] };
+const EMPTY = { invites: [], requests: [], myRequests: [] };
 
 /**
- * What is waiting for an answer: invites addressed to me, and — if I lead a team — requests to join
- * it. There is no "my applications" endpoint (GET /applications is admin-only), so both lists come
- * from the records that carry them. The navbar counter and the applications page read the same
- * state instead of asking twice.
+ * Everything the student has to do with applications: invites addressed to them, requests to join
+ * their team when they lead one, and the requests they sent themselves. There is no "my
+ * applications" endpoint (GET /applications is admin-only), so all three come from the records that
+ * carry them. The navbar counter and the applications page read the same state instead of asking
+ * twice; only the first two wait for an answer, so only they are counted.
  */
 const ApplicationsProvider = ({ children }) => {
   const { studentId, isParticipant } = useIdentity();
@@ -39,8 +40,13 @@ const ApplicationsProvider = ({ children }) => {
     setState((prev) => ({ ...prev, loading: true }));
     try {
       const student = await fetchStudentById(studentId);
-      const invites = (student.applications ?? []).filter(
+      const myApplications = student.applications ?? [];
+      const invites = myApplications.filter(
         (application) => isPending(application) && equalsIgnoreCase(application.type, 'invite'),
+      );
+      // Sent by the student, in any state: they are the answer to "what did I apply to".
+      const myRequests = myApplications.filter(
+        (application) => equalsIgnoreCase(application.type, 'request'),
       );
 
       // Only a team lead decides on requests, and only on the ones sent to their own team.
@@ -51,7 +57,7 @@ const ApplicationsProvider = ({ children }) => {
       );
 
       if (loadId === latestLoad.current) {
-        setState({ invites, requests, loading: false });
+        setState({ invites, requests, myRequests, loading: false });
       }
     } catch (error) {
       console.error('Не удалось загрузить заявки:', error);

@@ -64,16 +64,12 @@
 
 .student-profile-layout {
   display: grid;
-  grid-template-columns: var(--side-w) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--pad);
 }
 
-.student-profile-layout--single {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.student-profile-layout--single .main-content {
+.student-profile-layout .main-content {
   width: min(100%, 760px);
   margin: 0 auto;
 }
@@ -114,37 +110,9 @@
   margin-inline: 0;
 }
 
-.student-profile-section > .cards > button {
-  min-height: var(--ctrl-h);
-  padding: 0 var(--pad);
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 500;
-  cursor: pointer;
-}
-
 @media (max-width: 900px) {
   .student-profile-toolbar {
     grid-template-columns: 1fr;
-  }
-
-  .student-profile-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .student-profile-layout .sidebar {
-    overflow-x: auto;
-  }
-
-  .student-profile-layout .sidebar-links {
-    display: flex;
-    flex-direction: row;
-    min-width: max-content;
-  }
-
-  .student-profile-layout .sidebar-links a {
-    white-space: nowrap;
   }
 }
 
@@ -164,21 +132,6 @@
 
   .student-back-button {
     min-height: 40px;
-  }
-
-  .student-profile-layout .sidebar {
-    margin-inline: calc(var(--gap) * -1);
-    width: calc(100% + (var(--gap) * 2));
-    padding: 0 var(--gap) var(--gap);
-    border: 0;
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
-    background: none;
-  }
-
-  .student-profile-layout .sidebar-links a {
-    min-height: 40px;
-    padding: 0 var(--gap);
   }
 
   .student-profile-section-head {

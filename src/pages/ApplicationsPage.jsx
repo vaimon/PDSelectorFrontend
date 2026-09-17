@@ -3,17 +3,12 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/navbar/Navbar';
 import MainContent from '../components/main-section/MainSection';
 import { useApplications } from '../context/applicationsContext';
+import { describeApplicationStatus } from '../utils/applicationStatus';
 import './ApplicationsPage.css';
 
 const ApplicationsPage = () => {
-  const { invites, requests, loading } = useApplications();
-  const isTeamLead = requests.length > 0;
-
-  const renderEmpty = () => (
-    <p className="empty-state">
-      Ничего не ждёт ответа. Приглашения от команд и заявки в вашу команду появятся здесь.
-    </p>
-  );
+  const { invites, requests, myRequests, loading } = useApplications();
+  const isEmpty = invites.length === 0 && requests.length === 0 && myRequests.length === 0;
 
   return (
     <>
@@ -29,8 +24,11 @@ const ApplicationsPage = () => {
 
           {loading ? (
             <p className="loading-state">Загружаем заявки…</p>
-          ) : invites.length === 0 && requests.length === 0 ? (
-            renderEmpty()
+          ) : isEmpty ? (
+            <p className="empty-state">
+              Ничего не ждёт ответа. Здесь появятся приглашения от команд и заявки,{' '}
+              которые вы отправите из <Link to="/teams">каталога</Link>.
+            </p>
           ) : (
             <div className="applications">
               {invites.length > 0 && (
@@ -49,7 +47,7 @@ const ApplicationsPage = () => {
                 </section>
               )}
 
-              {isTeamLead && (
+              {requests.length > 0 && (
                 <section className="applications-section">
                   <h2>Заявки в вашу команду</h2>
                   <ul className="applications-list">
@@ -64,6 +62,27 @@ const ApplicationsPage = () => {
                         <span className="application-status">Ожидает вашего решения</span>
                       </li>
                     ))}
+                  </ul>
+                </section>
+              )}
+
+              {myRequests.length > 0 && (
+                <section className="applications-section">
+                  <h2>Мои отправленные заявки</h2>
+                  <ul className="applications-list">
+                    {myRequests.map((request) => {
+                      const status = describeApplicationStatus(request.status);
+                      return (
+                        <li key={request.id} className="application-row">
+                          <Link to={`/teams/${request.team?.id}`} className="application-subject">
+                            {request.team?.name ?? 'Команда'}
+                          </Link>
+                          <span className={`application-status application-status--${status.tone}`}>
+                            {status.text}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </section>
               )}

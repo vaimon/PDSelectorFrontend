@@ -42,3 +42,19 @@
   color: var(--text-3);
   font-size: 12px;
 }
+
+.application-status--warn {
+  color: var(--warn);
+}
+
+.application-status--ok {
+  color: var(--ok);
+}
+
+.application-status--bad {
+  color: var(--bad);
+}
+
+.application-status--neutral {
+  color: var(--text-3);
+}
