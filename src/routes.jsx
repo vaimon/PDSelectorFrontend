@@ -3,6 +3,7 @@ import LoginForm from "./components/login-form/LoginForm"
 import Registration from './pages/RegistrationPage';
 import TeamsPage from './pages/TeamsPage';
 import StudentProfilePage from "./pages/StudentProfile";
+import CabinetPage from './pages/CabinetPage';
 import AdminPage from './pages/AdminPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
@@ -33,7 +34,7 @@ const routes = [
     // Deliberately unguarded: this is where an account without a questionnaire is sent, and the
     // page itself explains that state and links to the form.
     path: '/profile',
-    element: <StudentProfilePage />
+    element: <CabinetPage />
   },
   {
     path: '/applications',
