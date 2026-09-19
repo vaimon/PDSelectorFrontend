@@ -5,6 +5,7 @@ import routes from './routes';
 import IdentityProvider from './context/IdentityProvider';
 import NotificationProvider from './context/NotificationProvider';
 import ApplicationsProvider from './context/ApplicationsProvider';
+import PendingJoinRedirect from './components/route-guards/PendingJoinRedirect';
 function App() {
   return (
     <NotificationProvider>
@@ -13,6 +14,7 @@ function App() {
           <Router>
             {/* Inside the router: the counter refreshes on every navigation. */}
             <ApplicationsProvider>
+              <PendingJoinRedirect />
               <Routes>
                 {routes.map((route, index) => (
                   <Route key={index} path={route.path} element={route.element} />

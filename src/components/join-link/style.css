@@ -1,0 +1,126 @@
+.join-link-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  min-width: 0;
+  margin-top: calc(var(--pad) * 1.5);
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.join-link-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.join-link-kicker {
+  margin: 0 0 var(--r-sm);
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: var(--track-num);
+  text-transform: uppercase;
+}
+
+.join-link-note {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.join-link-url {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs) - 1px);
+  text-overflow: ellipsis;
+}
+
+.join-link-url:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.join-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.join-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.join-link-button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.join-link-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.join-link-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.join-link-button--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.join-link-button--primary:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+.join-link-button--danger {
+  color: var(--bad);
+}
+
+@media (max-width: 640px) {
+  /* The lead passes the link on from a phone as often as from a laptop. */
+  .join-link-panel {
+    padding: var(--gap);
+  }
+
+  .join-link-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .join-link-button,
+  .join-link-url {
+    min-height: 44px;
+  }
+}

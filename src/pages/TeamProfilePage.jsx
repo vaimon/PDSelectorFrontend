@@ -9,6 +9,7 @@ import useTeamData from "../hooks/useTeamData";
 import { useTeamRequests } from "../hooks/useTeamRequests";
 import { useApplications } from "../context/applicationsContext";
 import TeamEditForm from "../components/profile/TeamEditForm";
+import JoinLinkPanel from "../components/join-link/JoinLinkPanel";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { useProjectTypes } from "../hooks/useProjectTypes";
 import { updateTeam } from "../api/apiTeamsController";
@@ -166,6 +167,11 @@ const TeamProfilePage = () => {
                 </div>
               )}
             </section>
+
+            {/* Above the member list: on a phone the lead would otherwise scroll past every card. */}
+            {!loading && !error && isCaptain && teamData.id && (
+              <JoinLinkPanel teamId={teamData.id} teamName={teamData.name} />
+            )}
 
             {!loading && !error && (
               <section className="team-members" aria-labelledby="team-members-title">

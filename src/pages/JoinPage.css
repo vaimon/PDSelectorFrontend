@@ -1,0 +1,76 @@
+.join-team {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+
+.join-team-name {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.join-team-lead {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs);
+}
+
+.join-places {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.join-places-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap);
+  color: var(--text-2);
+  font-size: var(--fs);
+}
+
+.join-places-row strong {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.join-action {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.join-reason {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs);
+  line-height: 1.55;
+}
+
+.join-primary:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (max-width: 640px) {
+  /* Opened from a messenger on a phone: a finger-sized primary action. */
+  .join-primary {
+    min-height: 44px;
+  }
+}
+
+.join-reason a {
+  color: var(--accent-text);
+  text-underline-offset: 3px;
+}
