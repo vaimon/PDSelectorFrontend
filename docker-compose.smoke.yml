@@ -1,0 +1,45 @@
+# Stack for the scripted journey smoke (`npm run smoke`, see README). Not a deployment: the backend
+# runs under its `smoke` profile, which signs people in by email instead of SFedU SSO and seeds a
+# selection; the backend refuses to start with that profile next to prod.
+#
+# The backend is built from a sibling checkout of vaimon/team-selection — whatever is checked out
+# there is what gets tested. Point TS_BACKEND_DIR elsewhere to test another checkout.
+name: pdselector-smoke
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: team-selection
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    # A clean database on every run: nothing survives `down`, so no run depends on the last one.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: ${TS_BACKEND_DIR:-../team-selection}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: smoke
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/team-selection
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      SPRING_FLYWAY_USER: postgres
+      SPRING_FLYWAY_PASSWORD: "1234"
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
