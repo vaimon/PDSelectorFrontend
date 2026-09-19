@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { rememberJoin } from '../utils/pendingJoin';
+
 let isRedirectingToLogin = false;
 let axiosInterceptorInstalled = false;
 
@@ -9,6 +11,8 @@ export const redirectToLogin = () => {
   }
 
   isRedirectingToLogin = true;
+  // A join link opened signed out has to lead back to the invitation once the person is in.
+  rememberJoin(window.location.pathname);
   window.location.replace('/login');
 };
 

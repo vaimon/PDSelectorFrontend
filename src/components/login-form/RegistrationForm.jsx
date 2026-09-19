@@ -20,6 +20,8 @@ const RegistrationForm = ({
   initialValues,
   isReturning = false,
   submitting = false,
+  // null: no invitation. A string: the team the person was invited to, "" while its name is unknown.
+  invitedTeam = null,
   onSubmit,
   onLeave,
 }) => {
@@ -85,6 +87,14 @@ const RegistrationForm = ({
           ? "Вы уже участвовали в отборе: данные подставлены из прошлой анкеты. Проверьте курс и группу — за год они изменились."
           : "Анкету видят участники отбора и организаторы. Тимлиды команд ищут людей именно по ней."}
       </p>
+
+      {invitedTeam !== null && (
+        <p className="questionnaire-invitation">
+          {invitedTeam
+            ? <>После анкеты вернём вас к приглашению в команду <strong>«{invitedTeam}»</strong>.</>
+            : "После анкеты вернём вас к приглашению в команду."}
+        </p>
+      )}
 
       <form className="registration-form" onSubmit={handleSubmit}>
         <label htmlFor="course">Курс</label>

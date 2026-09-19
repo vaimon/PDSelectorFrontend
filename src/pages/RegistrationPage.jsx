@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { createStudent } from "../api/apiStudentsController";
+import { previewJoin } from "../api/apiJoinLink";
 import { logout } from "../api/apiAuth";
 import RegistrationForm from "../components/login-form/RegistrationForm";
 import AuthShell from "../components/login-form/AuthShell";
@@ -9,6 +10,7 @@ import useStudentData from "../hooks/useStudentData";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { useIdentity } from "../context/identityContext";
 import { useNotifications } from "../context/notificationContext";
+import { forgetJoin, pendingJoin } from "../utils/pendingJoin";
 import "../components/login-form/style.css";
 
 // Only the first course counts as a first-year place (TeamComposition.isFirstYear), the rest share
@@ -29,6 +31,19 @@ const Registration = () => {
   // A returning student already has a record; its fields prefill the form.
   const { studentData, loading: studentLoading } = useStudentData(studentId);
   const [submitting, setSubmitting] = useState(false);
+  // Someone who came through a join link goes back to the invitation instead of the cabinet.
+  const [joinTarget] = useState(pendingJoin);
+  const [invitedTeam, setInvitedTeam] = useState(null);
+
+  useEffect(() => {
+    if (!joinTarget || loading || !user) {
+      return;
+    }
+    previewJoin(joinTarget.slice("/join/".length))
+      .then((preview) => setInvitedTeam(preview.teamName))
+      // The note is a courtesy; without the name it still says where the form leads.
+      .catch(() => setInvitedTeam(""));
+  }, [joinTarget, loading, user]);
 
   // A fresh object on every render would restart the form's prefill effect endlessly.
   const initialValues = useMemo(() => (studentData ? {
@@ -57,7 +72,9 @@ const Registration = () => {
       // The account is a participant now, so the shell has to see it.
       await refresh();
       notify({ type: "success", text: "Анкета сохранена" });
-      navigate("/profile");
+      // Used once: the invitation page takes it from here.
+      forgetJoin();
+      navigate(joinTarget ?? "/profile");
     } catch (error) {
       // The shared client already showed the backend's reason; the form keeps what was typed.
       console.error("Не удалось сохранить анкету:", error);
@@ -98,6 +115,7 @@ const Registration = () => {
       technologies={allTechnologies}
       initialValues={initialValues}
       isReturning={studentId != null}
+      invitedTeam={joinTarget ? invitedTeam ?? "" : null}
       submitting={submitting}
       onSubmit={handleSubmit}
       onLeave={handleLeave}

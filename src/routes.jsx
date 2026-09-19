@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
+import JoinPage from './pages/JoinPage';
 import { RequireAdmin, RequireParticipant } from './components/route-guards/RouteGuards';
 
 const routes = [
@@ -25,6 +26,12 @@ const routes = [
   {
     path: '/registration',
     element: <Registration />
+  },
+  {
+    // Unguarded like /registration: the page itself leads a signed-out person to login and one
+    // without a questionnaire to the questionnaire, and back.
+    path: '/join/:token',
+    element: <JoinPage />
   },
   {
     path: '/teams',

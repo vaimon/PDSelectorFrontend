@@ -439,3 +439,15 @@
     width: 100%;
   }
 }
+
+.questionnaire-invitation {
+  margin: 0;
+  padding: 10px var(--gap);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--text);
+  font-size: var(--fs);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
