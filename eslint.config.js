@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'playwright-report', 'test-results'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
@@ -34,5 +34,10 @@ export default [
         { allowConstantExport: true },
       ],
     },
+  },
+  {
+    // The journey smoke runs in Node, not in the browser.
+    files: ['smoke/**/*.{js,mjs}', 'playwright.config.js'],
+    languageOptions: { globals: globals.node },
   },
 ]
