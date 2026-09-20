@@ -8,6 +8,7 @@ import { normalizePageResponse } from './normalizeResponse';
 export const fetchTeams = async ({
   input,
   isFull,
+  hasPlaceForCourse,
   projectType,
   technologies,
   page = 0,
@@ -20,6 +21,10 @@ export const fetchTeams = async ({
     const normalizedInput = input?.trim();
     if (normalizedInput) queryParams.append("input", normalizedInput);
     if (typeof isFull === "boolean") queryParams.append("is_full", String(isFull));
+    // 1 means a first-year place, anything else a second-year one (TeamComposition.isFirstYear).
+    if (hasPlaceForCourse != null) {
+      queryParams.append("has_place_for_course", String(hasPlaceForCourse));
+    }
     if (Array.isArray(projectType)) {
       projectType.forEach((typeName) => queryParams.append("project_type", typeName));
     }

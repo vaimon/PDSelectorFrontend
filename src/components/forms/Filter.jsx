@@ -1,7 +1,15 @@
 import './style.css';
 import { useMemo, useState } from "react";
 
-const Filter = ({ filterParams, onApplyFilters, variant = "teams" }) => {
+/**
+ * `placesForCourse` is the course the viewer takes a place on, or null when they have none of
+ * their own. It decides what the second option of «Заполненность» asks: «есть место для меня»,
+ * which is the question a student has, or the old «есть свободные места», which is the overview
+ * an admin has. On the catalogue null means an admin, because `RequireParticipant` lets nobody
+ * else in; the caller decides that, not this component — it is told the course rather than
+ * looking it up, since no other filter here knows who is asking.
+ */
+const Filter = ({ filterParams, onApplyFilters, variant = "teams", placesForCourse = null }) => {
   const [binaryValue, setBinaryValue] = useState(null);
   const [captainValue, setCaptainValue] = useState(null);
   const [selectedProjectTypes, setSelectedProjectTypes] = useState([]);
@@ -39,7 +47,11 @@ const Filter = ({ filterParams, onApplyFilters, variant = "teams" }) => {
             ...(selectedGroups.length > 0 ? { groupNumber: selectedGroups } : {}),
           }
         : {
-            ...(binaryValue === null ? {} : { isFull: binaryValue }),
+            // «Собрана» is a plain is_full; the other option asks the backend the per-year
+            // question when there is a course to ask it about, and the old one when there is not.
+            ...(binaryValue === null ? {}
+              : binaryValue || placesForCourse === null ? { isFull: binaryValue }
+                : { hasPlaceForCourse: placesForCourse }),
             ...(selectedProjectTypes.length > 0 ? { projectType: selectedProjectTypes } : {}),
           }),
     };
@@ -84,12 +96,12 @@ const Filter = ({ filterParams, onApplyFilters, variant = "teams" }) => {
           <h3>{variant === "students" ? "Наличие команды" : "Заполненность"}</h3>
           {(variant === "students"
             ? ["Состоит в команде", "Ищет команду"]
-            : ["Команда собрана", "Есть свободные места"]
+            : ["Команда собрана", placesForCourse === null ? "Есть свободные места" : "Есть места для моего курса"]
           ).map((label, index) => (
             <label key={index}>
               <input
                 type="radio"
-                name={variant === "students" ? "hasTeam" : "isFull"}
+                name={variant === "students" ? "hasTeam" : "teamPlaces"}
                 value={String(index === 0)}
                 checked={binaryValue === (index === 0)}
                 onChange={() => {
