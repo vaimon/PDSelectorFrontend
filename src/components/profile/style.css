@@ -130,8 +130,10 @@
   align-self: flex-start;
 }
 
+/* Not :disabled — this rule outranks the per-button palettes below and would repaint a disabled
+   «Сохранить» accent blue while its own text colour stayed green. */
 .edit-button:hover,
-.profile-edit-form button:hover {
+.profile-edit-form button:hover:not(:disabled) {
   border-color: var(--accent-hover);
   background: var(--accent-hover);
 }
@@ -265,4 +267,17 @@
   .profile-edit-form .form-buttons button {
     width: 100%;
   }
+}
+
+/* Why «Сохранить» is off, in text: a disabled button has no tooltip on a phone. */
+.profile-form-hint {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.profile-edit-form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }

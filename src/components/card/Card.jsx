@@ -17,7 +17,9 @@ const Card = ({
   applyTone = "primary",
   viewText = "Перейти",
   showApplyButton,
-  showEditingOptions
+  showEditingOptions,
+  badge,
+  actions = [],
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentName, setCurrentName] = useState(name);
@@ -37,7 +39,14 @@ const Card = ({
 
   const showApplyAction = showActionsForStudent && showApplyButton && onApply;
   const showViewAction = Boolean(profileLink);
-  const hasActions = showApplyAction || showViewAction || showEditingOptions;
+  const hasActions = showApplyAction || showViewAction || showEditingOptions || actions.length > 0;
+  // Same rule as the apply button: a disabled action has to say why in text, because a phone has
+  // no hover and a disabled button is not reachable with a keyboard or a screen reader.
+  // Two actions off for the same reason — the closed window — say it once.
+  const reasons = [...new Set([
+    ...(showApplyAction && applyDisabled && applyReason ? [applyReason] : []),
+    ...actions.filter((action) => action.disabled && action.reason).map((action) => action.reason),
+  ])];
 
   return (
     <div className={`card ${currentType ? 'card--with-type' : 'card--person'}`}>
@@ -52,6 +61,7 @@ const Card = ({
         ) : (
           <h3 className="card-name" title={currentName}>{currentName}</h3>
         )}
+        {badge && <span className="card-badge">{badge}</span>}
         {currentType && (
           <p className="card-type">
             <span className="type-capture">Тип проекта: </span>
@@ -105,12 +115,22 @@ const Card = ({
           )}
         </div>
       </div>
-      {/* The reason is text, not only a tooltip: there is no hover on a phone and a disabled
-          button is not reachable with a keyboard or a screen reader. */}
-      {showApplyAction && applyDisabled && applyReason && (
-        <p className="card-action-reason">{applyReason}</p>
-      )}
+      {reasons.map((reason) => (
+        <p className="card-action-reason" key={reason}>{reason}</p>
+      ))}
       {hasActions && <div className="card-actions">
+        {actions.map((action) => (
+          <button
+            key={action.key ?? action.label}
+            type="button"
+            className={`action-button apply${action.tone === "cancel" ? " action-button--cancel" : ""}`}
+            onClick={action.onClick}
+            disabled={action.disabled}
+            title={action.reason}
+          >
+            {action.label}
+          </button>
+        ))}
         {showApplyAction && (
           <button
             className={`action-button apply${applyTone === "cancel" ? " action-button--cancel" : ""}`}

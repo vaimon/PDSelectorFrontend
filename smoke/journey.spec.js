@@ -184,6 +184,7 @@ test('a friend opens the join link signed out and joins through login and the qu
   await expect(page.getByRole('status')).toContainText(`Вы в команде «${teamName}»`);
   await expect(page).toHaveURL(/\/teams\/\d+$/);
   await expect(page.locator('.team-members').getByRole('heading', { name: friend.fio })).toBeVisible();
+  people.friend = friend;
 });
 
 test('the lead invites a free student and they accept', async ({ browser }, testInfo) => {
@@ -241,6 +242,62 @@ test('the lead invites a free student and they accept', async ({ browser }, test
   const answered = sent.getByRole('listitem').filter({ hasText: invitee.fio });
   await expect(answered).toContainText('Принята');
   await expect(answered.getByRole('button', { name: 'Отменить приглашение', exact: true })).toHaveCount(0);
+  people.invitee = invitee;
+});
+
+test('the lead removes a member and another one leaves', async ({ browser }, testInfo) => {
+  expect(people.lead && people.invitee && people.friend, 'builds on the invite step; run the whole file').toBeTruthy();
+
+  const { page: lead } = await signIn(browser, people.lead);
+  await openOwnTeamPage(lead);
+  const members = lead.locator('.team-members');
+  // The lead is named once — the page used to name them beside the roster as well — and there is
+  // no way out that keeps the team: they hand the role over or disband it.
+  await expect(members.locator('.card-badge')).toHaveText(['Тимлид']);
+  await expect(lead.getByRole('button', { name: 'Выйти из команды' })).toHaveCount(0);
+  await expect(lead.getByRole('button', { name: 'Распустить команду' })).toBeVisible();
+  await expect(members.getByText('1 курс — 2 из 3 · 2 курс и старше — 2 из 3')).toBeVisible();
+  await expectNoSidewaysScroll(lead, testInfo);
+
+  // The rest happens inside the running app: the roster has to change on its own, and a reload
+  // would hide one that never did. The marker dies with the document, so a `goto` slipped in later
+  // turns the check red instead of quietly making it vacuous.
+  await lead.evaluate(() => { window.__sameDocument = true; });
+  const inviteeCard = members.locator('.card')
+    .filter({ has: lead.getByRole('heading', { name: people.invitee.fio }) });
+  await inviteeCard.getByRole('button', { name: 'Исключить', exact: true }).click();
+  await confirm(lead, 'Исключить участника?', 'Исключить');
+  await expect(lead.getByRole('status')).toContainText('Участник исключён');
+  await expect(inviteeCard).toHaveCount(0);
+  await expect(members.getByText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3')).toBeVisible();
+  expect(await lead.evaluate(() => window.__sameDocument), 'the roster changed without reloading').toBe(true);
+
+  // The one who joined by the link leaves on their own — and manages nobody else on the way.
+  const { page: friend } = await signIn(browser, people.friend);
+  await friend.goto('/profile');
+  await openMyTeamSection(friend);
+  await friend.locator('.card').filter({ has: friend.getByRole('heading', { name: teamName }) })
+    .getByRole('link').click();
+  await expect(friend.getByRole('heading', { name: teamName, level: 1 })).toBeVisible();
+  await expect(friend.getByRole('button', { name: 'Исключить' })).toHaveCount(0);
+  await expect(friend.getByRole('button', { name: 'Сделать тимлидом' })).toHaveCount(0);
+  await expectNoSidewaysScroll(friend, testInfo);
+  // Leaving takes them to the catalogue, and it has to be the app that takes them: a full load
+  // would refetch identity on the way and hide a shell that never learned they left.
+  await friend.evaluate(() => { window.__sameDocument = true; });
+  await friend.getByRole('button', { name: 'Выйти из команды' }).click();
+  await confirm(friend, 'Выйти из команды?', 'Выйти');
+  await expect(friend.getByRole('status')).toContainText('Вы вышли из команды');
+  await expect(friend).toHaveURL(/\/teams$/);
+  expect(await friend.evaluate(() => window.__sameDocument), 'left without reloading').toBe(true);
+  await expect(friend.getByRole('button', { name: 'Подать заявку', exact: true }).first()).toBeVisible();
+
+  // Both sides agree afterwards: their cabinet has no team, the lead's roster has no them.
+  await friend.goto('/profile');
+  await openMyTeamSection(friend);
+  await expect(friend.getByText('Вы пока не в команде.')).toBeVisible();
+  await openOwnTeamPage(lead);
+  await expect(members.getByRole('heading', { name: people.friend.fio })).toHaveCount(0);
 });
 
 test('a registered student opens the link signed out and is brought back to it after login @desktop', async ({ browser }) => {

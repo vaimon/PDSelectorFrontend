@@ -90,3 +90,30 @@ export const updateTeam = async (teamData, teamId) => {
   const response = await apiClient.put(`/teams/${teamId}`, teamData);
   return response.data;
 };
+
+// --- состав команды (#9) ---
+// Membership is not part of the team payload: each change is its own operation, so there is
+// exactly one way to make it and the backend can refuse it on its own terms.
+
+// Исключить участника. Тимлида исключить нельзя — он передаёт капитанство или распускает команду.
+export const removeMember = async (teamId, studentId) => {
+  const response = await apiClient.post(`/teams/${teamId}/members/${studentId}/remove`);
+  return response.data;
+};
+
+// Выйти из команды самому.
+export const leaveTeam = async (teamId) => {
+  const response = await apiClient.post(`/teams/${teamId}/leave`);
+  return response.data;
+};
+
+// Передать капитанство действующему участнику команды.
+export const transferCaptaincy = async (teamId, studentId) => {
+  const response = await apiClient.post(`/teams/${teamId}/captain/${studentId}`);
+  return response.data;
+};
+
+// Распустить команду: участники освобождаются, заявки уходят вместе с командой.
+export const disbandTeam = async (teamId) => {
+  await apiClient.post(`/teams/${teamId}/disband`);
+};

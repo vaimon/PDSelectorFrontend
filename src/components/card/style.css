@@ -337,3 +337,16 @@
   font-size: 12px;
   line-height: 1.45;
 }
+
+/* Who this person is in the team, said once and next to them. */
+.card-badge {
+  align-self: flex-start;
+  padding: 2px 9px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r-pill);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
