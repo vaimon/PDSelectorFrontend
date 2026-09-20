@@ -23,8 +23,8 @@
 .confirm-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--r-sm);
-  margin-top: var(--r-sm);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
 }
 
 .confirm-primary,
@@ -71,7 +71,7 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .confirm-actions button {
     flex: 1 0 100%;
   }

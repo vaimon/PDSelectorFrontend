@@ -1,8 +1,5 @@
 .team-profile-page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--pad);
+  padding-block: var(--pad);
   color: var(--text);
   text-align: left;
 }
@@ -23,7 +20,7 @@
 .team-back-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   width: fit-content;
   min-height: var(--ctrl-h);
   padding: 0 var(--gap);
@@ -49,7 +46,7 @@
 
 .team-profile-heading p,
 .team-section-kicker {
-  margin: 0 0 var(--r-sm);
+  margin: 0 0 var(--space-4);
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -90,7 +87,7 @@
 }
 
 .team-members {
-  margin-top: calc(var(--pad) * 1.5);
+  margin-top: var(--space-24);
 }
 
 .team-section-head {
@@ -171,7 +168,7 @@
   min-height: 0;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 600px) {
   .team-members .card-name,
   .team-members .card-resume,
   .team-members .card-tags {
@@ -207,7 +204,7 @@
   margin-inline: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
   .team-profile-toolbar,
   .team-profile-layout {
     grid-template-columns: minmax(0, 1fr);
@@ -232,63 +229,8 @@
   }
 }
 
-@media (max-width: 640px) {
-  .team-profile-page {
-    padding: var(--gap);
-  }
-
-  .team-profile-toolbar,
-  .team-profile-layout {
-    gap: var(--gap);
-  }
-
-  .team-profile-heading h1 {
-    font-size: 20px;
-  }
-
-  .team-back-button {
-    min-height: 40px;
-  }
-
-  .team-profile-layout .sidebar {
-    margin-inline: calc(var(--gap) * -1);
-    width: calc(100% + (var(--gap) * 2));
-    padding: 0 var(--gap) var(--gap);
-    border: 0;
-    border-bottom: 1px solid var(--border);
-    border-radius: 0;
-    background: none;
-  }
-
-  .team-profile-layout .sidebar-links a {
-    min-height: 40px;
-    padding: 0 var(--gap);
-  }
-
-  .team-section-head {
-    align-items: flex-start;
-  }
-
-  .team-info-row {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--r-sm);
-    padding: var(--gap);
-  }
-}
-
-@media (max-width: 420px) {
-  .team-back-button,
-  .team-edit-toggle {
-    width: 100%;
-  }
-
-  .team-section-head {
-    flex-direction: column;
-  }
-}
-
 .team-section-note {
-  margin: 6px 0 0;
+  margin: var(--space-8) 0 0;
   color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
   line-height: 1.5;
@@ -314,13 +256,6 @@
   line-height: 1.45;
 }
 
-@media (max-width: 640px) {
-  /* The reason gets its own line instead of a squeezed column next to the button. */
-  .team-action-reason {
-    flex-basis: 100%;
-  }
-}
-
 /* The one place on the page where a click cannot be taken back, kept away from the roster. */
 .team-danger {
   display: flex;
@@ -340,7 +275,7 @@
   min-width: 0;
   flex: 1 1 320px;
   flex-direction: column;
-  gap: var(--r-sm);
+  gap: var(--space-4);
 }
 
 .team-danger h2 {
@@ -389,15 +324,9 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
-  .team-danger-button {
-    width: 100%;
-  }
-}
-
 /* Said to the team about itself: complete, or who is still missing and by when. */
 .team-status {
-  margin: 6px 0 0;
+  margin: var(--space-8) 0 0;
   font-size: calc(var(--fs) - 1px);
   line-height: 1.5;
 }
@@ -408,4 +337,63 @@
 
 .team-status--missing {
   color: var(--warn);
+}
+
+@media (max-width: 599.98px) {
+  .team-profile-page {
+    padding-block: var(--gap);
+  }
+
+  .team-profile-toolbar,
+  .team-profile-layout {
+    gap: var(--gap);
+  }
+
+  .team-profile-heading h1 {
+    font-size: 20px;
+  }
+
+  .team-back-button {
+    min-height: 40px;
+    width: 100%;
+  }
+
+  .team-profile-layout .sidebar {
+    margin-inline: calc(var(--gutter) * -1);
+    width: calc(100% + (var(--gutter) * 2));
+    padding: 0 var(--gutter) var(--gap);
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: none;
+  }
+
+  .team-profile-layout .sidebar-links a {
+    min-height: 40px;
+    padding: 0 var(--gap);
+  }
+
+  .team-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .team-info-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--gap);
+  }
+
+  .team-edit-toggle {
+    width: 100%;
+  }
+
+  /* The reason gets its own line instead of a squeezed column next to the button. */
+  .team-action-reason {
+    flex-basis: 100%;
+  }
+
+  .team-danger-button {
+    width: 100%;
+  }
 }

@@ -24,7 +24,7 @@ const HowItWorksPage = () => {
   return (
     <>
       <Navbar />
-      <main className="how-page">
+      <main className="page-container how-page">
         <header className="how-head">
           <p className="how-kicker">Проектная деятельность</p>
           <h1>Как проходит набор</h1>

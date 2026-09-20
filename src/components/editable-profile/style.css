@@ -24,7 +24,7 @@ h3.editable-profile {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--r-sm);
+  gap: var(--space-4);
   margin: 0;
 }
 
@@ -78,7 +78,7 @@ input.editable-profile:focus {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--r-sm);
+  gap: var(--space-4);
 }
 
 .technology-picker > label,

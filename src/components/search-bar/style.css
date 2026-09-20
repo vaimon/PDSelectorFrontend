@@ -1,10 +1,7 @@
 .search-bar {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: calc(var(--gap) + 2px) var(--pad) 0;
+  padding-block: var(--pad) 0;
 }
 
 .search-container {
@@ -69,9 +66,9 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
   .search-bar {
-    padding: var(--gap) var(--gap) 0;
+    padding-block: var(--gap) 0;
   }
 
   .search-container {

@@ -64,7 +64,7 @@ const TeamsPage = () => {
     <>
       <Navbar />
       <SearchBar onSearch={handleSearch} />
-      <main className="container content-layout catalog-layout">
+      <main className="page-container content-layout catalog-layout">
         <Filter filterParams={filterParams} onApplyFilters={handleApplyFilters} />
         <MainContent>
           <div className="catalog-head">

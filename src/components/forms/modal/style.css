@@ -19,7 +19,7 @@
   width: min(100%, 500px);
   max-height: calc(100dvh - (var(--pad) * 2));
   overflow: hidden;
-  padding: calc(var(--pad) * 2) var(--pad) var(--pad);
+  padding: var(--space-32) var(--pad) var(--pad);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -36,8 +36,8 @@
 
 .modal-close {
   position: absolute;
-  top: var(--r-sm);
-  right: var(--r-sm);
+  top: var(--space-4);
+  right: var(--space-4);
   z-index: 1;
   display: grid;
   place-items: center;
@@ -116,7 +116,7 @@
   background: var(--accent-hover);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .modal-overlay {
     align-items: flex-end;
     padding: var(--gap);

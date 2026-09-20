@@ -119,81 +119,85 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="logo"><ConsoleMark /></div>
+      {/* The bar is full-bleed, its row is not: sharing the page container is what puts the logo
+          on the same line as the content below it. */}
+      <div className="navbar-row page-container">
+        <div className="logo"><ConsoleMark /></div>
 
-      <nav className="nav-links" aria-label="Основная навигация">
-        {links.map(renderLink)}
-      </nav>
+        <nav className="nav-links" aria-label="Основная навигация">
+          {links.map(renderLink)}
+        </nav>
 
-      <div className="navbar-actions">
-        {selection && (
-          <span className={`selection-state selection-${selection.state}`}>
-            <span className="selection-name">{selection.name}</span>
-            <span className="selection-note">{selection.note}</span>
-          </span>
-        )}
-        {!selection && !loading && (
-          <span className="selection-state selection-none">Отбор не идёт</span>
-        )}
+        <div className="navbar-actions">
+          {selection && (
+            <span className={`selection-state selection-${selection.state}`}>
+              <span className="selection-name">{selection.name}</span>
+              <span className="selection-note">{selection.note}</span>
+            </span>
+          )}
+          {!selection && !loading && (
+            <span className="selection-state selection-none">Отбор не идёт</span>
+          )}
 
-        <div className="nav-menu" ref={menuRef}>
-          <button
-            type="button"
-            className={`select-icon nav-menu-button ${isMenuOpen ? 'open' : ''}`}
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            aria-expanded={isMenuOpen}
-            aria-haspopup="menu"
-            aria-label="Меню разделов"
-          >
-            <FaBars aria-hidden="true" />
-            {pendingApplications > 0 && <span className="nav-badge">{pendingApplications}</span>}
-          </button>
-          {isMenuOpen && (
-            <div className="dropdown nav-menu-dropdown" role="menu">
-              {/* Under 600px the bar above drops this line, and the deadline is the one thing a
-                  student has to see while the window is open. Its CSS keeps it to those widths,
-                  so between 600 and 900px the menu does not repeat what the bar still shows. */}
-              {selection && (
-                <p className={`nav-menu-selection selection-${selection.state}`}>
-                  <span>{selection.name}</span>
-                  <span>{selection.note}</span>
+          <div className="nav-menu" ref={menuRef}>
+            <button
+              type="button"
+              className={`select-icon nav-menu-button ${isMenuOpen ? 'open' : ''}`}
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+              aria-expanded={isMenuOpen}
+              aria-haspopup="menu"
+              aria-label="Меню разделов"
+            >
+              <FaBars aria-hidden="true" />
+              {pendingApplications > 0 && <span className="nav-badge">{pendingApplications}</span>}
+            </button>
+            {isMenuOpen && (
+              <div className="dropdown nav-menu-dropdown" role="menu">
+                {/* Under 600px the bar above drops this line, and the deadline is the one thing a
+                    student has to see while the window is open. Its CSS keeps it to those widths,
+                    so between 600 and 900px the menu does not repeat what the bar still shows. */}
+                {selection && (
+                  <p className={`nav-menu-selection selection-${selection.state}`}>
+                    <span>{selection.name}</span>
+                    <span>{selection.note}</span>
+                  </p>
+                )}
+                {links.map(renderLink)}
+              </div>
+            )}
+          </div>
+
+          <div className="account-menu" ref={accountRef}>
+            <button
+              type="button"
+              className={`select-icon ${isAccountOpen ? 'open' : ''}`}
+              onClick={() => setIsAccountOpen((prev) => !prev)}
+              aria-expanded={isAccountOpen}
+              aria-haspopup="menu"
+            >
+              <span>{user?.fio ?? 'Аккаунт'}</span>
+              <FaChevronDown aria-hidden="true" />
+            </button>
+            {isAccountOpen && (
+              <div className="dropdown account-dropdown" role="menu">
+                <p className="account-identity">
+                  <span className="account-name">{user?.fio}</span>
+                  <span className="account-email">{user?.email}</span>
                 </p>
-              )}
-              {links.map(renderLink)}
-            </div>
-          )}
-        </div>
+                <button
+                  type="button"
+                  className="account-logout"
+                  role="menuitem"
+                  onClick={handleLogout}
+                >
+                  Выйти
+                </button>
+              </div>
+            )}
+          </div>
 
-        <div className="account-menu" ref={accountRef}>
-          <button
-            type="button"
-            className={`select-icon ${isAccountOpen ? 'open' : ''}`}
-            onClick={() => setIsAccountOpen((prev) => !prev)}
-            aria-expanded={isAccountOpen}
-            aria-haspopup="menu"
-          >
-            <span>{user?.fio ?? 'Аккаунт'}</span>
-            <FaChevronDown aria-hidden="true" />
-          </button>
-          {isAccountOpen && (
-            <div className="dropdown account-dropdown" role="menu">
-              <p className="account-identity">
-                <span className="account-name">{user?.fio}</span>
-                <span className="account-email">{user?.email}</span>
-              </p>
-              <button
-                type="button"
-                className="account-logout"
-                role="menuitem"
-                onClick={handleLogout}
-              >
-                Выйти
-              </button>
-            </div>
-          )}
+          <ThemeToggle />
         </div>
-
-        <ThemeToggle />
       </div>
     </div>
   );

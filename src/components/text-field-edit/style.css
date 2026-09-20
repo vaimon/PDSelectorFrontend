@@ -69,11 +69,11 @@
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
 }
 
 .card-tag {
-  padding: var(--r-sm) calc(var(--gap) - 2px);
+  padding: 3px 9px;
   border: 1px solid var(--hairline);
   border-radius: var(--r-pill);
   background: var(--surface-2);
@@ -81,7 +81,7 @@
   font-size: calc(var(--fs) - 1px);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .button-input {
     float: none;
     width: 100%;

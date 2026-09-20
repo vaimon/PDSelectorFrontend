@@ -41,7 +41,7 @@
   opacity: 0.55;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .pagination {
     justify-content: space-between;
   }

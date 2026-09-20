@@ -1,7 +1,7 @@
 .theme-toggle {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   height: var(--ctrl-h);
   margin: 0;
   padding: 0 var(--gap);
@@ -26,7 +26,7 @@
   outline-offset: 2px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 899.98px) {
   .theme-toggle {
     width: var(--ctrl-h);
     height: var(--ctrl-h);

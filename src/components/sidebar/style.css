@@ -24,7 +24,7 @@
 .sidebar-links {
   display: flex;
   flex-direction: column;
-  gap: var(--r-sm);
+  gap: var(--space-4);
   width: 100%;
   margin: 0;
   padding: 0;
@@ -41,10 +41,10 @@
 .sidebar-links a {
   display: flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   width: 100%;
   min-height: var(--ctrl-h);
-  padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  padding: var(--space-8) var(--gap);
   border-radius: var(--r);
   color: var(--text-2);
   font-size: var(--fs);
@@ -119,7 +119,7 @@
   background: var(--accent);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
   .sidebar {
     flex-basis: auto;
     width: 100%;
@@ -131,9 +131,9 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .sidebar {
-    padding: var(--r-sm);
+    padding: var(--space-4);
   }
 
   .sidebar-links {
@@ -143,7 +143,7 @@
   .sidebar-links a {
     align-items: flex-start;
     min-height: 44px;
-    padding: calc(var(--gap) - var(--r-sm));
+    padding: var(--space-8);
   }
 
   .sidebar-name {

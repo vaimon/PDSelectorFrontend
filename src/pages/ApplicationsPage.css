@@ -1,6 +1,6 @@
 .applications {
   display: grid;
-  gap: calc(var(--pad) + var(--r-sm));
+  gap: var(--space-20);
 }
 
 .applications-section h2 {
@@ -10,7 +10,7 @@
 
 .applications-list {
   display: grid;
-  gap: var(--r-sm);
+  gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -63,7 +63,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--r-sm);
+  gap: var(--space-4);
 }
 
 .application-action {

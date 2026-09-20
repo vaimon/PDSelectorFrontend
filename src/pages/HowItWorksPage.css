@@ -1,8 +1,5 @@
 .how-page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--pad);
+  padding-block: var(--pad);
   color: var(--text);
   text-align: left;
 }
@@ -21,14 +18,14 @@
 }
 
 .how-head h1 {
-  margin: 4px 0 0;
+  margin: var(--space-4) 0 0;
   font-size: 24px;
   font-weight: 600;
   line-height: 1.25;
 }
 
 .how-lead {
-  margin: 8px 0 0;
+  margin: var(--space-8) 0 0;
   color: var(--text-2);
   line-height: 1.6;
 }
@@ -60,7 +57,7 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
   padding: var(--gap);
   border: 1px solid var(--hairline);
   border-radius: var(--r-lg);
@@ -127,9 +124,9 @@
   line-height: 1.6;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
   .how-page {
-    padding: var(--gap);
+    padding-block: var(--gap);
   }
 
   .how-head h1 {
@@ -138,7 +135,7 @@
 
   .how-rule {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    gap: var(--space-4);
   }
 
   .how-action {
