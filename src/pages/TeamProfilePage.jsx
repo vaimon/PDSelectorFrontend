@@ -121,6 +121,7 @@ const TeamProfilePage = () => {
         {members.map((member) => (
           <Card
             key={member.id}
+            variant="person"
             name={member.user?.fio || member.fio}
             resume={member.about_self || "Нет описания"}
             tags={member.technologies || []}

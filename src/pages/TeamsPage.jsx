@@ -43,6 +43,7 @@ const TeamsPage = () => {
     return (
       <Card
         key={team.id}
+        variant="team"
         name={team.name}
         type={team.project_type.name}
         resume={team.project_description}

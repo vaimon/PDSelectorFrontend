@@ -73,11 +73,10 @@ const StudentsPage = () => {
                 return (
                   <Card
                     key={student.id}
+                    variant="person"
                     name={student.user?.fio || "Имя отсутствует"}
                     resume={student.about_self || "Описание отсутствует"}
                     tags={student.technologies || []}
-                    showActionsForCaptain={false}
-                    showActionsForUser={false}
                     profileLink={`/students/${student.id}`}
                     showApplyButton={Boolean(inviteAction)}
                     onApply={inviteAction?.onClick}

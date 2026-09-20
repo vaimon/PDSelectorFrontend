@@ -61,3 +61,43 @@ test('the header, the search field and the page content share their edges @deskt
     }
   }
 });
+
+test('a lone card keeps a card\'s width, and a row of them lines its actions up @desktop', async ({ browser }) => {
+  const context = await browser.newContext();
+  await logIn(context, seeded.lead);
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  // The catalogue holds one team here — the one the journey creates, which is why this file runs
+  // after it — and that is the case that used to look broken: the grid gave its only card the
+  // whole row, so a team read as a banner.
+  await page.goto('/teams');
+  const only = page.locator('.cards .card');
+  await expect(only, 'builds on the team the journey creates; run the whole file').toHaveCount(1);
+  const row = await page.locator('.cards').boundingBox();
+  const lone = await only.boundingBox();
+  expect(lone.width, 'a lone card must not stretch across the row').toBeLessThan(row.width / 2);
+
+  // Only one seeded person carries technologies, so their card has a block the others do not —
+  // the cards in this row hold different amounts, which is the precondition for the check below.
+  // It is asserted rather than assumed: a seed where every card holds the same would make the
+  // baseline agree on its own and quietly stop testing anything.
+  await page.goto('/students');
+  const bodies = page.locator('.cards .card .card-body');
+  await expect(bodies.first()).toBeVisible();
+  expect(await bodies.count(), 'needs at least two cards in a row to compare').toBeGreaterThan(1);
+  const [firstBody, secondBody] = await Promise.all([
+    bodies.nth(0).boundingBox(),
+    bodies.nth(1).boundingBox(),
+  ]);
+  expect(Math.round(firstBody.height), 'the two cards must hold different amounts')
+    .not.toBe(Math.round(secondBody.height));
+
+  const actions = page.locator('.cards .card .card-actions');
+  const [first, second] = await Promise.all([
+    actions.nth(0).boundingBox(),
+    actions.nth(1).boundingBox(),
+  ]);
+  expect(Math.round(second.y), 'the actions of cards in one row must share a baseline')
+    .toBe(Math.round(first.y));
+});
