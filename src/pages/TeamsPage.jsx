@@ -80,7 +80,7 @@ const TeamsPage = () => {
               <p className="loading-state">Загружаем команды…</p>
             ) : !selectionRunning ? (
               <p className="empty-state">
-                Отбор сейчас не идёт. Команды появятся, когда начнётся новый набор.
+                Набора сейчас нет. Команды появятся, когда начнётся следующий.
               </p>
             ) : loading ? (
               <p className="loading-state">Загружаем команды…</p>

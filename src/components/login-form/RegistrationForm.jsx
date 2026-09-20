@@ -74,7 +74,7 @@ const RegistrationForm = ({
   };
 
   return (
-    <AuthShell title={isReturning ? "Проверьте анкету" : "Анкета участника отбора"}>
+    <AuthShell title={isReturning ? "Проверьте анкету" : "Анкета участника набора"}>
       <p className="questionnaire-identity">
         Вы вошли как <strong>{user?.fio}</strong> ({user?.email}).{" "}
         <button type="button" className="questionnaire-link" onClick={onLeave}>
@@ -84,8 +84,8 @@ const RegistrationForm = ({
 
       <p className="login-purpose">
         {isReturning
-          ? "Вы уже участвовали в отборе: данные подставлены из прошлой анкеты. Проверьте курс и группу — за год они изменились."
-          : "Анкету видят участники отбора и организаторы. Тимлиды команд ищут людей именно по ней."}
+          ? "Вы уже участвовали в наборе: данные подставлены из прошлой анкеты. Проверьте курс и группу — за год они изменились."
+          : "Анкету видят участники набора и организаторы. Тимлиды команд ищут людей именно по ней."}
       </p>
 
       {invitedTeam !== null && (
@@ -183,7 +183,7 @@ const RegistrationForm = ({
         />
 
         <p className="questionnaire-note">
-          Анкета доступна зарегистрированным участникам отбора и организаторам проектной
+          Анкета доступна зарегистрированным участникам набора и организаторам проектной
           деятельности. Другим она не видна.
         </p>
 
@@ -192,7 +192,7 @@ const RegistrationForm = ({
             {isReturning ? "Подтвердить анкету" : "Отправить анкету"}
           </button>
           <button type="button" className="questionnaire-link" onClick={onLeave}>
-            Я не участвую в отборе
+            Я не участвую в наборе
           </button>
         </div>
       </form>

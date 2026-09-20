@@ -60,7 +60,7 @@ const StudentsPage = () => {
               <p className="loading-state">Загружаем участников…</p>
             ) : !selectionRunning ? (
               <p className="empty-state">
-                Отбор сейчас не идёт. Участники появятся, когда начнётся новый набор.
+                Набора сейчас нет. Участники появятся, когда начнётся следующий.
               </p>
             ) : loading ? (
               <p className="loading-state">Загружаем участников…</p>
