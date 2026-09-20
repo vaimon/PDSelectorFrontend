@@ -19,8 +19,14 @@ const TeamsPage = () => {
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(0);
 
-  const { activeTrack, loading: identityLoading } = useIdentity();
+  const { activeTrack, loading: identityLoading, isParticipant, user } = useIdentity();
   const { applyActionFor, confirmProps } = useTeamRequests();
+
+  // Which course the viewer takes a place on. `RequireParticipant` guards this page, so anyone
+  // who is not a participant here is an admin: they have no course, join nothing, and keep the
+  // old filter. A participant whose course is somehow unset is a second-year, because that is
+  // what the backend assumes of them — the list then cannot offer a team the button would refuse.
+  const placesForCourse = isParticipant ? user?.student?.course ?? 2 : null;
 
   // The catalogue always shows the current selection, so there is nothing to show between two.
   const selectionRunning = activeTrack != null;
@@ -66,7 +72,11 @@ const TeamsPage = () => {
       <Navbar />
       <SearchBar onSearch={handleSearch} />
       <main className="page-container content-layout catalog-layout">
-        <Filter filterParams={filterParams} onApplyFilters={handleApplyFilters} />
+        <Filter
+          filterParams={filterParams}
+          onApplyFilters={handleApplyFilters}
+          placesForCourse={placesForCourse}
+        />
         <MainContent>
           <div className="catalog-head">
             <div>

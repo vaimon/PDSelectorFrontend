@@ -137,6 +137,30 @@ test('a first-year asks to join, the lead accepts, and both sides see it', async
   const card = catalog.locator('.card').filter({ has: catalog.getByRole('heading', { name: teamName }) });
   await expect(card).toBeVisible();
   await expectNoSidewaysScroll(catalog, testInfo);
+
+  // «Есть места для моего курса» asks the backend about this student's own year. What the
+  // parameter means is pinned on the backend (vaimon/team-selection#37); what has to hold here is
+  // that the viewer's course reaches the wire under the name the two repositories agreed on — a
+  // dropped parameter, a renamed key or a course read from the wrong place each turn this red.
+  // A frontend that hardcoded 1 would pass: both projects act as a first-year here, and course 2
+  // is checked by hand rather than by seeding three more students.
+  const filters = catalog.locator('.filter-section');
+  const showFilters = filters.getByRole('button', { name: 'Показать' });
+  if (await showFilters.isVisible()) {
+    await showFilters.click();
+  }
+  // The response, not the request: the assertion below then runs against a settled list instead
+  // of relying on the page still showing «Загружаем команды…» while the fetch is in flight.
+  const filtered = catalog.waitForResponse(
+    (response) => response.url().includes('/teams/search')
+      && response.url().includes('has_place_for_course=1'),
+  );
+  await filters.getByLabel('Есть места для моего курса').check();
+  await filters.getByRole('button', { name: 'Применить' }).click();
+  await filtered;
+  // The team has every first-year place free at this point, so it survives its own filter.
+  await expect(card).toBeVisible();
+
   await card.getByRole('button', { name: 'Подать заявку' }).click();
   await confirm(catalog, 'Отправить заявку?', 'Отправить');
   await expect(catalog.getByRole('status')).toContainText('Заявка отправлена');
