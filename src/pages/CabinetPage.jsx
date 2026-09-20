@@ -110,6 +110,7 @@ const CabinetPage = () => {
       return (
         <div className="cards">
           <Card
+            variant="team"
             name={myTeam.name}
             type={myTeam.project_type?.name}
             resume={myTeam.project_description}

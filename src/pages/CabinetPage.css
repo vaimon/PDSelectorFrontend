@@ -180,3 +180,9 @@
     width: 100%;
   }
 }
+
+/* The cabinet holds exactly one team, and a grid of one is a card with an empty track beside it.
+   Here the card is the section, so it takes the column. */
+.cabinet-section .cards {
+  grid-template-columns: minmax(0, 1fr);
+}

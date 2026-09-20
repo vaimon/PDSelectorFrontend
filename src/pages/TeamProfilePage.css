@@ -147,44 +147,6 @@
   overflow-wrap: anywhere;
 }
 
-.team-info-row .card-tags {
-  min-height: 0;
-  height: auto;
-  overflow: visible;
-}
-
-.team-members .card {
-  gap: var(--gap);
-}
-
-.team-members .cards {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-}
-
-.team-members .card-header,
-.team-members .card-name,
-.team-members .card-resume,
-.team-members .card-tags {
-  min-height: 0;
-}
-
-@media (min-width: 600px) {
-  .team-members .card-name,
-  .team-members .card-resume,
-  .team-members .card-tags {
-    height: auto;
-  }
-
-  .team-members .card-resume {
-    min-height: calc(1.55em * 2);
-  }
-
-  .team-members .card-tags {
-    min-height: 24px;
-    overflow: visible;
-  }
-}
-
 .team-inline-state {
   margin: 0;
   padding: var(--pad);
@@ -222,10 +184,6 @@
 
   .team-profile-layout .sidebar-links a {
     white-space: nowrap;
-  }
-
-  .team-members .cards {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   }
 }
 

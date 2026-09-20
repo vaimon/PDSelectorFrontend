@@ -95,7 +95,6 @@
 
 .profile-detail .card-tags {
   justify-content: flex-start;
-  min-height: 0;
 }
 
 .profile-detail--about span {

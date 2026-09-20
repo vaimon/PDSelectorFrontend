@@ -21,21 +21,11 @@
   gap: var(--space-8);
 }
 
-.card-header {
-  min-height: 0;
-}
-
-.card--with-type .card-header,
-.card--application .card-header {
-  min-height: 76px;
-}
-
 .card-body {
   flex: 1;
 }
 
 .card-name {
-  min-height: calc(1.35em * 2);
   margin: 0;
   color: var(--text);
   font-size: var(--fs-lg);
@@ -56,12 +46,7 @@
   line-height: 1.55;
 }
 
-.card-type {
-  min-height: calc(1.55em + 1px);
-}
-
 .card-resume {
-  min-height: calc(1.55em * 3);
   align-items: flex-start;
 }
 
@@ -75,12 +60,17 @@
   white-space: nowrap;
 }
 
-.card-type p,
-.card-resume p {
-  flex-grow: 1;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.card-resume-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Label on its own line, chips under it: in front of them, a wrapped second row started under
+   the label instead of at the card edge. */
+.card-technologies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .card-tags {
@@ -89,7 +79,6 @@
   align-items: center;
   align-content: flex-start;
   gap: var(--space-8);
-  min-height: 54px;
   margin: 0;
 }
 
@@ -181,7 +170,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 30px;
+  min-height: var(--ctrl-h);
   width: 100%;
   margin: 0;
   padding: 0 var(--gap);
@@ -238,59 +227,34 @@
 }
 
 .action-button:focus-visible,
-.card input:focus-visible,
-.card textarea:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.card input,
-.card textarea {
-  width: 100%;
-  min-height: var(--ctrl-h);
-  padding: var(--space-8) var(--gap);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-}
-
+/* Long text is capped, not padded out: a name takes at most two lines and a summary three, and
+   a card with less in it is simply shorter. */
 @media (min-width: 600px) {
-  .card-name {
+  .card-name,
+  .card-resume-text {
     display: -webkit-box;
-    height: calc(1.35em * 2);
-    min-height: calc(1.35em * 2);
     overflow: hidden;
     -webkit-box-orient: vertical;
+  }
+
+  .card-name {
     -webkit-line-clamp: 2;
   }
 
+  /* A person is фамилия имя отчество: one line and an ellipsis keep a row of people even, while
+     a team name is free text and gets the two. This is what the variant is for. */
   .card--person .card-name {
-    display: block;
-    height: 1.35em;
-    min-height: 1.35em;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
+  }
+
+  .card-resume-text {
+    -webkit-line-clamp: 3;
   }
 
   .card-type {
-    height: calc(1.55em + 1px);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-
-  .card-resume {
-    height: calc(1.55em * 3);
-    min-height: calc(1.55em * 3);
-    overflow: hidden;
-  }
-
-  .card-tags {
-    height: 54px;
-    overflow: hidden;
   }
 }
 
@@ -306,7 +270,7 @@
 }
 
 .card-action-reason {
-  margin: 0 var(--pad) var(--space-8);
+  margin: 0;
   color: var(--text-3);
   font-size: 12px;
   line-height: 1.45;
@@ -327,7 +291,7 @@
 
 /* A fact about the card's subject that decides whether to act on it — places left, for a team. */
 .card-note {
-  margin: 0 var(--pad) var(--space-8);
+  margin: 0;
   color: var(--text-2);
   font-size: 12px;
   line-height: 1.45;
@@ -342,14 +306,6 @@
   .card-resume {
     flex-direction: column;
     gap: var(--space-4);
-  }
-
-  .card-header,
-  .card-name,
-  .card-type,
-  .card-resume,
-  .card-tags {
-    min-height: 0;
   }
 
   .card-actions {
