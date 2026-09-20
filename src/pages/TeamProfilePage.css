@@ -111,14 +111,6 @@
   line-height: 1.35;
 }
 
-.team-summary-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  align-items: stretch;
-  gap: var(--gap);
-  width: 100%;
-}
-
 .team-info-card {
   display: grid;
   gap: 1px;
@@ -138,8 +130,7 @@
   background: var(--surface);
 }
 
-.team-info-row > span,
-.team-captain span {
+.team-info-row > span {
   color: var(--text-3);
   font-size: calc(var(--fs) - 1px);
   font-weight: 500;
@@ -163,38 +154,6 @@
   min-height: 0;
   height: auto;
   overflow: visible;
-}
-
-.team-captain {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 0;
-  padding: var(--pad);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  color: var(--text-2);
-}
-
-.team-captain > svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--accent);
-  font-size: 20px;
-}
-
-.team-captain > div {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--r-sm);
-}
-
-.team-captain strong {
-  color: var(--text);
-  font-weight: 500;
-  overflow-wrap: anywhere;
 }
 
 .team-members .card {
@@ -268,10 +227,6 @@
     white-space: nowrap;
   }
 
-  .team-summary-grid {
-    grid-template-columns: minmax(0, 1fr) 210px;
-  }
-
   .team-members .cards {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   }
@@ -314,17 +269,9 @@
     align-items: flex-start;
   }
 
-  .team-summary-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .team-info-row {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--r-sm);
-    padding: var(--gap);
-  }
-
-  .team-captain {
     padding: var(--gap);
   }
 }
@@ -352,7 +299,7 @@
   text-underline-offset: 3px;
 }
 
-.team-apply {
+.team-action {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -361,7 +308,7 @@
   min-width: 0;
 }
 
-.team-apply-reason {
+.team-action-reason {
   color: var(--text-3);
   font-size: 12px;
   line-height: 1.45;
@@ -369,7 +316,81 @@
 
 @media (max-width: 640px) {
   /* The reason gets its own line instead of a squeezed column next to the button. */
-  .team-apply-reason {
+  .team-action-reason {
     flex-basis: 100%;
+  }
+}
+
+/* The one place on the page where a click cannot be taken back, kept away from the roster. */
+.team-danger {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  margin-top: var(--gap);
+  padding: var(--pad);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r-lg);
+  background: var(--warn-bg);
+}
+
+.team-danger-text {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 320px;
+  flex-direction: column;
+  gap: var(--r-sm);
+}
+
+.team-danger h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.team-danger p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.team-danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--warn);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.team-danger-button:hover:not(:disabled) {
+  border-color: var(--warn);
+}
+
+.team-danger-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.team-danger-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .team-danger-button {
+    width: 100%;
   }
 }

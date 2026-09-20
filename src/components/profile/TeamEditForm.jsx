@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import Modal from "../forms/modal/Modal";
+// The form is rendered from the team page as well, which pulls in nothing else from here.
+import "./style.css";
 
 
 const TeamEditForm = ({
@@ -33,10 +35,17 @@ const TeamEditForm = ({
 
   const handleProjectTypeChange = (e) => {
     const { value } = e.target;
-    console.log(value);
     setFormData((prev) => ({ ...prev, project_type: projectTypes.find(type => type.id === (value*1)) }));
   };
-  
+
+  // TeamUpdateDto requires both (@NotBlank name, @NotNull project type) and answers a missing one
+  // with a bare 400, which says nothing about which field it means.
+  const missing = !formData.name?.trim()
+    ? "Укажите название команды."
+    : !formData.project_type
+      ? "Выберите тип проекта."
+      : null;
+
 
   const handleRemoveTechnology = (idToRemove) => {
     const updatedTechnologies = formData.technologies.filter(
@@ -91,6 +100,7 @@ const TeamEditForm = ({
             name="project_description"
             value={formData.project_description || ""}
             onChange={handleChange}
+            maxLength={1024}
           />
         </label>
 
@@ -139,11 +149,18 @@ const TeamEditForm = ({
           </div>
         </label>
 
+        {missing && <p className="profile-form-hint">{missing}</p>}
+
         <div className="form-buttons">
           <button type="button" onClick={() => toggleModal("add")}>
             Добавить технологию
           </button>
-          <button type="button" className="save-button" onClick={handleSave}>
+          <button
+            type="button"
+            className="save-button"
+            onClick={handleSave}
+            disabled={Boolean(missing)}
+          >
             Сохранить
           </button>
           <button type="button" className="cancel-button" onClick={onCancel}>
