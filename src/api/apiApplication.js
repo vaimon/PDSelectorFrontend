@@ -27,6 +27,18 @@ export const sendRequest = async (studentId, teamId) => {
   return response.data;
 };
 
+// A team lead asking a student to join. The backend takes the team's lead as the sender, so nobody
+// else can send one (ApplicationValidator.validateCreate).
+export const sendInvite = async (studentId, teamId) => {
+  const response = await apiClient.post('/applications', {
+    student_id: studentId,
+    team_id: teamId,
+    status: 'SENT',
+    type: 'INVITE',
+  });
+  return response.data;
+};
+
 // Only the sender, and only while the application is still `SENT`.
 export const cancelApplication = (application) => changeStatus(application, 'CANCELLED');
 

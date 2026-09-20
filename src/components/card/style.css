@@ -319,3 +319,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* An action that takes something back is not the primary thing to do on the card. */
+.action-button.apply.action-button--cancel {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.action-button.apply.action-button--cancel:hover {
+  background: var(--surface-2);
+}

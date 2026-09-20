@@ -176,6 +176,50 @@ test('a friend opens the join link signed out and joins through login and the qu
   await expect(page.locator('.team-members').getByRole('heading', { name: friend.fio })).toBeVisible();
 });
 
+test('the lead invites a free student and they accept', async ({ browser }, testInfo) => {
+  expect(people.lead && teamName, 'builds on the team step; run the whole file').toBeTruthy();
+  // A first-year: by now the team's second-year places are taken.
+  const invitee = newcomer(testInfo, 'invitee');
+  const { page: student } = await signIn(browser, invitee);
+  await fillQuestionnaire(student, testInfo, { course: 1, group: 7, contact: '@smoke_invitee' });
+
+  const { page: lead } = await signIn(browser, people.lead);
+  await lead.goto('/students');
+  await lead.getByRole('search').getByRole('textbox').fill(invitee.fio);
+  await lead.getByRole('search').getByRole('button', { name: 'Выполнить поиск' }).click();
+  const card = lead.locator('.card').filter({ has: lead.getByRole('heading', { name: invitee.fio }) });
+  await expect(card).toBeVisible();
+  await expectNoSidewaysScroll(lead, testInfo);
+  await card.getByRole('button', { name: 'Пригласить' }).click();
+  await confirm(lead, 'Пригласить в команду?', 'Пригласить');
+  await expect(lead.getByRole('status')).toContainText('Приглашение отправлено');
+
+  await lead.goto('/applications');
+  const sent = lead.locator('section')
+    .filter({ has: lead.getByRole('heading', { name: 'Отправленные приглашения' }) });
+  await expect(sent.getByRole('listitem').filter({ hasText: invitee.fio })).toBeVisible();
+
+  // The student answers where everything else waiting for them is.
+  await student.goto('/applications');
+  const incoming = student.locator('section')
+    .filter({ has: student.getByRole('heading', { name: 'Приглашения в команды' }) });
+  await expect(incoming.getByRole('link', { name: teamName })).toBeVisible();
+  await expectNoSidewaysScroll(student, testInfo);
+  await incoming.getByRole('button', { name: 'Принять' }).click();
+  await confirm(student, 'Принять приглашение?', 'Принять');
+  await expect(student.getByRole('status')).toContainText('Вы в команде');
+
+  await student.goto('/profile');
+  await openMyTeamSection(student);
+  await expect(student.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
+
+  // Nothing is left waiting on the lead's side: the invite is answered, not cancellable any more.
+  await lead.goto('/applications');
+  const answered = sent.getByRole('listitem').filter({ hasText: invitee.fio });
+  await expect(answered).toContainText('Принята');
+  await expect(answered.getByRole('button', { name: 'Отменить' })).toHaveCount(0);
+});
+
 test('a registered student opens the link signed out and is brought back to it after login @desktop', async ({ browser }) => {
   expect(joinLink, 'builds on the join-link step; run the whole file').toBeDefined();
   const context = await browser.newContext();

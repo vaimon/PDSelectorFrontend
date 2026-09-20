@@ -17,12 +17,13 @@ import './ApplicationsPage.css';
 
 
 const ApplicationsPage = () => {
-  const { invites, requests, myRequests, loading, refresh } = useApplications();
+  const { invites, requests, myRequests, sentInvites, loading, refresh } = useApplications();
   const { activeTrack, isSelectionOpen } = useIdentity();
   const { ask, confirmProps } = useConfirmAction(refresh);
 
   const closedReason = selectionClosedReason(activeTrack);
-  const isEmpty = invites.length === 0 && requests.length === 0 && myRequests.length === 0;
+  const isEmpty = invites.length === 0 && requests.length === 0
+    && myRequests.length === 0 && sentInvites.length === 0;
 
   const renderAction = (label, variant, request) => (
     <button
@@ -56,8 +57,9 @@ const ApplicationsPage = () => {
             <p className="loading-state">Загружаем заявки…</p>
           ) : isEmpty ? (
             <p className="empty-state">
-              Ничего не ждёт ответа. Здесь появятся приглашения от команд и заявки,{' '}
-              которые вы отправите из <Link to="/teams">каталога</Link>.
+              Ничего не ждёт ответа. Здесь появятся приглашения от команд, заявки,{' '}
+              которые вы отправите из <Link to="/teams">каталога</Link>, и приглашения,{' '}
+              которые вы отправите из <Link to="/students">списка участников</Link>.
             </p>
           ) : (
             <div className="applications">
@@ -70,7 +72,22 @@ const ApplicationsPage = () => {
                         <Link to={`/teams/${invite.team?.id}`} className="application-subject">
                           {invite.team?.name ?? 'Команда'}
                         </Link>
-                        <span className="application-status">Ожидает вашего ответа</span>
+                        <span className="application-actions">
+                          {renderAction('Принять', 'accept', {
+                            heading: 'Принять приглашение?',
+                            description: `Вы войдёте в состав «${invite.team?.name}», а ваши собственные заявки в другие команды будут отменены. Решение необратимо.`,
+                            confirmText: 'Принять',
+                            successText: 'Вы в команде',
+                            run: () => acceptApplication(invite),
+                          })}
+                          {renderAction('Отклонить', 'reject', {
+                            heading: 'Отклонить приглашение?',
+                            description: `Вы не войдёте в «${invite.team?.name}». Позвать вас снова сможет только тимлид команды.`,
+                            confirmText: 'Отклонить',
+                            successText: 'Приглашение отклонено',
+                            run: () => rejectApplication(invite),
+                          })}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -107,6 +124,37 @@ const ApplicationsPage = () => {
                         </span>
                       </li>
                     ))}
+                  </ul>
+                </section>
+              )}
+
+              {sentInvites.length > 0 && (
+                <section className="applications-section">
+                  <h2>Отправленные приглашения</h2>
+                  <ul className="applications-list">
+                    {sentInvites.map((invite) => {
+                      const status = describeApplicationStatus(invite.status);
+                      const name = invite.student?.fio ?? 'Участник';
+                      return (
+                        <li key={invite.id} className="application-row">
+                          <Link to={`/students/${invite.student?.id}`} className="application-subject">
+                            {name}
+                          </Link>
+                          <span className="application-actions">
+                            <span className={`application-status application-status--${status.tone}`}>
+                              {status.text}
+                            </span>
+                            {isPendingApplication(invite) && renderAction('Отменить', 'cancel', {
+                              heading: 'Отменить приглашение?',
+                              description: `${name} больше не увидит приглашение. Пригласить снова можно будет из списка участников.`,
+                              confirmText: 'Отменить приглашение',
+                              successText: 'Приглашение отменено',
+                              run: () => cancelApplication(invite),
+                            })}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </section>
               )}

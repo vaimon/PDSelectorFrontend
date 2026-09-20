@@ -8,6 +8,7 @@ import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import useTeamData from "../hooks/useTeamData";
 import { useTeamRequests } from "../hooks/useTeamRequests";
 import { useApplications } from "../context/applicationsContext";
+import { isPendingApplication } from "../utils/applicationStatus";
 import TeamEditForm from "../components/profile/TeamEditForm";
 import JoinLinkPanel from "../components/join-link/JoinLinkPanel";
 import { useTechnologies } from "../hooks/useTechnologies";
@@ -29,11 +30,12 @@ const TeamProfilePage = () => {
 
   const { allTechnologies } = useTechnologies();
   const { applyActionFor, confirmProps } = useTeamRequests();
-  const { requests } = useApplications();
+  const { requests, sentInvites } = useApplications();
 
   const applyAction = applyActionFor(teamData?.id ? teamData : null);
   // Requests to this team are answered in one place, «Заявки», where the navbar counter points.
   const pendingForThisTeam = isCaptain ? requests.length : 0;
+  const pendingInvites = isCaptain ? sentInvites.filter(isPendingApplication).length : 0;
 
   const handleSave = async (updatedData) => {
     await updateTeam(updatedData, teamId);
@@ -179,6 +181,13 @@ const TeamProfilePage = () => {
                   <div>
                     <p className="team-section-kicker">Состав</p>
                     <h2 id="team-members-title">Текущие участники</h2>
+                    {/* Answering happens on «Заявки», where the navbar counter points. */}
+                    {isCaptain && pendingInvites > 0 && (
+                      <p className="team-section-note">
+                        Приглашений ждёт ответа: {pendingInvites}.{" "}
+                        <Link to="/applications">Посмотреть</Link>
+                      </p>
+                    )}
                   </div>
                   {isCaptain && (
                     <Link to="/applications" className="team-edit-toggle">

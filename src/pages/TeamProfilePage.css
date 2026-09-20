@@ -339,3 +339,15 @@
     flex-direction: column;
   }
 }
+
+.team-section-note {
+  margin: 6px 0 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.team-section-note a {
+  color: var(--accent-text);
+  text-underline-offset: 3px;
+}

@@ -14,6 +14,7 @@ const Card = ({
   applyText = "Подать заявку",
   applyDisabled = false,
   applyTitle,
+  applyTone = "primary",
   viewText = "Перейти",
   showApplyButton,
   showEditingOptions
@@ -107,7 +108,7 @@ const Card = ({
       {hasActions && <div className="card-actions">
         {showApplyAction && (
           <button
-            className="action-button apply"
+            className={`action-button apply${applyTone === "cancel" ? " action-button--cancel" : ""}`}
             onClick={handleApply}
             disabled={applyDisabled}
             title={applyTitle}
