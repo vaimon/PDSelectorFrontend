@@ -17,7 +17,18 @@ function App() {
               <PendingJoinRedirect />
               <Routes>
                 {routes.map((route, index) => (
-                  <Route key={index} path={route.path} element={route.element} />
+                  <Route key={index} path={route.path} element={route.element}>
+                    {/* An area with sections is one route with children: the parent draws the
+                        frame and <Outlet/> draws whichever section is open. */}
+                    {route.children?.map((child, childIndex) => (
+                      <Route
+                        key={childIndex}
+                        index={child.index}
+                        path={child.path}
+                        element={child.element}
+                      />
+                    ))}
+                  </Route>
                 ))}
               </Routes>
             </ApplicationsProvider>
