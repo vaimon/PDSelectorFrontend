@@ -1,0 +1,98 @@
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+}
+
+.settings-form label {
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+}
+
+/* Everything else an input needs is already global (`src/styles/style.css`); only the side
+   padding is this form's own. */
+.settings-form input {
+  padding: 0 9px;
+}
+
+.settings-actions button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.settings-form input:disabled {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+
+.settings-form input.input-error {
+  border-color: var(--bad);
+}
+
+/* Two fields that are read together — the two ends of the window, the two years' places. */
+.settings-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: var(--gap);
+}
+
+.settings-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.settings-note {
+  margin: var(--space-8) 0 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-8);
+  gap: var(--gap);
+}
+
+.settings-actions button {
+  min-height: var(--ctrl-h);
+  padding: 0 var(--pad);
+  border: 1px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: var(--fs);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.settings-actions button:hover:not(:disabled) {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+}
+
+.settings-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A disabled control says why in text: a phone has no hover, and `title` is unreachable there. */
+.settings-reason {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.settings-handover {
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+  border-top: 1px solid var(--hairline);
+}
