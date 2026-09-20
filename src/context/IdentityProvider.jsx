@@ -17,7 +17,10 @@ const IdentityProvider = ({ children }) => {
   const [state, setState] = useState({ ...EMPTY, loading: true, error: null });
 
   const load = useCallback(async () => {
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    // A reload after an action (joining a team, filling the questionnaire) keeps what is known
+    // on screen: flipping `loading` here would blank the navigation for the duration of the
+    // requests. Only the very first load has nothing to show.
+    setState((prev) => ({ ...prev, loading: prev.user == null, error: null }));
     try {
       const [user, studentId, activeTrack] = await Promise.all([
         fetchCurrentUser(),

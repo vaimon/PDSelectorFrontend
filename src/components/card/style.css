@@ -330,3 +330,10 @@
 .action-button.apply.action-button--cancel:hover {
   background: var(--surface-2);
 }
+
+.card-action-reason {
+  margin: 0 var(--pad) 8px;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}

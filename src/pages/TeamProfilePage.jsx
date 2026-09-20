@@ -104,15 +104,20 @@ const TeamProfilePage = () => {
                     {showEditForm ? "Закрыть" : "Редактировать"}
                   </button>
                 ) : applyAction && (
-                  <button
-                    type="button"
-                    className="team-edit-toggle team-apply-button"
-                    onClick={applyAction.onClick}
-                    disabled={applyAction.disabled}
-                    title={applyAction.title}
-                  >
-                    {applyAction.label}
-                  </button>
+                  <div className="team-apply">
+                    {applyAction.disabled && applyAction.reason && (
+                      <span className="team-apply-reason">{applyAction.reason}</span>
+                    )}
+                    <button
+                      type="button"
+                      className="team-edit-toggle team-apply-button"
+                      onClick={applyAction.onClick}
+                      disabled={applyAction.disabled}
+                      title={applyAction.reason}
+                    >
+                      {applyAction.label}
+                    </button>
+                  </div>
                 )}
               </div>
 

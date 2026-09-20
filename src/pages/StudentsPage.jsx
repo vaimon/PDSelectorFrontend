@@ -83,7 +83,7 @@ const StudentsPage = () => {
                     onApply={inviteAction?.onClick}
                     applyText={inviteAction?.label}
                     applyDisabled={inviteAction?.disabled}
-                    applyTitle={inviteAction?.title}
+                    applyReason={inviteAction?.reason}
                     applyTone={inviteAction?.tone}
                   />
                 );

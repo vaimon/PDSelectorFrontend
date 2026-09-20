@@ -351,3 +351,25 @@
   color: var(--accent-text);
   text-underline-offset: 3px;
 }
+
+.team-apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+.team-apply-reason {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  /* The reason gets its own line instead of a squeezed column next to the button. */
+  .team-apply-reason {
+    flex-basis: 100%;
+  }
+}

@@ -37,7 +37,9 @@ export const useTeamInvites = () => {
       return {
         label: 'Отменить приглашение',
         tone: 'cancel',
-        disabled: false,
+        // Cancelling is a student mutation too, so the backend refuses it outside the window.
+        disabled: !isSelectionOpen,
+        reason: isSelectionOpen ? null : closedReason,
         onClick: () => ask({
           heading: 'Отменить приглашение?',
           description: `${name} больше не увидит приглашение в «${myTeam.name}». Пригласить снова можно будет отсюда же.`,
@@ -50,17 +52,25 @@ export const useTeamInvites = () => {
 
     // Reasons the backend would refuse anyway, said before the click instead of after it.
     const placesLeft = placesLeftFor(myTeam.composition, student.course);
+    // The validator compares the student's selection with the team's, not with the active one.
+    // Note the two shapes: a team carries `current_track` as a bare id, a student as an object
+    // whose `id` comes back null from the catalogue (only the name is filled), so the id comes
+    // from the nested user record. When neither says, the button stays enabled and the backend
+    // has the last word.
+    const studentTrackId = student.current_track?.id ?? student.user?.student?.current_track_id ?? null;
+    const inThisSelection = studentTrackId == null || studentTrackId === myTeam.current_track;
     const reason = !isSelectionOpen ? closedReason
       : student.has_team ? `${name} уже состоит в команде.`
-        : placesLeft === 0 ? `В команде не осталось мест для ${student.course === 1 ? '1 курса' : '2 курса и старше'}.`
-          : null;
+        : !inThisSelection ? `${name} не участвует в текущем наборе.`
+          : placesLeft === 0 ? `В команде не осталось мест для ${student.course === 1 ? '1 курса' : '2 курса и старше'}.`
+            : null;
 
     const sendAgain = mine != null;
     return {
       label: sendAgain ? 'Пригласить снова' : 'Пригласить',
       tone: 'primary',
       disabled: Boolean(reason),
-      title: reason ?? undefined,
+      reason,
       onClick: () => ask({
         heading: 'Пригласить в команду?',
         description: `${name} увидит приглашение в «${myTeam.name}» и решит сам. Приняв его, он войдёт в состав, а его собственные заявки отменятся.`,

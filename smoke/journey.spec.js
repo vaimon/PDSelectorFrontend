@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { expectNoSidewaysScroll, logIn, newcomer, seeded, signIn } from './support/people';
 
 // The student journey against the real backend, one step building on the previous one. Steps still
-// to come with their features: invites (#16), "how it works" (#25) and the admin board (#27) each
-// add their own step here.
+// to come with their features: "how it works" (#25) and the admin board (#27) each add their own
+// step here.
 //
 // On desktop the team lead and the first-year are the seeded people; at 390px everybody is a
 // newcomer who fills the questionnaire from the phone first.
@@ -40,6 +40,16 @@ async function confirm(page, heading, action) {
   await expect(dialog.getByRole('heading', { name: heading })).toBeVisible();
   await dialog.getByRole('button', { name: action, exact: true }).click();
   await expect(dialog).toBeHidden();
+}
+
+/** Clicks a navbar link, opening the menu first at phone width — no page reload either way. */
+async function navigateTo(page, label) {
+  const menu = page.getByRole('button', { name: 'Меню разделов' });
+  if (await menu.isVisible()) {
+    await menu.click();
+  }
+  await page.locator('.navbar').getByRole('link', { name: label, exact: true })
+    .filter({ visible: true }).click();
 }
 
 /** Opens «Моя команда» in the cabinet sidebar (the navbar has a link of the same name). */
@@ -178,7 +188,8 @@ test('a friend opens the join link signed out and joins through login and the qu
 
 test('the lead invites a free student and they accept', async ({ browser }, testInfo) => {
   expect(people.lead && teamName, 'builds on the team step; run the whole file').toBeTruthy();
-  // A first-year: by now the team's second-year places are taken.
+  // A first-year: the seeded targets are 3 + 3 and the first-year places are the ones still free
+  // after the earlier steps.
   const invitee = newcomer(testInfo, 'invitee');
   const { page: student } = await signIn(browser, invitee);
   await fillQuestionnaire(student, testInfo, { course: 1, group: 7, contact: '@smoke_invitee' });
@@ -190,7 +201,7 @@ test('the lead invites a free student and they accept', async ({ browser }, test
   const card = lead.locator('.card').filter({ has: lead.getByRole('heading', { name: invitee.fio }) });
   await expect(card).toBeVisible();
   await expectNoSidewaysScroll(lead, testInfo);
-  await card.getByRole('button', { name: 'Пригласить' }).click();
+  await card.getByRole('button', { name: 'Пригласить', exact: true }).click();
   await confirm(lead, 'Пригласить в команду?', 'Пригласить');
   await expect(lead.getByRole('status')).toContainText('Приглашение отправлено');
 
@@ -209,15 +220,27 @@ test('the lead invites a free student and they accept', async ({ browser }, test
   await confirm(student, 'Принять приглашение?', 'Принять');
   await expect(student.getByRole('status')).toContainText('Вы в команде');
 
-  await student.goto('/profile');
-  await openMyTeamSection(student);
-  await expect(student.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
+  // Everything below has to happen inside the running app: a reload would refetch identity and
+  // hide exactly the bug this step exists for. The marker dies with the document, so a `goto`
+  // slipped in later turns the check red instead of quietly making it vacuous.
+  await student.evaluate(() => { window.__sameDocument = true; });
+  // The shell has to know the student is in a team now, or the catalogue keeps offering
+  // «Подать заявку» and «Моя команда» keeps pointing at the cabinet.
+  await navigateTo(student, 'Команды');
+  const ownTeamCard = student.locator('.card')
+    .filter({ has: student.getByRole('heading', { name: teamName }) });
+  await expect(ownTeamCard).toBeVisible();
+  await expect(student.getByRole('button', { name: 'Подать заявку', exact: true })).toHaveCount(0);
+  await navigateTo(student, 'Моя команда');
+  await expect(student).toHaveURL(/\/teams\/\d+$/);
+  await expect(student.getByRole('heading', { name: teamName, level: 1 })).toBeVisible();
+  expect(await student.evaluate(() => window.__sameDocument), 'navigated without reloading').toBe(true);
 
   // Nothing is left waiting on the lead's side: the invite is answered, not cancellable any more.
   await lead.goto('/applications');
   const answered = sent.getByRole('listitem').filter({ hasText: invitee.fio });
   await expect(answered).toContainText('Принята');
-  await expect(answered.getByRole('button', { name: 'Отменить' })).toHaveCount(0);
+  await expect(answered.getByRole('button', { name: 'Отменить приглашение', exact: true })).toHaveCount(0);
 });
 
 test('a registered student opens the link signed out and is brought back to it after login @desktop', async ({ browser }) => {
