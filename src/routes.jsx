@@ -4,7 +4,8 @@ import Registration from './pages/RegistrationPage';
 import TeamsPage from './pages/TeamsPage';
 import StudentProfilePage from "./pages/StudentProfile";
 import CabinetPage from './pages/CabinetPage';
-import AdminPage from './pages/AdminPage';
+import AdminLayout from './pages/AdminLayout';
+import AdminOverviewPage from './pages/AdminOverviewPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
@@ -56,8 +57,13 @@ const routes = [
     element: <RequireParticipant><ApplicationsPage /></RequireParticipant>
   },
   {
+    // The area is a layout with one section so far: #47-#49 add siblings to `children` and
+    // inherit the frame — the selection's name, the hand-over banner — instead of repeating it.
     path: '/admin',
-    element: <RequireAdmin><AdminPage /></RequireAdmin>
+    element: <RequireAdmin><AdminLayout /></RequireAdmin>,
+    children: [
+      { index: true, element: <AdminOverviewPage /> },
+    ]
   },
   {
     path: '/teams/:teamId',

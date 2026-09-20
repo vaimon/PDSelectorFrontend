@@ -1,0 +1,53 @@
+.admin-area {
+  padding-block: var(--pad);
+  color: var(--text);
+  text-align: left;
+}
+
+.admin-head {
+  margin-bottom: var(--gap);
+}
+
+.admin-kicker {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-head h1 {
+  margin: var(--space-4) 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.admin-lead {
+  margin: var(--space-8) 0 0;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+/* Said once, at the top: after the hand-over nothing below it can be changed. */
+.admin-banner {
+  margin: 0 0 var(--gap);
+  padding: var(--gap) var(--pad);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r-lg);
+  background: var(--warn-bg);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+@media (max-width: 599.98px) {
+  .admin-area {
+    padding-block: var(--gap);
+  }
+
+  .admin-head h1 {
+    font-size: 20px;
+  }
+}

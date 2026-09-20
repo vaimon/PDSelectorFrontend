@@ -384,11 +384,45 @@ test('a registered student opens the link signed out and is brought back to it a
   await expect(page).toHaveURL(/\/profile$/);
 });
 
-test('the admin sees the team @desktop', async ({ browser }) => {
+/**
+ * The number a stat block shows, found by the words under it.
+ *
+ * The label is matched exactly against its own span: a block also carries a hint, and «1 курс» is
+ * a substring of the hint under «без команды» — a loose filter would match two blocks and die on
+ * strict mode instead of on the number.
+ */
+async function statValue(page, label) {
+  const stat = page.locator('.admin-stat').filter({ has: page.getByText(label, { exact: true }) });
+  await expect(stat, `«${label}» is on the overview`).toBeVisible();
+  return Number(await stat.locator('.admin-stat-value').innerText());
+}
+
+test('the admin lands on the overview and sees the team @desktop', async ({ browser }) => {
   expect(teamName, 'builds on the team step; run the whole file').toBeDefined();
   const { page, redirect } = await signIn(browser, seeded.admin);
   expect(redirect).toBe('/admin');
   await expect(page.getByRole('link', { name: 'Администрирование' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Где сейчас набор: Смоук-набор/ })).toBeVisible();
+
+  // The cast of this run, counted: the 3 seeded students plus the 3 who filled the questionnaire
+  // above — the team's lead and the friend (both 2 курс) and the invitee (1 курс); the first-year
+  // who asked to join is the seeded one on desktop. Three of them are in the one team by the end.
+  // Every number below is a different field of the answer, so a swapped pair — собраны/не хватает,
+  // в командах/без команды, 1 курс/2 курс — turns this red.
+  expect(await statValue(page, 'зарегистрировались')).toBe(6);
+  expect(await statValue(page, '1 курс')).toBe(2);
+  expect(await statValue(page, '2 курс и старше')).toBe(4);
+  expect(await statValue(page, 'в командах'), 'the team is down to three by the last step').toBe(3);
+  expect(await statValue(page, 'без команды')).toBe(3);
+  await expect(page.getByText('1 курс — 1, 2 курс и старше — 2')).toBeVisible();
+
+  expect(await statValue(page, 'всего'), 'the team this run created').toBe(1);
+  expect(await statValue(page, 'собраны'), 'it is short of 2 first-years and 1 second-year').toBe(0);
+  expect(await statValue(page, 'кого-то не хватает')).toBe(1);
+
+  // Every application this run raised was answered, so nothing is waiting and nothing is stale.
+  expect(await statValue(page, 'заявок от студентов')).toBe(0);
+  expect(await statValue(page, 'приглашений от команд')).toBe(0);
 
   await page.goto('/teams');
   await expect(page.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
