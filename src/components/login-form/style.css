@@ -5,7 +5,7 @@
   align-items: center;
   min-height: calc(100vh - var(--topbar-h));
   width: 100%;
-  padding: calc(var(--pad) * 2) var(--pad);
+  padding: var(--space-32) var(--pad);
   background: var(--bg);
   color: var(--text);
 }
@@ -13,10 +13,11 @@
 .auth-theme-toggle {
   position: absolute;
   top: var(--gap);
-  right: max(var(--pad), calc((100vw - 1200px) / 2 + var(--pad)));
+  /* The container edge, computed against the page and not the window: 100vw counts the scrollbar. */
+  right: max(var(--gutter), calc((100% - 1200px) / 2 + var(--gutter)));
 }
 
-@media (max-width: 720px) {
+@media (max-width: 899.98px) {
   .auth-theme-toggle .theme-toggle {
     width: auto;
     padding-inline: var(--gap);
@@ -42,7 +43,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(var(--pad) * 2);
+  padding: var(--space-32);
   background: var(--accent-weak);
   border-right: 1px solid var(--accent-border);
 }
@@ -59,15 +60,15 @@
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  gap: calc(var(--gap) + 6px);
-  padding: calc(var(--pad) * 2);
+  gap: var(--space-20);
+  padding: var(--space-32);
   text-align: left;
 }
 
 .login-identity {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-8);
 }
 
 .login-operator {
@@ -101,7 +102,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .login-button {
@@ -152,7 +153,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: var(--space-4);
   width: fit-content;
   color: var(--text-2);
   font-size: 12px;
@@ -176,7 +177,7 @@
 .registration-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .registration-container {
@@ -198,7 +199,7 @@
 .registration-form textarea {
   width: 100%;
   margin: 0;
-  padding: 0 12px;
+  padding: 0 var(--gap);
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);
@@ -235,8 +236,8 @@
 .form-buttons {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
+  gap: var(--space-8);
+  margin-top: var(--space-4);
 }
 
 .registration-form button {
@@ -276,7 +277,7 @@
   width: 100%;
   min-height: var(--ctrl-h);
   margin: 0;
-  padding: 0 12px;
+  padding: 0 var(--gap);
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);
@@ -330,7 +331,7 @@
 }
 
 .questionnaire-technologies {
-  margin: 4px 0 0;
+  margin: var(--space-4) 0 0;
   padding: 0;
   border: 0;
 }
@@ -345,14 +346,14 @@
 .technologies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 4px 12px;
-  margin-top: 8px;
+  gap: var(--space-4) var(--gap);
+  margin-top: var(--space-8);
 }
 
 .technology-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-8);
   min-height: 32px;
   color: var(--text);
   font-size: var(--fs);
@@ -368,7 +369,7 @@
 }
 
 .questionnaire-note {
-  margin: 4px 0 0;
+  margin: var(--space-4) 0 0;
   padding: var(--gap);
   border: 1px solid var(--border);
   border-radius: var(--r);
@@ -384,7 +385,19 @@
   font-size: 12px;
 }
 
-@media (max-width: 640px) {
+.questionnaire-invitation {
+  margin: 0;
+  padding: var(--gap);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--text);
+  font-size: var(--fs);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 599.98px) {
   .background {
     align-items: flex-start;
     padding: calc(var(--ctrl-h) + var(--pad) + var(--gap)) var(--pad) var(--pad);
@@ -417,37 +430,15 @@
   }
 
   .login-content {
-    padding: calc(var(--pad) + 8px);
+    padding: var(--space-24);
   }
 
   .registration-container {
     width: 100%;
-  }
-}
-
-@media (max-width: 420px) {
-  .background {
-    padding: calc(var(--ctrl-h) + (var(--gap) * 2)) var(--gap) var(--gap);
-  }
-
-  .login-content {
-    padding: var(--pad);
   }
 
   .login-button,
   .registration-form button {
     width: 100%;
   }
-}
-
-.questionnaire-invitation {
-  margin: 0;
-  padding: 10px var(--gap);
-  border: 1px solid var(--accent-border);
-  border-radius: var(--r);
-  background: var(--accent-weak);
-  color: var(--text);
-  font-size: var(--fs);
-  line-height: 1.5;
-  overflow-wrap: anywhere;
 }

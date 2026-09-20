@@ -21,7 +21,7 @@
   display: grid;
   grid-template-columns: 64px minmax(0, 1fr);
   align-items: center;
-  gap: 2px var(--gap);
+  gap: var(--space-4) var(--gap);
   margin: 0;
 }
 
@@ -149,7 +149,7 @@
 
 .profile-edit-form > h2,
 .form-header {
-  margin: 0 0 var(--r-sm);
+  margin: 0 0 var(--space-4);
   color: var(--text);
   font-size: 18px;
   font-weight: 600;
@@ -160,7 +160,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--r-sm);
+  gap: var(--space-4);
   width: 100%;
   margin: 0;
   color: var(--text-2);
@@ -194,7 +194,7 @@
   place-items: center;
   width: 20px;
   min-height: 20px;
-  margin-left: var(--r-sm);
+  margin-left: var(--space-4);
   padding: 0;
   border: 0;
   background: none;
@@ -218,7 +218,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: var(--gap);
-  margin-top: var(--r-sm);
+  margin-top: var(--space-4);
 }
 
 .profile-edit-form .save-button {
@@ -239,7 +239,7 @@
   padding: 0;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 599.98px) {
   .profile-container {
     padding: var(--gap);
   }
@@ -259,7 +259,7 @@
 
   .profile-detail {
     grid-template-columns: 1fr;
-    gap: var(--r-sm);
+    gap: var(--space-4);
   }
 
   .edit-button,

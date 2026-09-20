@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--gap);
   min-width: 0;
-  margin-top: calc(var(--pad) * 1.5);
+  margin-top: var(--space-24);
   padding: var(--pad);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -19,7 +19,7 @@
 }
 
 .join-link-kicker {
-  margin: 0 0 var(--r-sm);
+  margin: 0 0 var(--space-4);
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -40,7 +40,7 @@
   min-width: 0;
   min-height: var(--ctrl-h);
   margin: 0;
-  padding: 0 12px;
+  padding: 0 var(--gap);
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface-2);
@@ -58,7 +58,7 @@
 .join-link-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-8);
 }
 
 .join-link-button {
@@ -108,7 +108,7 @@
   color: var(--bad);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
   /* The lead passes the link on from a phone as often as from a laptop. */
   .join-link-panel {
     padding: var(--gap);

@@ -1,0 +1,70 @@
+/*
+ * Layout foundation: the breakpoints, the spacing scale and the one page container (#19).
+ *
+ * This file belongs to the fork. The Console palette in `design/theme.css` flows one way, core →
+ * here, and says not to re-derive its values; where a page breaks and how far its gutters sit from
+ * the edge is this app's own business, so it lives beside it instead of inside it.
+ *
+ * ---- Breakpoints ----
+ *
+ * Three, the same numbers core gets from MUI: 600, 900, 1200. There are no others. A component
+ * that needs a fourth is a component that wants a different layout, not a different number.
+ *
+ *   phone          @media (max-width: 599.98px)
+ *   below desktop  @media (max-width: 899.98px)
+ *   below wide     @media (max-width: 1199.98px)
+ *   from tablet up @media (min-width: 600px)
+ *
+ * The .98 is not decoration, and it is not whole pixels that make it necessary — it is that a
+ * viewport is not measured in whole pixels at all. At 150% display scaling, which is the default
+ * on the laptops this is used from, widths land on fractions: with `max-width: 599px` against
+ * `min-width: 600px`, 599.4px matches NEITHER, and the page renders in a state no rule intended.
+ *
+ * ---- Spacing ----
+ *
+ * A 4px grid in 8px steps. `--pad` (16px) and `--gap` (12px) come from the theme and are steps 16
+ * and 12 of this same scale — they are already tokens with the right values, so they keep their
+ * names and the rest of the scale fills in around them. No spacing step is computed any more —
+ * what `calc` remains sizes a box against the viewport or pulls one out to the page edge by the
+ * gutter — and the radius tokens are radii again.
+ *
+ * Three things are deliberately not on the scale, because they are not layout:
+ *   - what is inside a control — a chip's `3px 9px`, an input's `9px` — which the Console spec
+ *     sets against the type, not against the grid, and where a badge is pinned to a control's
+ *     corner (`-6px`);
+ *   - `gap: 1px` on a grid whose background is `--hairline`: that gap is a border, not a space.
+ */
+
+:root {
+  --space-4: 4px;
+  --space-8: 8px;
+  /* --gap is 12px */
+  /* --pad is 16px */
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+
+  /* Distance from the viewport edge to the content, at every width the container is not capped. */
+  --gutter: var(--pad);
+}
+
+@media (min-width: 600px) {
+  :root {
+    --gutter: var(--space-24);
+  }
+}
+
+/*
+ * The one page container: the header, the search bar and the page content all sit in it, which is
+ * what makes their left and right edges the same line (smoke/layout.spec.js checks that they are).
+ *
+ * The header is full-bleed, so it wraps its row in this instead of deriving the gutter from
+ * `100vw` — that width counts the scrollbar, and the header used to miss the content by exactly
+ * its width on every page that scrolls.
+ */
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}

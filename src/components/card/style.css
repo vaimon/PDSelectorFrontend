@@ -1,11 +1,11 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--gap) - 2px);
+  gap: var(--space-8);
   width: 100%;
   height: 100%;
   min-width: 0;
-  padding: calc(var(--pad) - 2px);
+  padding: var(--pad);
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -18,7 +18,7 @@
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
 }
 
 .card-header {
@@ -49,7 +49,7 @@
 .card-resume {
   display: flex;
   align-items: baseline;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   margin: 0;
   color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
@@ -88,7 +88,7 @@
   flex-wrap: wrap;
   align-items: center;
   align-content: flex-start;
-  gap: calc(var(--gap) / 2);
+  gap: var(--space-8);
   min-height: 54px;
   margin: 0;
 }
@@ -166,7 +166,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   width: 100%;
   margin-top: auto;
 }
@@ -248,7 +248,7 @@
 .card textarea {
   width: 100%;
   min-height: var(--ctrl-h);
-  padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  padding: var(--space-8) var(--gap);
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);
@@ -256,7 +256,7 @@
   font: inherit;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 600px) {
   .card-name {
     display: -webkit-box;
     height: calc(1.35em * 2);
@@ -294,32 +294,6 @@
   }
 }
 
-@media (max-width: 640px) {
-  .card {
-    padding: var(--gap);
-  }
-
-  .card-type,
-  .card-resume {
-    flex-direction: column;
-    gap: var(--r-sm);
-  }
-
-  .card-header,
-  .card-name,
-  .card-type,
-  .card-resume,
-  .card-tags {
-    min-height: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .card-actions {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* An action that takes something back is not the primary thing to do on the card. */
 .action-button.apply.action-button--cancel {
   border-color: var(--border-strong);
@@ -332,7 +306,7 @@
 }
 
 .card-action-reason {
-  margin: 0 var(--pad) 8px;
+  margin: 0 var(--pad) var(--space-8);
   color: var(--text-3);
   font-size: 12px;
   line-height: 1.45;
@@ -353,8 +327,32 @@
 
 /* A fact about the card's subject that decides whether to act on it — places left, for a team. */
 .card-note {
-  margin: 0 var(--pad) 8px;
+  margin: 0 var(--pad) var(--space-8);
   color: var(--text-2);
   font-size: 12px;
   line-height: 1.45;
+}
+
+@media (max-width: 599.98px) {
+  .card {
+    padding: var(--gap);
+  }
+
+  .card-type,
+  .card-resume {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .card-header,
+  .card-name,
+  .card-type,
+  .card-resume,
+  .card-tags {
+    min-height: 0;
+  }
+
+  .card-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -35,7 +35,7 @@ const StudentProfilePage = () => {
   return (
     <>
       <Navbar />
-      <main className="student-profile-page">
+      <main className="page-container student-profile-page">
         <header className="student-profile-toolbar">
           <button
             type="button"

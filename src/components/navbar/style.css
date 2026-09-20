@@ -2,17 +2,18 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: calc(var(--gap) + var(--r-lg));
   width: 100%;
-  max-width: none;
-  min-height: var(--topbar-h);
-  padding: 0 max(var(--pad), calc((100vw - 1200px) / 2 + var(--pad)));
-  margin-inline: auto;
   background: var(--surface);
   color: var(--text);
   border-bottom: 1px solid var(--border);
+}
+
+/* The bar spans the window; its contents sit in the page container, like everything below. */
+.navbar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-20);
+  min-height: var(--topbar-h);
 }
 
 .navbar .logo {
@@ -33,7 +34,7 @@
 .navbar .nav-links {
   display: flex;
   align-items: center;
-  gap: var(--r-sm);
+  gap: var(--space-4);
   margin: 0;
   font-size: var(--fs);
 }
@@ -42,7 +43,7 @@
 .navbar .nav-menu-dropdown a {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   min-height: var(--ctrl-h);
   padding: 0 var(--gap);
   border-radius: var(--r);
@@ -92,7 +93,7 @@
 .navbar .navbar-actions {
   display: flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   min-width: 0;
   margin-left: auto;
 }
@@ -146,7 +147,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   height: var(--ctrl-h);
   margin: 0;
   padding: 0 var(--gap);
@@ -190,13 +191,13 @@
 
 .navbar .dropdown {
   position: absolute;
-  top: calc(100% + var(--r-sm));
+  top: calc(100% + var(--space-4));
   right: 0;
   z-index: 10;
   display: block;
   min-width: 100%;
   overflow: hidden;
-  padding: var(--r-sm) 0;
+  padding: var(--space-4) 0;
   border: 1px solid var(--border);
   border-radius: var(--r);
   background: var(--surface);
@@ -205,9 +206,9 @@
 
 .navbar .nav-menu-dropdown {
   display: grid;
-  gap: 2px;
+  gap: var(--space-4);
   min-width: 220px;
-  padding: var(--r-sm);
+  padding: var(--space-4);
 }
 
 .navbar .nav-menu-dropdown a {
@@ -216,14 +217,14 @@
 
 .navbar .account-dropdown {
   min-width: 240px;
-  padding: var(--r-sm);
+  padding: var(--space-4);
 }
 
 .navbar .account-identity {
   display: grid;
-  gap: 2px;
+  gap: var(--space-4);
   margin: 0;
-  padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  padding: var(--space-8) var(--gap);
   border-bottom: 1px solid var(--border);
 }
 
@@ -243,8 +244,8 @@
 .navbar .account-logout {
   display: block;
   width: 100%;
-  margin-top: var(--r-sm);
-  padding: calc(var(--gap) - var(--r-sm)) var(--gap);
+  margin-top: var(--space-4);
+  padding: var(--space-8) var(--gap);
   border: none;
   border-radius: var(--r);
   background: none;
@@ -260,10 +261,9 @@
   color: var(--text);
 }
 
-@media (max-width: 900px) {
-  .navbar {
+@media (max-width: 899.98px) {
+  .navbar-row {
     gap: var(--gap);
-    padding-inline: var(--gap);
   }
 
   .navbar .nav-links {
@@ -277,9 +277,11 @@
     display: block;
   }
 
+  /* Against the bar, which has no padding of its own: the gutter has to be named here. 100% is
+     the bar, 100vw would count the scrollbar. */
   .navbar .nav-menu-dropdown {
-    right: var(--gap);
-    max-width: calc(100vw - var(--gap) * 2);
+    right: var(--gutter);
+    max-width: calc(100% - var(--gutter) * 2);
   }
 
   .navbar .nav-menu-button {
@@ -297,32 +299,15 @@
   }
 }
 
-@media (max-width: 600px) {
-  .navbar .selection-state,
-  .navbar .theme-toggle-label {
-    display: none;
-  }
-
-  .navbar .account-menu .select-icon {
-    max-width: 40vw;
-  }
-}
-
-@media (max-width: 400px) {
-  .navbar .logo .console-mark {
-    height: 22px;
-  }
-}
-
-/* The same line as in the bar, for the widths where the bar drops it (see the 600px rule
-   above); the burger itself appears earlier, at 900px. */
+/* The same line as in the bar, for the widths where the bar drops it (the phone block at the
+   end of this file); the burger itself appears earlier, below 900px. */
 .navbar .nav-menu-selection {
   display: none;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
-  margin: 0 0 var(--r-sm);
-  padding: 0 var(--gap) var(--r-sm);
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--gap) var(--space-4);
   border-bottom: 1px solid var(--hairline);
   line-height: 1.25;
 }
@@ -342,7 +327,20 @@
   color: var(--ok);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 599.98px) {
+  .navbar .selection-state,
+  .navbar .theme-toggle-label {
+    display: none;
+  }
+
+  .navbar .account-menu .select-icon {
+    max-width: 40vw;
+  }
+
+  .navbar .logo .console-mark {
+    height: 22px;
+  }
+
   .navbar .nav-menu-selection {
     display: flex;
   }

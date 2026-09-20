@@ -182,7 +182,7 @@ const CabinetPage = () => {
   return (
     <>
       <Navbar />
-      <main className="cabinet-page">
+      <main className="page-container cabinet-page">
         <header className="cabinet-heading">
           <p>Проектная деятельность</p>
           <h1>Личный кабинет</h1>

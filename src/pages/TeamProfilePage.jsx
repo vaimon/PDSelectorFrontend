@@ -138,7 +138,7 @@ const TeamProfilePage = () => {
   return (
     <>
       <Navbar />
-      <main className="team-profile-page">
+      <main className="page-container team-profile-page">
         <header className="team-profile-toolbar team-profile-toolbar--single">
           <button type="button" className="team-back-button" onClick={() => navigate("/teams")}>
             <FaArrowLeft aria-hidden="true" />

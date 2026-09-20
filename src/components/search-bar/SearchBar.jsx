@@ -15,7 +15,7 @@ const SearchBar = ({
   };
 
   return (
-    <div className="search-bar">
+    <div className="page-container search-bar">
       <form className="search-container" role="search" onSubmit={handleSearch}>
         <input
           type="text"

@@ -1,8 +1,5 @@
 .student-profile-page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--pad);
+  padding-block: var(--pad);
   color: var(--text);
   text-align: left;
 }
@@ -19,7 +16,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
+  gap: var(--space-8);
   width: fit-content;
   min-height: var(--ctrl-h);
   padding: 0 var(--gap);
@@ -44,7 +41,7 @@
 }
 
 .student-profile-heading p {
-  margin: 0 0 var(--r-sm);
+  margin: 0 0 var(--space-4);
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -110,44 +107,9 @@
   margin-inline: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
   .student-profile-toolbar {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .student-profile-page {
-    padding: var(--gap);
-  }
-
-  .student-profile-toolbar,
-  .student-profile-layout {
-    gap: var(--gap);
-  }
-
-  .student-profile-heading h1 {
-    font-size: 20px;
-  }
-
-  .student-back-button {
-    min-height: 40px;
-  }
-
-  .student-profile-section-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--r-sm);
-  }
-
-  .student-profile-person {
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 420px) {
-  .student-back-button {
-    width: 100%;
   }
 }
 
@@ -194,16 +156,6 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 640px) {
-  .student-profile-section-head {
-    flex-wrap: wrap;
-  }
-
-  .student-invite-button {
-    min-height: 44px;
-  }
-}
-
 .student-invite-button--cancel {
   border-color: var(--border-strong);
   background: var(--surface);
@@ -221,7 +173,40 @@
   line-height: 1.45;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
+  .student-profile-page {
+    padding-block: var(--gap);
+  }
+
+  .student-profile-toolbar,
+  .student-profile-layout {
+    gap: var(--gap);
+  }
+
+  .student-profile-heading h1 {
+    font-size: 20px;
+  }
+
+  .student-back-button {
+    min-height: 40px;
+    width: 100%;
+  }
+
+  .student-profile-section-head {
+    align-items: flex-start;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .student-profile-person {
+    max-width: 100%;
+  }
+
+  .student-invite-button {
+    min-height: 44px;
+  }
+
   .student-profile-head-side {
     flex-wrap: wrap;
     justify-content: flex-end;

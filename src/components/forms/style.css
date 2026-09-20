@@ -9,7 +9,7 @@
   width: 222px;
   max-height: calc(100dvh - var(--topbar-h) - (var(--gap) * 2));
   margin: 0;
-  padding: calc(var(--pad) - 2px);
+  padding: var(--pad);
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
@@ -56,7 +56,7 @@
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
 }
 
 .filter-group h3 {
@@ -70,7 +70,7 @@
 .filter-group label {
   display: flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   margin: 0;
   color: var(--text-2);
   font-size: calc(var(--fs) - 0.5px);
@@ -114,7 +114,7 @@
 .filter-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--r-sm);
+  gap: var(--space-4);
 }
 
 .reset-button {
@@ -161,7 +161,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   width: 100%;
   margin-top: var(--gap);
   padding: var(--pad);
@@ -199,7 +199,7 @@
 .team-form {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   width: min(100%, 480px);
   margin: 0 auto;
   padding: var(--pad);
@@ -235,7 +235,7 @@
   align-items: center;
   justify-content: center;
   min-height: var(--ctrl-h);
-  margin: var(--r-sm) 0 0;
+  margin: var(--space-4) 0 0;
   padding: 0 var(--pad);
   border: 1px solid var(--accent);
   border-radius: var(--r);
@@ -257,7 +257,7 @@
 .technologies-list {
   display: flex;
   flex-wrap: wrap;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
   max-height: 200px;
   margin: 0;
   padding: var(--gap);
@@ -271,7 +271,7 @@
 .project-type-radio {
   display: flex;
   align-items: center;
-  gap: calc(var(--gap) - var(--r-sm));
+  gap: var(--space-8);
 }
 
 .technology-checkbox input,
@@ -281,7 +281,7 @@
   accent-color: var(--accent);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
   .filter-section {
     position: static;
     flex-basis: auto;
@@ -300,7 +300,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
   .filter-section {
     gap: 0;
     padding: var(--gap) var(--pad);

@@ -44,7 +44,7 @@ const ApplicationsPage = () => {
   return (
     <>
       <Navbar />
-      <main className="container content-layout">
+      <main className="page-container content-layout">
         <MainContent>
           <div className="catalog-head">
             <div>

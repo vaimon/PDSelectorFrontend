@@ -2,12 +2,9 @@
   display: flex;
   align-items: flex-start;
   gap: var(--pad);
-  width: 100%;
-  max-width: 1200px;
   height: auto;
   min-height: 0;
-  margin: 0 auto;
-  padding: var(--pad);
+  padding-block: var(--pad);
 }
 
 .main-content {
@@ -20,9 +17,8 @@
   text-align: left;
 }
 
-.main-content > h1,
-.team-page-title {
-  margin: 0 0 calc(var(--gap) + 2px);
+.main-content > h1 {
+  margin: 0 0 var(--pad);
   color: var(--text);
   font-size: 22px;
   font-weight: 600;
@@ -49,7 +45,7 @@
 }
 
 .catalog-kicker {
-  margin: 0 0 var(--r-sm);
+  margin: 0 0 var(--space-4);
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 11px;
@@ -65,15 +61,8 @@
   font-size: 11px;
 }
 
-.team-page-title {
-  width: 100%;
-  max-width: 1200px;
-  margin: calc(var(--gap) + 2px) auto 0;
-  padding: 0 var(--pad);
-}
-
 .main-content > h2 {
-  margin: var(--pad) 0 calc(var(--gap) - var(--r-sm));
+  margin: var(--pad) 0 var(--space-8);
   color: var(--text);
   font-size: 16px;
   font-weight: 600;
@@ -140,8 +129,6 @@
   grid-auto-rows: 1fr;
   align-items: stretch;
   gap: var(--gap);
-  width: 100%;
-  max-width: 1200px;
 }
 
 .empty-state {
@@ -165,25 +152,23 @@
   color: var(--text-2);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
+  /* Stretch, not flex-start: the column would otherwise shrink to its content and leave the
+     right third of the page empty. */
   .content-layout {
     flex-direction: column;
+    align-items: stretch;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 599.98px) {
   .content-layout {
     gap: var(--gap);
-    padding: var(--gap);
+    padding-block: var(--gap);
   }
 
-  .main-content > h1,
-  .team-page-title {
+  .main-content > h1 {
     font-size: 20px;
-  }
-
-  .team-page-title {
-    padding-inline: var(--gap);
   }
 
   .cards {
