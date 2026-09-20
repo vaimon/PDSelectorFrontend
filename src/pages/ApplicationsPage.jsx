@@ -18,8 +18,12 @@ import './ApplicationsPage.css';
 
 const ApplicationsPage = () => {
   const { invites, requests, myRequests, sentInvites, loading, refresh } = useApplications();
-  const { activeTrack, isSelectionOpen } = useIdentity();
-  const { ask, confirmProps } = useConfirmAction(refresh);
+  const { activeTrack, isSelectionOpen, refresh: refreshIdentity } = useIdentity();
+  // Accepting puts the student in a team, which is identity, not just a list of applications: the
+  // shell would otherwise keep offering «Подать заявку» until the next full page load.
+  const { ask, confirmProps } = useConfirmAction(
+    () => Promise.all([refreshIdentity(), refresh()]),
+  );
 
   const closedReason = selectionClosedReason(activeTrack);
   const isEmpty = invites.length === 0 && requests.length === 0

@@ -13,7 +13,7 @@ const Card = ({
   onApply,
   applyText = "Подать заявку",
   applyDisabled = false,
-  applyTitle,
+  applyReason,
   applyTone = "primary",
   viewText = "Перейти",
   showApplyButton,
@@ -105,13 +105,18 @@ const Card = ({
           )}
         </div>
       </div>
+      {/* The reason is text, not only a tooltip: there is no hover on a phone and a disabled
+          button is not reachable with a keyboard or a screen reader. */}
+      {showApplyAction && applyDisabled && applyReason && (
+        <p className="card-action-reason">{applyReason}</p>
+      )}
       {hasActions && <div className="card-actions">
         {showApplyAction && (
           <button
             className={`action-button apply${applyTone === "cancel" ? " action-button--cancel" : ""}`}
             onClick={handleApply}
             disabled={applyDisabled}
-            title={applyTitle}
+            title={applyReason}
           >
             {applyText}
           </button>

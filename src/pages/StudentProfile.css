@@ -214,3 +214,21 @@
   border-color: var(--border-strong);
   background: var(--surface-2);
 }
+
+.student-invite-reason {
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .student-profile-head-side {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .student-invite-reason {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}

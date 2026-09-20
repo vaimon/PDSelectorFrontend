@@ -32,7 +32,7 @@ export const useTeamRequests = () => {
     const action = (label, request) => ({
       label,
       disabled: !isSelectionOpen,
-      title: closedReason ?? undefined,
+      reason: isSelectionOpen ? null : closedReason,
       onClick: () => ask(request),
     });
 

@@ -50,7 +50,7 @@ const TeamsPage = () => {
         showApplyButton={Boolean(applyAction)}
         applyText={applyAction?.label}
         applyDisabled={applyAction?.disabled}
-        applyTitle={applyAction?.title}
+        applyReason={applyAction?.reason}
         onApply={applyAction?.onClick}
       />
     );

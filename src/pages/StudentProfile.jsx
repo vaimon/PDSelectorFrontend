@@ -61,15 +61,20 @@ const StudentProfilePage = () => {
                     <span className="student-profile-person">{studentData.user.fio}</span>
                   )}
                   {inviteAction && (
-                    <button
-                      type="button"
-                      className={`student-invite-button${inviteAction.tone === "cancel" ? " student-invite-button--cancel" : ""}`}
-                      onClick={inviteAction.onClick}
-                      disabled={inviteAction.disabled}
-                      title={inviteAction.title}
-                    >
-                      {inviteAction.label}
-                    </button>
+                    <>
+                      {inviteAction.disabled && inviteAction.reason && (
+                        <span className="student-invite-reason">{inviteAction.reason}</span>
+                      )}
+                      <button
+                        type="button"
+                        className={`student-invite-button${inviteAction.tone === "cancel" ? " student-invite-button--cancel" : ""}`}
+                        onClick={inviteAction.onClick}
+                        disabled={inviteAction.disabled}
+                        title={inviteAction.reason}
+                      >
+                        {inviteAction.label}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
