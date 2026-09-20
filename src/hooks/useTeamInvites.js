@@ -2,13 +2,9 @@ import { cancelApplication, resendApplication, sendInvite } from '../api/apiAppl
 import { useApplications } from '../context/applicationsContext';
 import { useIdentity } from '../context/identityContext';
 import { isPendingApplication } from '../utils/applicationStatus';
+import { noPlacesMessage, placesLeftFor } from '../utils/composition';
 import { selectionClosedReason } from '../utils/selectionWindow';
 import { useConfirmAction } from './useConfirmAction';
-
-// Course 1 takes a first-year place, every later course a second-year one (TeamComposition).
-const placesLeftFor = (composition, course) => (
-  course === 1 ? composition?.first_year_places_left : composition?.second_year_places_left
-);
 
 /**
  * The lead's button next to a student, in the catalogue and on the student's page.
@@ -62,7 +58,7 @@ export const useTeamInvites = () => {
     const reason = !isSelectionOpen ? closedReason
       : student.has_team ? `${name} уже состоит в команде.`
         : !inThisSelection ? `${name} не участвует в текущем наборе.`
-          : placesLeft === 0 ? `В команде не осталось мест для ${student.course === 1 ? '1 курса' : '2 курса и старше'}.`
+          : placesLeft === 0 ? noPlacesMessage(student.course)
             : null;
 
     const sendAgain = mine != null;

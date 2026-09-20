@@ -350,3 +350,11 @@
   font-weight: 600;
   line-height: 1.4;
 }
+
+/* A fact about the card's subject that decides whether to act on it — places left, for a team. */
+.card-note {
+  margin: 0 var(--pad) 8px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}

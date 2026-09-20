@@ -19,6 +19,7 @@ const Card = ({
   showApplyButton,
   showEditingOptions,
   badge,
+  note,
   actions = [],
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -115,6 +116,7 @@ const Card = ({
           )}
         </div>
       </div>
+      {note && <p className="card-note">{note}</p>}
       {reasons.map((reason) => (
         <p className="card-action-reason" key={reason}>{reason}</p>
       ))}

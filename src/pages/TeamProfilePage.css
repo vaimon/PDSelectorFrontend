@@ -394,3 +394,18 @@
     width: 100%;
   }
 }
+
+/* Said to the team about itself: complete, or who is still missing and by when. */
+.team-status {
+  margin: 6px 0 0;
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.5;
+}
+
+.team-status--complete {
+  color: var(--ok);
+}
+
+.team-status--missing {
+  color: var(--warn);
+}

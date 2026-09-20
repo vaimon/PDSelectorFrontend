@@ -313,3 +313,37 @@
     height: 22px;
   }
 }
+
+/* The same line as in the bar, for the widths where the bar drops it (see the 600px rule
+   above); the burger itself appears earlier, at 900px. */
+.navbar .nav-menu-selection {
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0 0 var(--r-sm);
+  padding: 0 var(--gap) var(--r-sm);
+  border-bottom: 1px solid var(--hairline);
+  line-height: 1.25;
+}
+
+.navbar .nav-menu-selection span:first-child {
+  color: var(--text);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+}
+
+.navbar .nav-menu-selection span:last-child {
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.navbar .nav-menu-selection.selection-open span:last-child {
+  color: var(--ok);
+}
+
+@media (max-width: 600px) {
+  .navbar .nav-menu-selection {
+    display: flex;
+  }
+}
