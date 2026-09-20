@@ -11,14 +11,14 @@ import { isPendingApplication } from '../utils/applicationStatus';
 // raw strings.
 const equalsIgnoreCase = (value, expected) => String(value).toLowerCase() === expected;
 
-const EMPTY = { invites: [], requests: [], myRequests: [] };
+const EMPTY = { invites: [], requests: [], myRequests: [], sentInvites: [], myTeam: null };
 
 /**
  * Everything the student has to do with applications: invites addressed to them, requests to join
- * their team when they lead one, and the requests they sent themselves. There is no "my
- * applications" endpoint (GET /applications is admin-only), so all three come from the records that
- * carry them. The navbar counter and the applications page read the same state instead of asking
- * twice; only the first two wait for an answer, so only they are counted.
+ * their team when they lead one, the requests they sent themselves and the invites they sent as a
+ * lead. There is no "my applications" endpoint (GET /applications is admin-only), so all of them
+ * come from the records that carry them. The navbar counter and the applications page read the same
+ * state instead of asking twice; only what waits for this person's answer is counted.
  */
 const ApplicationsProvider = ({ children }) => {
   const { studentId, isParticipant } = useIdentity();
@@ -49,15 +49,21 @@ const ApplicationsProvider = ({ children }) => {
         (application) => equalsIgnoreCase(application.type, 'request'),
       );
 
-      // Only a team lead decides on requests, and only on the ones sent to their own team.
+      // Only a team lead decides on requests, and only on the ones sent to their own team. The team
+      // also carries the invites they sent and the places left per year, so one request answers both.
       const teamId = student.is_captain ? student.current_team?.id : null;
       const team = teamId ? await fetchTeamById(teamId) : null;
-      const requests = (team?.applications ?? []).filter(
+      const teamApplications = team?.applications ?? [];
+      const requests = teamApplications.filter(
         (application) => isPendingApplication(application) && equalsIgnoreCase(application.type, 'request'),
+      );
+      // Sent by the lead, in any state: an invite that was refused can be sent again.
+      const sentInvites = teamApplications.filter(
+        (application) => equalsIgnoreCase(application.type, 'invite'),
       );
 
       if (loadId === latestLoad.current) {
-        setState({ invites, requests, myRequests, loading: false });
+        setState({ invites, requests, myRequests, sentInvites, myTeam: team, loading: false });
       }
     } catch (error) {
       console.error('Не удалось загрузить заявки:', error);

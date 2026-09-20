@@ -4,7 +4,9 @@ import { FaArrowLeft } from "react-icons/fa";
 import Navbar from "../components/navbar/Navbar";
 import MainContent from "../components/main-section/MainSection";
 import ProfileCard from "../components/profile/ProfileCard";
+import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import useStudentData from "../hooks/useStudentData";
+import { useTeamInvites } from "../hooks/useTeamInvites";
 import "./StudentProfile.css";
 
 // Someone else's profile, reached from the catalogue. The signed-in student's own cabinet is a
@@ -13,6 +15,10 @@ const StudentProfilePage = () => {
   const { studentId } = useParams();
   const navigate = useNavigate();
   const { studentData, loading, error } = useStudentData(studentId);
+  const { inviteActionFor, confirmProps } = useTeamInvites();
+
+  // Null unless the person looking is a team lead who could actually invite this student.
+  const inviteAction = loading || error ? null : inviteActionFor(studentData);
 
   const renderContent = () => {
     if (loading) {
@@ -50,15 +56,30 @@ const StudentProfilePage = () => {
             <section className="student-profile-section" aria-labelledby="student-section-title">
               <div className="student-profile-section-head">
                 <h2 id="student-section-title">Профиль</h2>
-                {studentData?.user?.fio && (
-                  <span className="student-profile-person">{studentData.user.fio}</span>
-                )}
+                <div className="student-profile-head-side">
+                  {studentData?.user?.fio && (
+                    <span className="student-profile-person">{studentData.user.fio}</span>
+                  )}
+                  {inviteAction && (
+                    <button
+                      type="button"
+                      className={`student-invite-button${inviteAction.tone === "cancel" ? " student-invite-button--cancel" : ""}`}
+                      onClick={inviteAction.onClick}
+                      disabled={inviteAction.disabled}
+                      title={inviteAction.title}
+                    >
+                      {inviteAction.label}
+                    </button>
+                  )}
+                </div>
               </div>
               {renderContent()}
             </section>
           </MainContent>
         </div>
       </main>
+
+      <ConfirmDialog {...confirmProps} />
     </>
   );
 };
