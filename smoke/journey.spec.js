@@ -8,6 +8,8 @@ import { expectNoSidewaysScroll, logIn, newcomer, seeded, signIn } from './suppo
 // newcomer who fills the questionnaire from the phone first.
 test.describe.configure({ mode: 'serial' });
 
+const BACKEND_URL = process.env.SMOKE_BACKEND_URL ?? 'http://localhost:8080';
+
 const people = {};
 let teamName;
 let joinLink;
@@ -426,4 +428,103 @@ test('the admin lands on the overview and sees the team @desktop', async ({ brow
 
   await page.goto('/teams');
   await expect(page.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
+});
+
+/** The team's target composition as the catalogue prints it, for the one team this run built. */
+function teamComposition(page) {
+  return page.locator('.card')
+    .filter({ has: page.getByRole('heading', { name: teamName }) })
+    .getByText(/1 курс — [0-9]+ из [0-9]+ · 2 курс и старше — [0-9]+ из [0-9]+/);
+}
+
+/** `"2026-10-01"` shifted by whole days, via Date so the month rolls over instead of hitting -00. */
+function shiftDay(value, days) {
+  const moved = new Date(`${value}T00:00:00Z`);
+  moved.setUTCDate(moved.getUTCDate() + days);
+  return moved.toISOString().slice(0, 10);
+}
+
+/**
+ * Puts the selection back the way the seed left it, through the API rather than the screen.
+ *
+ * This runs in a `finally`, where the page may be mid-failure and its own controls unreliable —
+ * and it has to undo the hand-over first, because a handed-over selection refuses the PUT.
+ */
+async function restoreSelection(context, { firstYearTarget, endDate }) {
+  const token = (await context.cookies(BACKEND_URL)).find((cookie) => cookie.name === 'XSRF-TOKEN');
+  const headers = { 'X-XSRF-TOKEN': token.value };
+  const track = await (await context.request.get(`${BACKEND_URL}/api/v1/tracks/current`)).json();
+
+  await context.request.post(`${BACKEND_URL}/api/v1/tracks/${track.id}/handover/cancel`, { headers });
+  const response = await context.request.put(`${BACKEND_URL}/api/v1/tracks/${track.id}`, {
+    headers,
+    data: { ...track, handedOverAt: null, firstYearTarget, endDate: endDate.split('-').map(Number) },
+  });
+  expect(response.ok(), `restoring the selection: ${response.status()}`).toBeTruthy();
+}
+
+test('the organiser moves the targets and the deadline, and marks the selection handed over @desktop', async ({ browser }) => {
+  expect(teamName, 'builds on the team step; run the whole file').toBeDefined();
+  const { page, context } = await signIn(browser, seeded.admin);
+  await page.goto('/admin');
+  await page.locator('.admin-sections').getByRole('link', { name: 'Настройки' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]settings$/);
+
+  const firstYear = page.getByLabel('Мест для 1 курса');
+  const end = page.getByLabel('Окончание', { exact: true });
+  const save = page.getByRole('button', { name: 'Сохранить' });
+
+  // Asserted before anything is changed: a check against 4 places proves nothing if the form
+  // already said 4, and the catalogue has to be showing the old target for the new one to mean
+  // something when it appears there.
+  await expect(firstYear, 'the seeded target').toHaveValue('3');
+  const seededEnd = await end.inputValue();
+  expect(seededEnd, 'the seed gives the selection an end date').toBeTruthy();
+  await page.goto('/teams');
+  await expect(teamComposition(page), 'the target before the change')
+    .toHaveText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3');
+  await page.goto('/admin/settings');
+
+  const movedEnd = shiftDay(seededEnd, -1);
+
+  // Everything below writes to the one database the mobile project inherits, so the restore runs
+  // even when an assertion in between fails — otherwise one red step here turns into a screenful
+  // of unrelated red in a run that never touched the admin area.
+  try {
+    await firstYear.fill('4');
+    await end.fill(movedEnd);
+    await save.click();
+    await expect(page.getByRole('status')).toContainText('Настройки сохранены');
+
+    // The target is not stored on a team: it is the track's, and every team without one of its
+    // own reads it on the next request. The catalogue is where that becomes visible.
+    await page.goto('/teams');
+    await expect(teamComposition(page)).toHaveText('1 курс — 1 из 4 · 2 курс и старше — 2 из 3');
+
+    // The new deadline reaches the shell, which reads the same track the form just wrote.
+    await page.goto('/admin/settings');
+    await expect(page.locator('.admin-lead')).toContainText('Идёт набор');
+    await expect(page.getByLabel('Окончание', { exact: true })).toHaveValue(movedEnd);
+
+    // Marking it handed over closes the selection: the backend answers every change to it with
+    // 409, so the form must not offer one. Starting the NEXT selection is not a change to this
+    // one and stays available — the backend allows it, and that is how a year ends.
+    await page.getByRole('button', { name: 'Отметить переданным' }).click();
+    await confirm(page, 'Отметить набор переданным?', 'Отметить переданным');
+    await expect(page.locator('.admin-banner')).toContainText('передан в кабинет ПД');
+    await expect(page.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Начать новый набор' })).toBeEnabled();
+    await expect(page.locator('.admin-lead')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Снять отметку о передаче' }).click();
+    await confirm(page, 'Снять отметку о передаче?', 'Снять отметку');
+    await expect(page.locator('.admin-banner')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Сохранить' })).toBeEnabled();
+  } finally {
+    await restoreSelection(context, { firstYearTarget: 3, endDate: seededEnd });
+  }
+
+  await page.goto('/teams');
+  await expect(teamComposition(page), 'restored for the run that follows this one')
+    .toHaveText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3');
 });
