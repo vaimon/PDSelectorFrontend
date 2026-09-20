@@ -27,12 +27,17 @@ const buildLinks = ({ isParticipant, isAdmin, hasActiveTrack, currentTeamId, pen
       ...CATALOG_LINKS,
       { to: currentTeamId ? `/teams/${currentTeamId}` : '/profile', label: 'Моя команда' },
       { to: '/applications', label: 'Заявки', badge: pendingApplications },
+      { to: '/how-it-works', label: 'Как проходит набор' },
     );
   } else if (isAdmin) {
     links.push(...CATALOG_LINKS);
   } else if (hasActiveTrack) {
     // Between two selections there is no questionnaire to fill in, so there is nothing to offer.
-    links.push({ to: '/registration', label: 'Заполнить анкету' });
+    // The guidance comes with it: it is the answer to what the questionnaire is for.
+    links.push(
+      { to: '/registration', label: 'Заполнить анкету' },
+      { to: '/how-it-works', label: 'Как проходит набор' },
+    );
   }
 
   if (isAdmin) {
@@ -145,6 +150,15 @@ const Navbar = () => {
           </button>
           {isMenuOpen && (
             <div className="dropdown nav-menu-dropdown" role="menu">
+              {/* Under 600px the bar above drops this line, and the deadline is the one thing a
+                  student has to see while the window is open. Its CSS keeps it to those widths,
+                  so between 600 and 900px the menu does not repeat what the bar still shows. */}
+              {selection && (
+                <p className={`nav-menu-selection selection-${selection.state}`}>
+                  <span>{selection.name}</span>
+                  <span>{selection.note}</span>
+                </p>
+              )}
               {links.map(renderLink)}
             </div>
           )}

@@ -9,6 +9,7 @@ import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
 import ApplicationsPage from './pages/ApplicationsPage';
 import JoinPage from './pages/JoinPage';
+import HowItWorksPage from './pages/HowItWorksPage';
 import { RequireAdmin, RequireParticipant } from './components/route-guards/RouteGuards';
 
 const routes = [
@@ -42,6 +43,13 @@ const routes = [
     // page itself explains that state and links to the form.
     path: '/profile',
     element: <CabinetPage />
+  },
+  {
+    // Unguarded on purpose, like /profile: the shell offers this page to an account that has not
+    // filled the questionnaire yet, which is exactly who needs it, and RequireParticipant would
+    // bounce them off it.
+    path: '/how-it-works',
+    element: <HowItWorksPage />
   },
   {
     path: '/applications',

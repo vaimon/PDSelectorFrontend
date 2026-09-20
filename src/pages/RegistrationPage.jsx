@@ -74,7 +74,9 @@ const Registration = () => {
       notify({ type: "success", text: "Анкета сохранена" });
       // Used once: the invitation page takes it from here.
       forgetJoin();
-      navigate(joinTarget ?? "/profile");
+      // An invitation is the one thing more urgent than the explanation; everyone else has just
+      // signed up for something nobody has explained to them yet.
+      navigate(joinTarget ?? "/how-it-works");
     } catch (error) {
       // The shared client already showed the backend's reason; the form keeps what was typed.
       console.error("Не удалось сохранить анкету:", error);

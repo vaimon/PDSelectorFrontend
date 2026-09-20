@@ -2,6 +2,7 @@ import { cancelApplication, resendApplication, sendRequest } from '../api/apiApp
 import { useApplications } from '../context/applicationsContext';
 import { useIdentity } from '../context/identityContext';
 import { isPendingApplication } from '../utils/applicationStatus';
+import { noPlacesMessage, placesLeftFor } from '../utils/composition';
 import { selectionClosedReason } from '../utils/selectionWindow';
 import { useConfirmAction } from './useConfirmAction';
 
@@ -18,6 +19,7 @@ export const useTeamRequests = () => {
   const { ask, confirmProps } = useConfirmAction(refresh);
 
   const hasTeam = user?.student?.current_team_id != null;
+  const course = user?.student?.course;
   const closedReason = selectionClosedReason(activeTrack);
 
   const applyActionFor = (team) => {
@@ -29,10 +31,12 @@ export const useTeamRequests = () => {
     const mine = myRequests.find((application) => application.team?.id === team.id) ?? null;
     const teamName = team.name ?? 'команду';
 
-    const action = (label, request) => ({
+    // Cancelling is a mutation like any other, so it follows the window — but a full team is no
+    // reason to keep someone's own application alive.
+    const action = (label, request, extraReason = null) => ({
       label,
-      disabled: !isSelectionOpen,
-      reason: isSelectionOpen ? null : closedReason,
+      disabled: !isSelectionOpen || Boolean(extraReason),
+      reason: !isSelectionOpen ? closedReason : extraReason,
       onClick: () => ask(request),
     });
 
@@ -46,6 +50,10 @@ export const useTeamRequests = () => {
       });
     }
 
+    // A team can be short of one year and full for the other, so «есть свободные места» is not the
+    // same as «есть место для меня». The backend refuses such an application; this says so first.
+    const noPlace = placesLeftFor(team.composition, course) === 0 ? noPlacesMessage(course) : null;
+
     const sendAgain = mine != null;
     return action(sendAgain ? 'Подать заявку снова' : 'Подать заявку', {
       heading: 'Отправить заявку?',
@@ -53,7 +61,7 @@ export const useTeamRequests = () => {
       confirmText: 'Отправить',
       successText: 'Заявка отправлена',
       run: () => (sendAgain ? resendApplication(mine) : sendRequest(studentId, team.id)),
-    });
+    }, noPlace);
   };
 
   return { applyActionFor, confirmProps };

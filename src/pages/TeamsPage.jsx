@@ -9,6 +9,7 @@ import useTeamFilters from "../hooks/useTeamFilters";
 import useTeams from "../hooks/useTeams";
 import { useTeamRequests } from "../hooks/useTeamRequests";
 import { useIdentity } from "../context/identityContext";
+import { describePlaces } from "../utils/composition";
 import Pagination from "../components/pagination/Pagination";
 
 
@@ -47,6 +48,9 @@ const TeamsPage = () => {
         resume={team.project_description}
         tags={team.technologies}
         profileLink={`/teams/${team.id}`}
+        // What actually decides whether this team is worth opening: the target is a number of
+        // first-years plus a number of second-years, not one number of people.
+        note={team.composition ? describePlaces(team.composition) : undefined}
         showApplyButton={Boolean(applyAction)}
         applyText={applyAction?.label}
         applyDisabled={applyAction?.disabled}

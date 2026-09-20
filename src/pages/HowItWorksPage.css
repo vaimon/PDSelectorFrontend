@@ -1,0 +1,147 @@
+.how-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--pad);
+  color: var(--text);
+  text-align: left;
+}
+
+.how-head {
+  margin-bottom: var(--gap);
+}
+
+.how-kicker {
+  margin: 0;
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.how-head h1 {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.how-lead {
+  margin: 8px 0 0;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.how-section {
+  margin-top: var(--gap);
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.how-section h2 {
+  margin: 0 0 var(--gap);
+  padding-bottom: var(--gap);
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.how-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--gap);
+}
+
+.how-path {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--gap);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.how-path h3 {
+  margin: 0;
+  font-size: calc(var(--fs) + 1px);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.how-path p {
+  margin: 0;
+  flex: 1;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.6;
+}
+
+.how-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.how-action:hover {
+  background: var(--surface-2);
+}
+
+.how-rules {
+  display: grid;
+  gap: var(--gap);
+  margin: 0;
+}
+
+.how-rule {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--gap);
+}
+
+.how-rule dt {
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+}
+
+.how-rule dd {
+  margin: 0;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .how-page {
+    padding: var(--gap);
+  }
+
+  .how-head h1 {
+    font-size: 20px;
+  }
+
+  .how-rule {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .how-action {
+    width: 100%;
+  }
+}

@@ -17,6 +17,7 @@ import { useTechnologies } from "../hooks/useTechnologies";
 import { useProjectTypes } from "../hooks/useProjectTypes";
 import { useIdentity } from "../context/identityContext";
 import { useNotifications } from "../context/notificationContext";
+import { describeMissing } from "../utils/composition";
 import { updateStudent } from "../api/apiStudentsController";
 import "./CabinetPage.css";
 
@@ -114,6 +115,11 @@ const CabinetPage = () => {
             resume={myTeam.project_description}
             tags={myTeam.technologies}
             profileLink={`/teams/${myTeam.id}`}
+            // The first screen a lead sees after signing in: whether the team still needs anyone.
+            // Silence when the composition is missing — «Команда собрана» would be a claim.
+            note={myTeam.composition
+              ? describeMissing(myTeam.composition) ?? "Команда собрана"
+              : undefined}
           />
         </div>
       );

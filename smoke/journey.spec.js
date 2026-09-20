@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { expectNoSidewaysScroll, logIn, newcomer, seeded, signIn } from './support/people';
 
-// The student journey against the real backend, one step building on the previous one. Steps still
-// to come with their features: "how it works" (#25) and the admin board (#27) each add their own
-// step here.
+// The student journey against the real backend, one step building on the previous one. The admin
+// board (#27) adds its own step here when it lands.
 //
 // On desktop the team lead and the first-year are the seeded people; at 390px everybody is a
 // newcomer who fills the questionnaire from the phone first.
@@ -13,7 +12,7 @@ const people = {};
 let teamName;
 let joinLink;
 
-async function fillQuestionnaire(page, testInfo, { course, group, contact }, landsOn = /\/profile$/) {
+async function fillQuestionnaire(page, testInfo, { course, group, contact }, landsOn = /\/how-it-works$/) {
   await expect(page.getByRole('heading', { name: 'Анкета участника отбора' })).toBeVisible();
   await expectNoSidewaysScroll(page, testInfo);
   await page.getByLabel('Курс').selectOption(String(course));
@@ -58,20 +57,40 @@ async function openMyTeamSection(page) {
   await expect(page.getByRole('heading', { name: 'Моя команда', level: 2 })).toBeVisible();
 }
 
-test('a newcomer fills the questionnaire and lands in the cabinet', async ({ browser }, testInfo) => {
+test('a newcomer fills the questionnaire and is told how the selection works', async ({ browser }, testInfo) => {
   const person = newcomer(testInfo, 'newcomer');
   const { page, redirect } = await signIn(browser, person);
   expect(redirect, 'a first login without a questionnaire goes to the questionnaire').toBe('/registration');
 
   await fillQuestionnaire(page, testInfo, { course: 2, group: 3, contact: '@smoke_newcomer' });
 
+  // The first screen after the questionnaire answers "what now": the two paths, the composition
+  // this selection asks for, and the date it all has to happen by — from the seeded track, not
+  // from the page's own text.
+  await expect(page.getByRole('heading', { name: 'Как проходит набор', level: 1 })).toBeVisible();
+  await expect(page.getByText('3 первокурсника и 3 второкурсника')).toBeVisible();
+  await expect(page.getByText(/Идёт набор «Смоук-набор», до \d+ \p{L}+\./u)).toBeVisible();
+  await expectNoSidewaysScroll(page, testInfo);
+
+  // The cabinet is one click away, and the guidance stays reachable from the menu afterwards.
+  await navigateTo(page, 'Моя команда');
   await expect(page.getByRole('heading', { name: 'Личный кабинет' })).toBeVisible();
   await expect(page.getByText('@smoke_newcomer')).toBeVisible();
   await expect(page.getByText(person.fio).first()).toBeVisible();
-  if (!testInfo.project.use.isMobile) {
-    // The shell names the current selection; at phone width that line is not shown.
+  // The shell names the selection and its deadline — in the bar on a laptop, and behind the menu
+  // button on a phone, where the bar drops the line. Asserted on both, or the phone half of the
+  // one thing this screen must always show would be free to disappear.
+  if (testInfo.project.use.isMobile) {
+    await page.getByRole('button', { name: 'Меню разделов' }).click();
+    const inMenu = page.locator('.nav-menu-selection');
+    await expect(inMenu).toContainText('Смоук-набор');
+    await expect(inMenu).toContainText(/до \d+ \p{L}+/u);
+    await page.keyboard.press('Escape');
+  } else {
     await expect(page.locator('.navbar').getByText('Смоук-набор')).toBeVisible();
   }
+  await navigateTo(page, 'Как проходит набор');
+  await expect(page.getByRole('heading', { name: 'Как проходит набор', level: 1 })).toBeVisible();
   await expectNoSidewaysScroll(page, testInfo);
   people.newcomer = person;
 });
@@ -145,10 +164,30 @@ test('a first-year asks to join, the lead accepts, and both sides see it', async
   await expect(members.getByRole('link', { name: 'Заявки в команду', exact: true })).toBeVisible();
   await expectNoSidewaysScroll(lead, testInfo);
 
-  // And the first-year's cabinet now shows the team as theirs.
+  // And the first-year's cabinet now shows the team as theirs, with what it still needs.
   await catalog.goto('/profile');
   await openMyTeamSection(catalog);
   await expect(catalog.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
+  await expect(catalog.getByText('Не хватает: 2 первокурсника, 2 второкурсника')).toBeVisible();
+});
+
+test('the team says who it is still short of, and so does the catalogue', async ({ browser }, testInfo) => {
+  expect(people.lead && teamName, 'builds on the request step; run the whole file').toBeTruthy();
+  const { page: lead } = await signIn(browser, people.lead);
+
+  // Two of six places taken: the lead and the first-year who just joined.
+  await openOwnTeamPage(lead);
+  await expect(lead.getByText('1 курс — 1 из 3 · 2 курс и старше — 1 из 3')).toBeVisible();
+  await expect(lead.getByText(/^Не хватает: 2 первокурсника, 2 второкурсника\. Собрать состав можно до /))
+    .toBeVisible();
+  await expectNoSidewaysScroll(lead, testInfo);
+
+  // The same numbers where someone decides whether this team is worth a request: the target is
+  // two numbers, not one, so «есть свободные места» alone would not answer them.
+  await lead.goto('/teams');
+  const card = lead.locator('.card').filter({ has: lead.getByRole('heading', { name: teamName }) });
+  await expect(card.getByText('1 курс — 1 из 3 · 2 курс и старше — 1 из 3')).toBeVisible();
+  await expectNoSidewaysScroll(lead, testInfo);
 });
 
 test('a friend opens the join link signed out and joins through login and the questionnaire', async ({ browser }, testInfo) => {

@@ -12,7 +12,8 @@ import { useApplications } from "../context/applicationsContext";
 import { useIdentity } from "../context/identityContext";
 import { useNotifications } from "../context/notificationContext";
 import { isPendingApplication } from "../utils/applicationStatus";
-import { selectionClosedReason } from "../utils/selectionWindow";
+import { describeMissing, describePlaces } from "../utils/composition";
+import { describeSelectionWindow, selectionClosedReason } from "../utils/selectionWindow";
 import TeamEditForm from "../components/profile/TeamEditForm";
 import JoinLinkPanel from "../components/join-link/JoinLinkPanel";
 import { useTechnologies } from "../hooks/useTechnologies";
@@ -20,11 +21,30 @@ import { useProjectTypes } from "../hooks/useProjectTypes";
 import { updateTeam } from "../api/apiTeamsController";
 import "./TeamProfilePage.css";
 
-// Course 1 takes a first-year place, every later course a second-year one (TeamComposition).
-const placesLine = (composition) => (
-  `1 курс — ${composition.first_years} из ${composition.first_year_target}`
-  + ` · 2 курс и старше — ${composition.second_years} из ${composition.second_year_target}`
-);
+/**
+ * What the team's own people are told about its composition: done, or who is still missing and by
+ * when. The lead also gets the way to fix it — nobody else can act on it.
+ */
+const teamStatus = (composition, selection, isCaptain) => {
+  const missing = describeMissing(composition);
+  if (!missing) {
+    return { tone: "complete", text: "Команда собрана: цели по обоим курсам выполнены." };
+  }
+
+  if (selection?.state === "closed") {
+    return { tone: "missing", text: `${missing}. Неполные команды после набора разбирают организаторы.` };
+  }
+
+  // Before the window opens there is nothing to add: no deadline to name yet, and no way to act.
+  if (selection?.state !== "open") {
+    return { tone: "missing", text: `${missing}.` };
+  }
+
+  const invite = isCaptain
+    ? " Пригласите участников ссылкой для вступления или со страницы «Участники»."
+    : "";
+  return { tone: "missing", text: `${missing}. Собрать состав можно ${selection.note}.${invite}` };
+};
 
 const TeamProfilePage = () => {
   const { teamId } = useParams();
@@ -41,7 +61,7 @@ const TeamProfilePage = () => {
 
   const { allTechnologies } = useTechnologies();
   const { notify } = useNotifications();
-  const { activeTrack, isSelectionOpen } = useIdentity();
+  const { activeTrack, isSelectionOpen, studentId } = useIdentity();
   const { applyActionFor, confirmProps: applyConfirmProps } = useTeamRequests();
   const { requests, sentInvites, refresh: refreshApplications } = useApplications();
   const {
@@ -56,6 +76,11 @@ const TeamProfilePage = () => {
   const pendingInvites = isCaptain ? sentInvites.filter(isPendingApplication).length : 0;
   // Editing is a student mutation too, so the backend refuses it outside the window.
   const editReason = isSelectionOpen ? null : selectionClosedReason(activeTrack);
+  // Whether the team is complete is the team's own business: outsiders read the places instead.
+  const isMember = teamData.students?.some((member) => member.id === studentId);
+  const status = isMember && teamData.composition
+    ? teamStatus(teamData.composition, describeSelectionWindow(activeTrack), isCaptain)
+    : null;
 
   // The form resets itself whenever this prop changes, so it has to change only when the team
   // does: every toast on this page — including the one a failed save raises — re-renders it, and
@@ -219,7 +244,10 @@ const TeamProfilePage = () => {
                     <p className="team-section-kicker">Состав</p>
                     <h2 id="team-members-title">Текущие участники</h2>
                     {teamData.composition && (
-                      <p className="team-section-note">{placesLine(teamData.composition)}</p>
+                      <p className="team-section-note">{describePlaces(teamData.composition)}</p>
+                    )}
+                    {status && (
+                      <p className={`team-status team-status--${status.tone}`}>{status.text}</p>
                     )}
                     {/* Answering happens on «Заявки», where the navbar counter points. */}
                     {isCaptain && pendingInvites > 0 && (
