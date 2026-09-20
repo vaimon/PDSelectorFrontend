@@ -54,7 +54,7 @@ export const describeSelectionWindow = (activeTrack) => {
  */
 export const selectionClosedReason = (activeTrack) => {
   if (!activeTrack) {
-    return 'Отбор сейчас не идёт.';
+    return 'Набора сейчас нет.';
   }
 
   const selection = describeSelectionWindow(activeTrack);

@@ -33,8 +33,8 @@ export const RequireParticipant = ({ children }) => {
   // them to the questionnaire here would be a dead end.
   if (!activeTrack) {
     return (
-      <StatusScreen title="Отбор не идёт">
-        <p>Сейчас нет активного набора. Разделы отбора откроются, когда начнётся следующий.</p>
+      <StatusScreen title="Набор не идёт">
+        <p>Сейчас нет активного набора. Разделы откроются, когда начнётся следующий.</p>
       </StatusScreen>
     );
   }
@@ -42,7 +42,7 @@ export const RequireParticipant = ({ children }) => {
   return (
     <StatusScreen title="Нужна анкета участника">
       <p>
-        Этот раздел доступен участникам текущего отбора.{' '}
+        Этот раздел доступен участникам текущего набора.{' '}
         <Link to="/registration">Заполнить анкету</Link>
       </p>
     </StatusScreen>

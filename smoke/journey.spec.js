@@ -13,7 +13,7 @@ let teamName;
 let joinLink;
 
 async function fillQuestionnaire(page, testInfo, { course, group, contact }, landsOn = /\/how-it-works$/) {
-  await expect(page.getByRole('heading', { name: 'Анкета участника отбора' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Анкета участника набора' })).toBeVisible();
   await expectNoSidewaysScroll(page, testInfo);
   await page.getByLabel('Курс').selectOption(String(course));
   await page.getByLabel('Номер группы').fill(String(group));

@@ -154,7 +154,7 @@ const Filter = ({ filterParams, onApplyFilters, variant = "teams" }) => {
         {variant === "students" && (
           <div className="filter-group">
             <h3>Роль</h3>
-            {[['Капитан', true], ['Участник', false]].map(([label, value]) => (
+            {[['Тимлид', true], ['Участник', false]].map(([label, value]) => (
               <label key={label}>
                 <input
                   type="radio"

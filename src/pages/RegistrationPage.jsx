@@ -104,7 +104,7 @@ const Registration = () => {
 
   if (!activeTrack) {
     return (
-      <Notice title="Отбор не идёт">
+      <Notice title="Набор не идёт">
         <p>Сейчас нет активного набора. Анкету можно будет заполнить, когда начнётся следующий.</p>
       </Notice>
     );

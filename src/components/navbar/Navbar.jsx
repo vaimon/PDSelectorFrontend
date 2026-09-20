@@ -136,7 +136,7 @@ const Navbar = () => {
             </span>
           )}
           {!selection && !loading && (
-            <span className="selection-state selection-none">Отбор не идёт</span>
+            <span className="selection-state selection-none">Набор не идёт</span>
           )}
 
           <div className="nav-menu" ref={menuRef}>

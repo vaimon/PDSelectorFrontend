@@ -171,7 +171,7 @@ const JoinPage = () => {
       return (
         <>
           <p className="join-reason">
-            Чтобы вступить, заполните анкету участника отбора — после неё вернём вас сюда.
+            Чтобы вступить, заполните анкету участника набора — после неё вернём вас сюда.
           </p>
           <button type="button" className="login-button join-primary" onClick={goToQuestionnaire}>
             Заполнить анкету и вступить
