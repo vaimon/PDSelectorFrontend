@@ -31,9 +31,9 @@ const AdminAccessPage = () => {
   const people = useAdminList(fetchUsers, query.text
     ? { text: query.text, page: query.page, size: PAGE_SIZE }
     : { role: "ADMIN", page: query.page, size: PAGE_SIZE });
-  // Only the count. It is of admins who can sign in, which is stricter than the backend: that one
-  // also counts disabled accounts and the demo admin of migration V1.002 (vaimon/team-selection#45),
-  // and would let the last usable admin step down. Until the count is known, nobody may step down.
+  // Only the count. It is of admins who can sign in (the user search skips disabled accounts by
+  // default), the same count the backend refuses by (vaimon/team-selection#45). Until the count is
+  // known, nobody may step down.
   const admins = useAdminList(fetchUsers, { role: "ADMIN", page: 0, size: 1 });
   const countKnown = !admins.loading && !admins.error;
   const lastAdmin = countKnown && admins.totalElements <= 1;
