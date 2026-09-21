@@ -50,6 +50,7 @@ const AdminLayout = () => {
           {/* `end` on the overview only: it lives at /admin itself, so without it every section
               below would light it up as well. */}
           <NavLink to="/admin" end className={sectionClass}>Обзор</NavLink>
+          <NavLink to="/admin/people" className={sectionClass}>Участники и команды</NavLink>
           <NavLink to="/admin/settings" className={sectionClass}>Настройки</NavLink>
         </nav>
 

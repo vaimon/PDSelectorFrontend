@@ -445,27 +445,83 @@ function shiftDay(value, days) {
 }
 
 /**
- * Puts the selection back the way the seed left it, through the API rather than the screen.
+ * The backend as the admin, on a request context of its own.
  *
- * This runs in a `finally`, where the page may be mid-failure and its own controls unreliable —
- * and it has to undo the hand-over first, because a handed-over selection refuses the PUT.
+ * Not the step's browser context: a step that times out has that context torn down before
+ * anything after it can run, and the undo below exists precisely for steps that failed.
  */
-async function restoreSelection(context, { firstYearTarget, endDate }) {
-  const token = (await context.cookies(BACKEND_URL)).find((cookie) => cookie.name === 'XSRF-TOKEN');
-  const headers = { 'X-XSRF-TOKEN': token.value };
-  const track = await (await context.request.get(`${BACKEND_URL}/api/v1/tracks/current`)).json();
+async function adminRequest(playwright) {
+  const request = await playwright.request.newContext({ baseURL: BACKEND_URL });
+  const xsrf = async () => (await request.storageState()).cookies
+    .find((cookie) => cookie.name === 'XSRF-TOKEN').value;
 
-  await context.request.post(`${BACKEND_URL}/api/v1/tracks/${track.id}/handover/cancel`, { headers });
-  const response = await context.request.put(`${BACKEND_URL}/api/v1/tracks/${track.id}`, {
-    headers,
-    data: { ...track, handedOverAt: null, firstYearTarget, endDate: endDate.split('-').map(Number) },
+  await request.get('/api/v1/users/me');
+  const login = await request.post('/api/v1/smoke/login', {
+    data: seeded.admin,
+    headers: { 'X-XSRF-TOKEN': await xsrf() },
   });
-  expect(response.ok(), `restoring the selection: ${response.status()}`).toBeTruthy();
+  expect(login.ok(), `admin login for the smoke's own writes: ${login.status()}`).toBeTruthy();
+
+  const call = async (method, path, data) => {
+    const response = await request.fetch(`/api/v1${path}`, {
+      method,
+      data,
+      headers: { 'X-XSRF-TOKEN': await xsrf() },
+    });
+    expect(response.ok(), `${method} ${path}: ${response.status()} ${await response.text()}`).toBeTruthy();
+    return response.status() === 204 ? null : response.json();
+  };
+  return { call, dispose: () => request.dispose() };
 }
+
+/**
+ * What a step has changed in the one database both projects share, to be put back after it.
+ *
+ * A step pushes its undo BEFORE it changes anything, so a step that fails halfway still gets
+ * undone. It runs in `afterEach` rather than in a `finally` inside the step, because a step that
+ * times out is ended before its `finally` can reach the network — and the mobile project runs
+ * after desktop on the same data, so one leaked target turns into a screenful of unrelated red.
+ */
+const undo = [];
+
+test.afterEach(async ({ playwright }) => {
+  if (undo.length === 0) {
+    return;
+  }
+  const api = await adminRequest(playwright);
+  let failure = null;
+  try {
+    // Each undo on its own: a failed one must not leave the rest of the database for the mobile run.
+    while (undo.length > 0) {
+      try {
+        await undo.pop()(api.call);
+      } catch (error) {
+        failure ??= error;
+      }
+    }
+  } finally {
+    await api.dispose();
+  }
+  if (failure) {
+    throw failure;
+  }
+});
+
+/** The selection back as the seed left it: not handed over, 3 first-year places, this end date. */
+const restoreSelection = (endDate) => async (call) => {
+  const track = await call('GET', '/tracks/current');
+  await call('POST', `/tracks/${track.id}/handover/cancel`);
+  await call('PUT', `/tracks/${track.id}`, {
+    ...track,
+    handedOverAt: null,
+    firstYearTarget: 3,
+    ...(endDate ? { endDate: endDate.split('-').map(Number) } : {}),
+  });
+};
 
 test('the organiser moves the targets and the deadline, and marks the selection handed over @desktop', async ({ browser }) => {
   expect(teamName, 'builds on the team step; run the whole file').toBeDefined();
-  const { page, context } = await signIn(browser, seeded.admin);
+  const { page } = await signIn(browser, seeded.admin);
   await page.goto('/admin');
   await page.locator('.admin-sections').getByRole('link', { name: 'Настройки' }).click();
   await expect(page).toHaveURL(/[/]admin[/]settings$/);
@@ -486,45 +542,133 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   await page.goto('/admin/settings');
 
   const movedEnd = shiftDay(seededEnd, -1);
+  undo.push(restoreSelection(seededEnd));
 
-  // Everything below writes to the one database the mobile project inherits, so the restore runs
-  // even when an assertion in between fails — otherwise one red step here turns into a screenful
-  // of unrelated red in a run that never touched the admin area.
+  await firstYear.fill('4');
+  await end.fill(movedEnd);
+  await save.click();
+  await expect(page.getByRole('status')).toContainText('Настройки сохранены');
+
+  // The target is not stored on a team: it is the track's, and every team without one of its own
+  // reads it on the next request. The catalogue is where that becomes visible.
+  await page.goto('/teams');
+  await expect(teamComposition(page)).toHaveText('1 курс — 1 из 4 · 2 курс и старше — 2 из 3');
+
+  // The new deadline reaches the shell, which reads the same track the form just wrote.
+  await page.goto('/admin/settings');
+  await expect(page.locator('.admin-lead')).toContainText('Идёт набор');
+  await expect(page.getByLabel('Окончание', { exact: true })).toHaveValue(movedEnd);
+
+  // Marking it handed over closes the selection: the backend answers every change to it with 409,
+  // so the form must not offer one. Starting the NEXT selection is not a change to this one and
+  // stays available — the backend allows it, and that is how a year ends.
+  await page.getByRole('button', { name: 'Отметить переданным' }).click();
+  await confirm(page, 'Отметить набор переданным?', 'Отметить переданным');
+  await expect(page.locator('.admin-banner')).toContainText('передан в кабинет ПД');
+  await expect(page.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Начать новый набор' })).toBeEnabled();
+  await expect(page.locator('.admin-lead')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Снять отметку о передаче' }).click();
+  await confirm(page, 'Снять отметку о передаче?', 'Снять отметку');
+  await expect(page.locator('.admin-banner')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Сохранить' })).toBeEnabled();
+});
+
+/** A row of the admin list, found by the name it is headed with. */
+function adminRow(page, name) {
+  return page.locator('.admin-row').filter({ has: page.getByRole('heading', { name, exact: true }) });
+}
+
+test('the organiser fixes a student and a team by hand @desktop', async ({ browser, playwright }) => {
+  expect(teamName && people.lead && people.invitee, 'builds on the journey; run the whole file').toBeTruthy();
+  const { page } = await signIn(browser, seeded.admin);
+
+  const api = await adminRequest(playwright);
+  let track;
+  let second;
+  let team;
   try {
-    await firstYear.fill('4');
-    await end.fill(movedEnd);
-    await save.click();
-    await expect(page.getByRole('status')).toContainText('Настройки сохранены');
-
-    // The target is not stored on a team: it is the track's, and every team without one of its
-    // own reads it on the next request. The catalogue is where that becomes visible.
-    await page.goto('/teams');
-    await expect(teamComposition(page)).toHaveText('1 курс — 1 из 4 · 2 курс и старше — 2 из 3');
-
-    // The new deadline reaches the shell, which reads the same track the form just wrote.
-    await page.goto('/admin/settings');
-    await expect(page.locator('.admin-lead')).toContainText('Идёт набор');
-    await expect(page.getByLabel('Окончание', { exact: true })).toHaveValue(movedEnd);
-
-    // Marking it handed over closes the selection: the backend answers every change to it with
-    // 409, so the form must not offer one. Starting the NEXT selection is not a change to this
-    // one and stays available — the backend allows it, and that is how a year ends.
-    await page.getByRole('button', { name: 'Отметить переданным' }).click();
-    await confirm(page, 'Отметить набор переданным?', 'Отметить переданным');
-    await expect(page.locator('.admin-banner')).toContainText('передан в кабинет ПД');
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
-    await expect(page.getByRole('button', { name: 'Начать новый набор' })).toBeEnabled();
-    await expect(page.locator('.admin-lead')).toHaveCount(0);
-
-    await page.getByRole('button', { name: 'Снять отметку о передаче' }).click();
-    await confirm(page, 'Снять отметку о передаче?', 'Снять отметку');
-    await expect(page.locator('.admin-banner')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Сохранить' })).toBeEnabled();
+    track = await api.call('GET', '/tracks/current');
+    [second] = (await api.call('GET', `/students/search?input=${encodeURIComponent(seeded.second.fio)}`)).content;
+    [team] = (await api.call('GET', `/teams/search?input=${encodeURIComponent(teamName)}`)).content;
   } finally {
-    await restoreSelection(context, { firstYearTarget: 3, endDate: seededEnd });
+    await api.dispose();
+  }
+  expect(second?.course, 'the seeded second-year is in the run').toBe(2);
+  expect(team?.id, 'the run built its team').toBeTruthy();
+  const renamed = `${teamName} (правка)`;
+
+  undo.push(restoreSelection(null));
+  undo.push(async (call) => {
+    const current = await call('GET', `/students/${second.id}`);
+    await call('PUT', `/students/${second.id}`, { ...current, course: 2 });
+  });
+  undo.push(async (call) => {
+    const loaded = await call('GET', `/teams/${team.id}`);
+    await call('PUT', `/teams/${team.id}`, { ...loaded, name: teamName });
+  });
+
+  // Arranged, not tested: with targets of 3 + 3, a course change cannot push a team of three over
+  // anything, so the first-year target is lowered to 1 for the warning to have a reason to exist.
+  const arrange = await adminRequest(playwright);
+  try {
+    await arrange.call('PUT', `/tracks/${track.id}`, { ...track, firstYearTarget: 1 });
+  } finally {
+    await arrange.dispose();
   }
 
-  await page.goto('/teams');
-  await expect(teamComposition(page), 'restored for the run that follows this one')
-    .toHaveText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3');
+  await page.goto('/admin');
+  await page.locator('.admin-sections').getByRole('link', { name: 'Участники и команды' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]people$/);
+
+  // «By group» means course and group together — group numbers repeat across years. The seeded
+  // second-year is in group 4, and every row that comes back is in group 4 of the second year.
+  await page.getByLabel('Искать по курсу').fill('2');
+  await page.getByLabel('Искать по группе').fill('4');
+  await page.getByRole('search').getByRole('button', { name: 'Найти' }).click();
+  await expect(adminRow(page, seeded.second.fio)).toBeVisible();
+  await expect(page.locator('.admin-row-meta').filter({ hasNotText: '2 курс · группа 4' })).toHaveCount(0);
+
+  // «By team» starts from the team: its row lists exactly its members, and says so.
+  await page.getByRole('group', { name: 'Что показать' }).getByRole('button', { name: 'Команды' }).click();
+  await adminRow(page, teamName).getByRole('button', { name: 'Участники' }).click();
+  await expect(page.locator('.admin-filter')).toContainText(teamName);
+  await expect(page.locator('.admin-row')).toHaveCount(3);
+
+  // The lead is not offered for deletion — the backend would refuse it — and the row says why.
+  const lead = adminRow(page, people.lead.fio);
+  await expect(lead.getByRole('button', { name: 'Удалить' })).toBeDisabled();
+  await expect(lead).toContainText('передайте роль тимлида');
+
+  // A course is a fact: the change goes through, and the team being over its target is said in the
+  // row where the change was made, as a warning rather than a refusal.
+  const secondRow = adminRow(page, seeded.second.fio);
+  await secondRow.getByRole('button', { name: 'Изменить' }).click();
+  await secondRow.getByLabel('Курс').fill('1');
+  await secondRow.getByRole('button', { name: 'Сохранить' }).click();
+  await expect(page.getByRole('status')).toContainText('Сохранено');
+  await expect(secondRow.locator('.admin-row-warning')).toContainText(teamName);
+  await expect(secondRow.locator('.admin-row-warning')).toContainText('первокурсник');
+
+  // A stray registration goes; the account behind it stays (vaimon/team-selection#38).
+  await page.locator('.admin-filter').getByRole('button', { name: 'Все участники' }).click();
+  await page.getByLabel('Поиск участников').fill(people.invitee.fio);
+  await page.getByRole('search').getByRole('button', { name: 'Найти' }).click();
+  const invitee = adminRow(page, people.invitee.fio);
+  await expect(invitee).toBeVisible();
+  await invitee.getByRole('button', { name: 'Удалить' }).click();
+  // The confirmation has to say that the person is kept — that is the whole of #38.
+  await expect(page.getByRole('dialog')).toContainText('Учётная запись останется');
+  await confirm(page, 'Удалить анкету?', 'Удалить');
+  await expect(page.getByRole('status')).toContainText('Анкета удалена');
+  await expect(invitee).toHaveCount(0);
+
+  // A team is renamed in its row, and the list shows it under the new name.
+  await page.getByRole('group', { name: 'Что показать' }).getByRole('button', { name: 'Команды' }).click();
+  const teamRow = adminRow(page, teamName);
+  await teamRow.getByRole('button', { name: 'Изменить' }).click();
+  await teamRow.getByLabel('Название команды').fill(renamed);
+  await teamRow.getByRole('button', { name: 'Сохранить' }).click();
+  await expect(adminRow(page, renamed)).toBeVisible();
 });

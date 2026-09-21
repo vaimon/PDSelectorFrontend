@@ -1,0 +1,249 @@
+.people-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--gap);
+  gap: var(--gap);
+}
+
+/* Two states of one control, not two actions: the pressed one reads as the current view. */
+.people-toggle {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+}
+
+.people-toggle button {
+  min-height: var(--ctrl-h);
+  padding: 0 var(--pad);
+  border: 0;
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs);
+  cursor: pointer;
+}
+
+.people-toggle button + button {
+  border-left: 1px solid var(--border-strong);
+}
+
+.people-toggle button[aria-pressed="true"] {
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.people-search {
+  display: flex;
+  min-width: min(100%, 280px);
+  flex: 1;
+  gap: var(--space-8);
+}
+
+.people-search input {
+  min-width: 0;
+  flex: 1;
+  padding: 0 9px;
+}
+
+/* Course and group are a number each: narrow, so the name keeps the room. */
+.people-search .people-number {
+  width: 72px;
+  flex: 0 0 72px;
+}
+
+.admin-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 var(--gap);
+  padding: var(--space-8) var(--gap);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  gap: var(--gap);
+  font-size: calc(var(--fs) - 1px);
+}
+
+.admin-rows {
+  display: flex;
+  margin: 0 0 var(--gap);
+  padding: 0;
+  flex-direction: column;
+  gap: var(--space-8);
+  list-style: none;
+}
+
+.admin-row {
+  padding: var(--gap);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.admin-row-head {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.admin-row-main {
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+.admin-row-main h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.admin-row-meta {
+  margin: var(--space-4) 0 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.4;
+}
+
+.admin-row-actions,
+.admin-row-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+/* Scoped to the row's own controls: the team editor and its modal render inside the row and
+   bring their own button styles, which a bare .admin-row button would override. */
+.admin-row-actions button,
+.admin-row-form button,
+.people-search button,
+.admin-filter button {
+  min-height: var(--ctrl-h);
+  padding: 0 var(--gap);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.admin-row-actions button:hover:not(:disabled),
+.admin-row-form button:hover:not(:disabled),
+.people-search button:hover,
+.admin-filter button:hover {
+  border-color: var(--accent);
+}
+
+.admin-row-actions button:disabled,
+.admin-row-form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-row-actions button:focus-visible,
+.admin-row-form button:focus-visible,
+.people-toggle button:focus-visible,
+.people-search button:focus-visible,
+.admin-filter button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.admin-row-actions .admin-danger:not(:disabled) {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.admin-row-form-actions button[type="submit"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.admin-row-form .admin-quiet,
+.admin-filter .admin-quiet {
+  background: transparent;
+}
+
+/* A disabled action says why in text: a phone has no hover, and `title` is unreachable there. */
+.admin-row-reason {
+  margin: var(--space-8) 0 0;
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.4;
+}
+
+/* Mounted always, drawn only when a save left something to say. */
+.admin-row-warning:empty {
+  display: none;
+}
+
+/* Not an error: the change went through. It is what the change did to the team, said where it was made. */
+.admin-row-warning {
+  margin: var(--space-8) 0 0;
+  padding: var(--space-8) var(--gap);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r);
+  background: var(--warn-bg);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.4;
+}
+
+.admin-row-form {
+  display: grid;
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+  border-top: 1px solid var(--hairline);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: var(--gap);
+}
+
+.admin-row-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-row-field label {
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+}
+
+.admin-row-field input {
+  padding: 0 9px;
+}
+
+.admin-row-field input.input-error {
+  border-color: var(--bad);
+}
+
+.admin-row-form-actions {
+  align-items: flex-end;
+  grid-column: 1 / -1;
+}
+
+.admin-row-team-form {
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+  border-top: 1px solid var(--hairline);
+}
+
+.people-locked {
+  margin: 0 0 var(--gap);
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+  line-height: 1.4;
+}

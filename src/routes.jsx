@@ -6,6 +6,7 @@ import StudentProfilePage from "./pages/StudentProfile";
 import CabinetPage from './pages/CabinetPage';
 import AdminLayout from './pages/AdminLayout';
 import AdminOverviewPage from './pages/AdminOverviewPage';
+import AdminPeoplePage from './pages/AdminPeoplePage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
@@ -64,6 +65,7 @@ const routes = [
     element: <RequireAdmin><AdminLayout /></RequireAdmin>,
     children: [
       { index: true, element: <AdminOverviewPage /> },
+      { path: 'people', element: <AdminPeoplePage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
     ]
   },
