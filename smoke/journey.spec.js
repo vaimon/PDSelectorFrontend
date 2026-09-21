@@ -468,8 +468,9 @@ async function adminRequest(playwright) {
       data,
       headers: { 'X-XSRF-TOKEN': await xsrf() },
     });
-    expect(response.ok(), `${method} ${path}: ${response.status()} ${await response.text()}`).toBeTruthy();
-    return response.status() === 204 ? null : response.json();
+    const body = await response.text();
+    expect(response.ok(), `${method} ${path}: ${response.status()} ${body}`).toBeTruthy();
+    return body ? JSON.parse(body) : null;
   };
   return { call, dispose: () => request.dispose() };
 }
@@ -671,4 +672,89 @@ test('the organiser fixes a student and a team by hand @desktop', async ({ brows
   await teamRow.getByLabel('Название команды').fill(renamed);
   await teamRow.getByRole('button', { name: 'Сохранить' }).click();
   await expect(adminRow(page, renamed)).toBeVisible();
+});
+
+test('the organiser gives access, takes it back and reads who did what @desktop', async ({ browser, playwright }, testInfo) => {
+  expect(teamName, 'builds on the journey; run the whole file').toBeDefined();
+
+  // Someone who has only ever signed in: the first login creates the account, as SSO would.
+  const helper = newcomer(testInfo, 'helper');
+  const helperContext = await browser.newContext();
+  await logIn(helperContext, helper);
+  await helperContext.close();
+
+  const api = await adminRequest(playwright);
+  let helperId;
+  let others;
+  try {
+    helperId = (await api.call('GET', `/users?fio=${encodeURIComponent(helper.fio)}`)).content[0]?.id;
+    expect(helperId, 'the login created the account').toBeTruthy();
+    others = (await api.call('GET', '/users?role=ADMIN&isEnabled=true&size=100')).content
+      .filter((user) => user.email !== seeded.admin.email);
+    // Pushed before anything changes: whatever fails below, the others get ADMIN back and the
+    // helper loses it. Not quite all the way back: taking ADMIN from an account with no
+    // questionnaire leaves an empty student row behind (UserService.assignRole), which giving it
+    // back does not remove. Nothing that runs later counts it — it has no selection.
+    undo.push((call) => call('POST', `/users/${helperId}/assign-role`, { name: 'STUDENT' }));
+    for (const other of others) {
+      undo.push((call) => call('POST', `/users/${other.id}/assign-role`, { name: 'ADMIN' }));
+    }
+    // Arranged, not tested: the demo data of V1.002 has an ADMIN of its own, and the rule under
+    // test is about the last one.
+    for (const other of others) {
+      await api.call('POST', `/users/${other.id}/assign-role`, { name: 'STUDENT' });
+    }
+  } finally {
+    await api.dispose();
+  }
+
+  const { page } = await signIn(browser, seeded.admin);
+  await page.goto('/admin');
+  await page.locator('.admin-sections').getByRole('link', { name: 'Доступ' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]access$/);
+
+  // Alone, the admin cannot step down: nobody would be left to give access back. The row says so
+  // instead of letting the backend refuse.
+  const admin = adminRow(page, seeded.admin.fio);
+  await expect(admin.getByRole('button', { name: 'Снять доступ' })).toBeDisabled();
+  await expect(admin).toContainText('последний администратор');
+
+  await page.getByLabel('Поиск людей').fill(helper.fio);
+  await page.getByRole('search').getByRole('button', { name: 'Найти' }).click();
+  await adminRow(page, helper.fio).getByRole('button', { name: 'Дать доступ' }).click();
+  await confirm(page, 'Дать доступ к администрированию?', 'Дать доступ');
+  await expect(page.getByRole('status')).toContainText('Доступ выдан');
+
+  // With two admins either can step down; taking it from the new one leaves the first alone again.
+  await page.locator('.admin-filter').getByRole('button', { name: 'Администраторы' }).click();
+  await expect(admin.getByRole('button', { name: 'Снять доступ' })).toBeEnabled();
+  await adminRow(page, helper.fio).getByRole('button', { name: 'Снять доступ' }).click();
+  await confirm(page, 'Снять доступ?', 'Снять доступ');
+  await expect(page.getByRole('status')).toContainText('Доступ снят');
+  await expect(adminRow(page, helper.fio)).toHaveCount(0);
+  await expect(admin.getByRole('button', { name: 'Снять доступ' })).toBeDisabled();
+
+  // What the admin did is in their history, under the name the entry was written with.
+  await admin.getByRole('button', { name: 'История' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]history[?]/);
+  await expect(page.locator('.admin-filter')).toContainText(seeded.admin.fio);
+  await expect(page.locator('.admin-entry').filter({ hasText: helper.fio }).first()).toBeVisible();
+
+  // A period narrows the log without losing today's entries, and the backend takes its bounds —
+  // the end is sent to the microsecond. Two days either side, so midnight on either clock is moot.
+  const today = new Date().toISOString().slice(0, 10);
+  await page.getByLabel('С', { exact: true }).fill(shiftDay(today, -2));
+  await page.getByLabel('по', { exact: true }).fill(shiftDay(today, 2));
+  await page.getByRole('button', { name: 'Показать' }).click();
+  await expect(page.locator('.admin-state--error')).toHaveCount(0);
+  await expect(page.locator('.admin-entry').filter({ hasText: helper.fio }).first()).toBeVisible();
+
+  // «Who moved a student and when»: find the student, open their history. The first-year joined
+  // the run's team by request, and the entry names it.
+  await page.locator('.admin-sections').getByRole('link', { name: 'Участники и команды' }).click();
+  await page.getByLabel('Поиск участников').fill(seeded.firstYear.fio);
+  await page.getByRole('search').getByRole('button', { name: 'Найти' }).click();
+  await adminRow(page, seeded.firstYear.fio).getByRole('button', { name: 'История' }).click();
+  await expect(page.locator('.admin-filter')).toContainText(seeded.firstYear.fio);
+  await expect(page.locator('.admin-entry').filter({ hasText: teamName }).first()).toBeVisible();
 });

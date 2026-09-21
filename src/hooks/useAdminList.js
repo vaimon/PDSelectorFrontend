@@ -30,7 +30,9 @@ export const useAdminList = (fetchPage, params) => {
         setState({ items, page, totalPages, totalElements, loading: false, error: null });
       })
       .catch((error) => {
-        if (error.name === 'AbortError') {
+        // A request this effect cancelled is not a failure, whatever the client names it: `fetch`
+        // throws AbortError, axios CanceledError.
+        if (controller.signal.aborted) {
           return;
         }
         console.error('Не удалось загрузить список:', error);
