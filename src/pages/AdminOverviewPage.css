@@ -74,6 +74,18 @@
   line-height: 1.4;
 }
 
+/* The count that is acted on elsewhere: the board is the one place teams are put together. */
+.admin-stat--link {
+  color: inherit;
+  text-decoration: none;
+}
 
+.admin-stat--link .admin-stat-hint {
+  color: var(--accent-text);
+  text-decoration: underline;
+}
 
-
+.admin-stat--link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

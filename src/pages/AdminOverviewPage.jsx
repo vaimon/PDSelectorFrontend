@@ -1,14 +1,22 @@
+import { Link } from "react-router-dom";
+
 import { useIdentity } from "../context/identityContext";
 import useAdminOverview from "../hooks/useAdminOverview";
 import "./AdminOverviewPage.css";
 
-const Stat = ({ value, label, hint, alert }) => (
-  <div className={alert ? "admin-stat admin-stat--alert" : "admin-stat"}>
-    <span className="admin-stat-value">{value}</span>
-    <span className="admin-stat-label">{label}</span>
-    {hint && <span className="admin-stat-hint">{hint}</span>}
-  </div>
-);
+const Stat = ({ value, label, hint, alert, to }) => {
+  const body = (
+    <>
+      <span className="admin-stat-value">{value}</span>
+      <span className="admin-stat-label">{label}</span>
+      {hint && <span className="admin-stat-hint">{hint}</span>}
+    </>
+  );
+  const className = alert ? "admin-stat admin-stat--alert" : "admin-stat";
+  return to
+    ? <Link className={`${className} admin-stat--link`} to={to}>{body}</Link>
+    : <div className={className}>{body}</div>;
+};
 
 /**
  * Where the selection stands, in numbers: who registered, how the teams are filling up, and what
@@ -62,7 +70,7 @@ const AdminOverviewPage = () => {
           <div className="admin-stats">
             <Stat value={teams.total} label="всего" />
             <Stat value={teams.complete} label="собраны" />
-            <Stat value={teams.incomplete} label="кого-то не хватает" />
+            <Stat value={teams.incomplete} label="кого-то не хватает" hint="собрать в «Составе»" to="/admin/board" />
           </div>
         </article>
 

@@ -9,8 +9,8 @@ import "./AdminList.css";
 
 /**
  * The frame of the admin area: which selection this is, whether it can still be changed, and the
- * section below it. Sections are routes under `/admin` — настройки (#47), участники и команды
- * (#48), доступ (#49). The menu below lists the ones that exist; each later section adds an
+ * section below it. Sections are routes under `/admin` — состав (#55), настройки (#47), участники
+ * и команды (#48), доступ (#49). The menu below lists the ones that exist; each later section adds an
  * item to it.
  *
  * Who may open it is the router's business: `RequireAdmin` already answers everyone else with
@@ -51,6 +51,7 @@ const AdminLayout = () => {
           {/* `end` on the overview only: it lives at /admin itself, so without it every section
               below would light it up as well. */}
           <NavLink to="/admin" end className={sectionClass}>Обзор</NavLink>
+          <NavLink to="/admin/board" className={sectionClass}>Состав</NavLink>
           <NavLink to="/admin/people" className={sectionClass}>Участники и команды</NavLink>
           <NavLink to="/admin/settings" className={sectionClass}>Настройки</NavLink>
           <NavLink to="/admin/access" className={sectionClass}>Доступ</NavLink>

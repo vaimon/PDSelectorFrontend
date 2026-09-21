@@ -1,0 +1,250 @@
+/*
+ * The board: the pool on the left, the teams beside it. Desktop-first — at 1280px the pool stays in
+ * view while the teams scroll; below 900px the pool goes on top and everything is one column.
+ */
+
+.board-toolbar {
+  align-items: center;
+}
+
+.board-search {
+  min-width: min(100%, 240px);
+  flex: 1;
+  padding: 0 9px;
+}
+
+.board-check,
+.board-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  white-space: nowrap;
+}
+
+.board-select select {
+  min-height: var(--ctrl-h);
+}
+
+.board-summary {
+  margin: 0 0 var(--gap);
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+}
+
+.board {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  gap: var(--gap);
+}
+
+.board-pool {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--gap));
+  max-height: calc(100dvh - var(--topbar-h) - (var(--gap) * 2));
+  overflow-y: auto;
+  padding: var(--gap);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.board-pool h3,
+.board-team h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.board-teams {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  align-items: start;
+  gap: var(--gap);
+}
+
+.board-team {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--gap);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.board-team-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.board-team-status {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  gap: var(--space-8);
+  font-size: calc(var(--fs) - 1px);
+}
+
+/* The status is said in words; the dot only lets a screenful of cards be read at a glance. */
+.board-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  color: var(--text-2);
+}
+
+.board-status::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  content: "";
+}
+
+.is-complete .board-status {
+  color: var(--ok);
+}
+
+.is-complete .board-status::before {
+  background: var(--ok);
+}
+
+.is-over_target .board-status {
+  color: var(--bad);
+}
+
+.is-over_target .board-status::before {
+  background: var(--bad);
+}
+
+.board-badge,
+.board-lead {
+  padding: 0 var(--space-8);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-size: calc(var(--fs) - 2px);
+  font-weight: 500;
+}
+
+.board-lead {
+  margin-left: var(--space-8);
+}
+
+.board-counters {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs) - 1px);
+  letter-spacing: var(--track-num);
+}
+
+.board-students {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  list-style: none;
+}
+
+.board-student {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--hairline);
+  gap: var(--space-8);
+}
+
+.board-pool .board-students {
+  margin-top: var(--space-8);
+}
+
+.board-student-main {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 160px;
+  flex-direction: column;
+}
+
+.board-student-name {
+  color: var(--text);
+  font-size: var(--fs);
+  line-height: 1.35;
+}
+
+.board-student-meta {
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+}
+
+.board-student-actions,
+.board-team-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.board-team-actions {
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--hairline);
+}
+
+.board-action {
+  min-height: 28px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  cursor: pointer;
+}
+
+.board-action:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.board-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.board-action:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.board-action.board-danger:not(:disabled) {
+  border-color: var(--bad-border);
+  color: var(--bad);
+}
+
+.board-empty {
+  margin: var(--space-8) 0 0;
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1px);
+}
+
+@media (max-width: 899.98px) {
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .board-pool {
+    position: static;
+    max-height: none;
+  }
+}

@@ -758,3 +758,52 @@ test('the organiser gives access, takes it back and reads who did what @desktop'
   await expect(page.locator('.admin-filter')).toContainText(seeded.firstYear.fio);
   await expect(page.locator('.admin-entry').filter({ hasText: teamName }).first()).toBeVisible();
 });
+
+/** A team card on the board, found by its heading. */
+function boardTeam(page, name) {
+  return page.locator('.board-team').filter({ has: page.getByRole('heading', { name, exact: true }) });
+}
+
+test('the organiser completes a team from the pool on the board @desktop', async ({ browser }) => {
+  expect(teamName && people.friend, 'builds on the journey; run the whole file').toBeTruthy();
+  const friend = people.friend;
+
+  // Pushed before anything changes: wherever the friend ended up, they go back to the pool.
+  undo.push(async (call) => {
+    const board = await call('GET', '/admin/board');
+    for (const team of board.teams) {
+      const member = team.members.find((student) => student.name === friend.fio);
+      if (member) {
+        await call('POST', '/admin/board/moves', {
+          studentId: member.id, fromTeamId: team.id, fromVersion: team.version, allowOverTarget: false,
+        });
+      }
+    }
+  });
+
+  const { page } = await signIn(browser, seeded.admin);
+  await page.goto('/admin');
+  await page.locator('.admin-sections').getByRole('link', { name: 'Состав' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]board$/);
+
+  // By now the run's team is its lead and the seeded second-year (2 курс) and one first-year; the
+  // friend (2 курс) left it and waits in the pool.
+  const team = boardTeam(page, teamName);
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  const pool = page.locator('.board-pool');
+  await expect(pool).toContainText(friend.fio);
+
+  await pool.locator('.board-student').filter({ hasText: friend.fio })
+    .getByRole('button', { name: 'Переместить в…' }).click();
+  const picker = page.getByRole('dialog');
+  await expect(picker).toContainText(friend.fio);
+  await picker.getByRole('button', { name: teamName }).click();
+
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+  await expect(team).toContainText(friend.fio);
+  await expect(pool).not.toContainText(friend.fio);
+
+  // Not only on this screen: the move reached the backend.
+  await page.reload();
+  await expect(boardTeam(page, teamName)).toContainText(friend.fio);
+});
