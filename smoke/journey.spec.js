@@ -764,7 +764,7 @@ function boardTeam(page, name) {
   return page.locator('.board-team').filter({ has: page.getByRole('heading', { name, exact: true }) });
 }
 
-test('the organiser completes a team from the pool on the board @desktop', async ({ browser }) => {
+test('the organiser completes a team from the pool on the board, drags a student and takes a move back @desktop', async ({ browser }) => {
   expect(teamName && people.friend, 'builds on the journey; run the whole file').toBeTruthy();
   const friend = people.friend;
 
@@ -803,7 +803,32 @@ test('the organiser completes a team from the pool on the board @desktop', async
   await expect(team).toContainText(friend.fio);
   await expect(pool).not.toContainText(friend.fio);
 
-  // Not only on this screen: the move reached the backend.
+  // The same moves by hand: dragged out of the team into the pool, and from the pool onto it again.
+  // The counters change before the server answers; the toast is its answer. The row is grabbed by
+  // the name, not in the middle where its buttons are.
+  const friendRow = () => page.locator('.board-student').filter({ hasText: friend.fio });
+  const byTheName = { sourcePosition: { x: 8, y: 8 } };
+  await friendRow().dragTo(pool, byTheName);
+  await expect(page.getByRole('status')).toContainText(`${friend.fio} — без команды`);
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expect(pool).toContainText(friend.fio);
+
+  await friendRow().dragTo(team, byTheName);
+  await expect(page.getByRole('status')).toContainText(`${friend.fio} — в команде «${teamName}»`);
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+
+  // The last move can be taken back; after that there is nothing left to undo.
+  const undoBar = page.locator('.board-undo');
+  await expect(undoBar).toContainText(friend.fio);
+  await undoBar.getByRole('button', { name: 'Отменить' }).click();
+  await expect(page.getByRole('status')).toContainText('Перемещение отменено');
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expect(pool).toContainText(friend.fio);
+  await expect(undoBar).toHaveCount(0);
+
+  // Not only on this screen: the friend ends in the pool only if the undo reached the backend —
+  // without it the reload would show them in the team, where the last drag put them.
   await page.reload();
-  await expect(boardTeam(page, teamName)).toContainText(friend.fio);
+  await expect(page.locator('.board-pool')).toContainText(friend.fio);
+  await expect(boardTeam(page, teamName)).not.toContainText(friend.fio);
 });
