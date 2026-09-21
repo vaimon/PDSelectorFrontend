@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import Pagination from "../components/pagination/Pagination";
@@ -14,7 +15,6 @@ import { useProjectTypes } from "../hooks/useProjectTypes";
 import { useTechnologies } from "../hooks/useTechnologies";
 import { describePlaces } from "../utils/composition";
 import { toStudentFormValues, toStudentPayload, validateStudent } from "../utils/studentForm";
-import "./AdminPeoplePage.css";
 
 const PAGE_SIZE = 20;
 const LEAD_REASON = "Тимлида удалить нельзя: сначала передайте роль тимлида или распустите команду.";
@@ -92,6 +92,7 @@ const StudentEditor = ({ student, onSaved, onCancel }) => {
  * team's own row rather than from a list of every team to pick from.
  */
 const AdminPeoplePage = () => {
+  const navigate = useNavigate();
   const { activeTrack } = useIdentity();
   const { handedOver } = useHandOver();
   const { notify } = useNotifications();
@@ -196,6 +197,10 @@ const AdminPeoplePage = () => {
     setStudentQuery({ ...EMPTY_STUDENT_QUERY, team: { id: team.id, name: team.name } });
   };
 
+  const showHistory = (kind, id, name) => {
+    navigate(`/admin/history?${kind}=${id}&name=${encodeURIComponent(name)}`);
+  };
+
   const editTeam = (team) => setEditing({
     kind: "team",
     id: team.id,
@@ -271,6 +276,9 @@ const AdminPeoplePage = () => {
             </p>
           </div>
           <div className="admin-row-actions">
+            <button type="button" onClick={() => showHistory("student", student.id, student.user?.fio ?? "")}>
+              История
+            </button>
             <button type="button" disabled={locked || isEditing} onClick={() => setEditing({ kind: "student", id: student.id })}>
               Изменить
             </button>
@@ -308,6 +316,7 @@ const AdminPeoplePage = () => {
           </div>
           <div className="admin-row-actions">
             <button type="button" onClick={() => showMembers(team)}>Участники</button>
+            <button type="button" onClick={() => showHistory("team", team.id, team.name)}>История</button>
             <button type="button" disabled={locked || isEditing} onClick={() => editTeam(team)}>
               Изменить
             </button>
@@ -355,8 +364,8 @@ const AdminPeoplePage = () => {
           </p>
         ) : (
           <>
-            <div className="people-toolbar">
-              <div className="people-toggle" role="group" aria-label="Что показать">
+            <div className="admin-toolbar">
+              <div className="admin-toggle" role="group" aria-label="Что показать">
                 <button type="button" aria-pressed={view === "students"} onClick={() => switchTo("students")}>
                   Участники
                 </button>
@@ -364,7 +373,7 @@ const AdminPeoplePage = () => {
                   Команды
                 </button>
               </div>
-              <form className="people-search" role="search" onSubmit={search}>
+              <form className="admin-search" role="search" onSubmit={search}>
                 <input
                   type="text"
                   name="input"
@@ -379,7 +388,7 @@ const AdminPeoplePage = () => {
                       type="text"
                       inputMode="numeric"
                       name="course"
-                      className="people-number"
+                      className="admin-number"
                       value={draft.course}
                       onChange={changeDraft}
                       aria-label="Искать по курсу"
@@ -389,7 +398,7 @@ const AdminPeoplePage = () => {
                       type="text"
                       inputMode="numeric"
                       name="group"
-                      className="people-number"
+                      className="admin-number"
                       value={draft.group}
                       onChange={changeDraft}
                       aria-label="Искать по группе"
@@ -411,7 +420,7 @@ const AdminPeoplePage = () => {
             )}
 
             {/* Once for the list, not once per row: the banner above already gives the sentence. */}
-            {locked && <p className="people-locked">Набор передан — правки в кабинете ПД.</p>}
+            {locked && <p className="admin-locked">Набор передан — правки в кабинете ПД.</p>}
 
             {list.loading && list.items.length === 0 ? (
               <p className="admin-state">Загружаем…</p>

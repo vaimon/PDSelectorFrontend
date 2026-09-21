@@ -5,6 +5,7 @@ import { useIdentity } from "../context/identityContext";
 import useHandOver from "../hooks/useHandOver";
 import { describeSelectionWindow, selectionClosedReason } from "../utils/selectionWindow";
 import "./AdminLayout.css";
+import "./AdminList.css";
 
 /**
  * The frame of the admin area: which selection this is, whether it can still be changed, and the
@@ -52,6 +53,8 @@ const AdminLayout = () => {
           <NavLink to="/admin" end className={sectionClass}>Обзор</NavLink>
           <NavLink to="/admin/people" className={sectionClass}>Участники и команды</NavLink>
           <NavLink to="/admin/settings" className={sectionClass}>Настройки</NavLink>
+          <NavLink to="/admin/access" className={sectionClass}>Доступ</NavLink>
+          <NavLink to="/admin/history" className={sectionClass}>История</NavLink>
         </nav>
 
         <Outlet />

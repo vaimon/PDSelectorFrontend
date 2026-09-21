@@ -7,6 +7,8 @@ import CabinetPage from './pages/CabinetPage';
 import AdminLayout from './pages/AdminLayout';
 import AdminOverviewPage from './pages/AdminOverviewPage';
 import AdminPeoplePage from './pages/AdminPeoplePage';
+import AdminAccessPage from './pages/AdminAccessPage';
+import AdminHistoryPage from './pages/AdminHistoryPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import TeamProfilePage from './pages/TeamProfilePage';
 import StudentsPage from './pages/StudentsPage';
@@ -67,6 +69,8 @@ const routes = [
       { index: true, element: <AdminOverviewPage /> },
       { path: 'people', element: <AdminPeoplePage /> },
       { path: 'settings', element: <AdminSettingsPage /> },
+      { path: 'access', element: <AdminAccessPage /> },
+      { path: 'history', element: <AdminHistoryPage /> },
     ]
   },
   {
