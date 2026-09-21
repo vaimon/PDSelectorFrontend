@@ -232,6 +232,53 @@
   color: var(--bad);
 }
 
+/* Dragging (#56): the row is the grip; where it would land is marked while it is over it. */
+.board-student[draggable="true"] {
+  cursor: grab;
+}
+
+.board-student.is-dragging {
+  opacity: 0.5;
+}
+
+.board-pool.is-drop-target,
+.board-team.is-drop-target {
+  border-color: var(--accent);
+  background: var(--accent-weak);
+}
+
+/* The last move and the way back, until the next action on the board. */
+.board-undo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 var(--gap);
+  padding: var(--space-8) var(--gap);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  gap: var(--gap);
+  font-size: calc(var(--fs) - 1px);
+}
+
+.board-undo button {
+  min-height: 28px;
+  padding: 0 var(--space-8);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--accent-text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.board-undo button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .board-empty {
   margin: var(--space-8) 0 0;
   color: var(--text-3);

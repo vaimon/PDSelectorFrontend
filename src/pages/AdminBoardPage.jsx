@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import LeadPicker from "../components/board/LeadPicker";
@@ -35,7 +35,11 @@ const studentMeta = (student) => `${courseLabel(student.course)}${student.group 
  * the team first — ends the same way, with the other admin's change on screen.
  *
  * The questions a move needs (over target? who leads next? dissolve?) are asked before anything is
- * sent, from the same numbers the server will check; if it still refuses, that was a race.
+ * sent, from the same numbers the server will check; if it still refuses, that was a race. A move
+ * starts from «Переместить в…» or from dragging a row (#56) — both end in the same `advance`.
+ *
+ * The last move can be taken back until the next action on the board. Only a move: a dissolved
+ * team, new targets or a new lead are confirmed before they happen instead.
  */
 const AdminBoardPage = () => {
   const { handedOver } = useHandOver();
@@ -49,7 +53,16 @@ const AdminBoardPage = () => {
   const [move, setMove] = useState(null);
   const [targetsOf, setTargetsOf] = useState(null);
   const [confirmation, setConfirmation] = useState(null);
+  const [lastMove, setLastMove] = useState(null);
+  // What is being dragged lives in a ref: the first `dragover` fires before a state update renders,
+  // and a target that does not call preventDefault on it refuses the drop. State only draws it.
+  const dragging = useRef(null);
+  const [dragged, setDragged] = useState(null);
+  const [dropOn, setDropOn] = useState(null);
   const loadId = useRef(0);
+  // Dragging is offered to a mouse or a trackpad only, by choice (#56): a long-press drag on a phone
+  // fights the page's scrolling, and a keyboard has nothing to drag with — the picker is the way there.
+  const finePointer = useMemo(() => window.matchMedia?.("(any-pointer: fine)").matches ?? false, []);
 
   const load = useCallback(async () => {
     const id = ++loadId.current;
@@ -73,9 +86,13 @@ const AdminBoardPage = () => {
     load();
   }, [load]);
 
-  /** Holds every action off until `work` is done, however many requests it takes. */
+  /**
+   * Holds every action off until `work` is done, however many requests it takes. Any action ends the
+   * chance to undo the move before it: an undo is only ever of the last thing done.
+   */
   const whileBusy = async (work) => {
     setBusy(true);
+    setLastMove(null);
     try {
       return await work();
     } finally {
@@ -109,7 +126,11 @@ const AdminBoardPage = () => {
       current = await run(current, applyDissolve(current, from.id),
         () => dissolveTeam(from.id, { version: from.version }),
         to ? null : `Команда «${from.name}» расформирована`);
-      if (current.refused || !to) return;
+      if (current.refused) return;
+      if (!to) {
+        setLastMove({ student, originName: from.name, destinationId: null, destinationName: null, dissolved: true });
+        return;
+      }
       origin = null;
     }
     // Two requests, and the first has already gone through: if the second does not, the page says
@@ -141,7 +162,54 @@ const AdminBoardPage = () => {
       }),
       target ? `${student.name} — в команде «${target.name}»` : `${student.name} — без команды`,
     );
-    if (moved.refused) halfDone();
+    if (moved.refused) {
+      halfDone();
+      return;
+    }
+    setLastMove({
+      student,
+      originId: dissolve ? null : origin?.id ?? null,
+      originName: from?.name ?? null,
+      destinationId: target?.id ?? null,
+      destinationName: target?.name ?? null,
+      successorName: newLeadId == null ? null : from.members.find((member) => member.id === newLeadId)?.name,
+      dissolved: dissolve,
+    });
+  });
+
+  /**
+   * The last move, backwards: from where the student is now to where they came from, with the
+   * versions both teams have now. If the board has moved on under it, there is nothing to undo.
+   */
+  const undoLast = () => whileBusy(async () => {
+    const last = lastMove;
+    const holder = last.destinationId == null ? null : board.teams.find((team) => team.id === last.destinationId);
+    const stillThere = last.destinationId == null
+      ? board.pool.some((student) => student.id === last.student.id)
+      : Boolean(holder?.members.some((member) => member.id === last.student.id));
+    const origin = last.originId == null ? null : board.teams.find((team) => team.id === last.originId);
+    if (!stillThere || (last.originId != null && !origin)) {
+      notify({ type: "info", text: "Состав изменился после перемещения — отменять уже нечего" });
+      await load();
+      return;
+    }
+    await run(
+      board,
+      applyMove(board, { studentId: last.student.id, fromTeamId: holder?.id ?? null, toTeamId: origin?.id ?? null }),
+      () => moveStudent({
+        studentId: last.student.id,
+        fromTeamId: holder?.id ?? null,
+        fromVersion: holder?.version ?? null,
+        toTeamId: origin?.id ?? null,
+        toVersion: origin?.version ?? null,
+        // The composition it puts back existed a moment ago, over target or not; the versions of both
+        // teams guarantee that nothing else changed since, and without this a move out of an
+        // over-target team — the usual way to fix one — could never be undone.
+        allowOverTarget: true,
+        newLeadId: null,
+      }),
+      "Перемещение отменено",
+    );
   });
 
   /**
@@ -229,6 +297,58 @@ const AdminBoardPage = () => {
   const teams = filterTeams(board.teams, { ...filter, placesFor: filter.placesFor ? Number(filter.placesFor) : null });
   const pool = filterPool(board.pool, filter.text);
 
+  // A row to drag, and a place to drop it: a team card or the pool, never where the student already is.
+  const dragFrom = (student, from) => (locked || !finePointer ? {} : {
+    draggable: !busy,
+    onDragStart: (event) => {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", String(student.id)); // Firefox starts no drag without data
+      dragging.current = { student, from };
+      setDragged(student.id);
+    },
+    onDragEnd: () => {
+      dragging.current = null;
+      setDragged(null);
+      setDropOn(null);
+    },
+  });
+
+  const dropInto = (key, to) => (locked ? {} : {
+    onDragOver: (event) => {
+      const current = dragging.current;
+      if (!current || busy || (current.from?.id ?? null) === (to?.id ?? null)) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      if (dropOn !== key) setDropOn(key);
+    },
+    onDragLeave: (event) => {
+      if (!event.currentTarget.contains(event.relatedTarget)) setDropOn(null);
+    },
+    onDrop: (event) => {
+      const current = dragging.current;
+      dragging.current = null;
+      setDragged(null);
+      setDropOn(null);
+      if (!current || busy) return;
+      event.preventDefault();
+      advance({ student: current.student, from: current.from, to });
+    },
+  });
+
+  const rowClass = (student) => (dragged === student.id ? "board-student is-dragging" : "board-student");
+  const dropClass = (base, key) => (dropOn === key ? `${base} is-drop-target` : base);
+
+  const undoNote = (last) => {
+    const where = last.destinationName ? `в команде «${last.destinationName}»` : "без команды";
+    if (last.dissolved) {
+      return `${last.student.name} — ${where}. Команда «${last.originName}» расформирована, это перемещение не отменить.`;
+    }
+    const back = last.successorName
+      ? ` После отмены ${last.student.name} вернётся в команду «${last.originName}» участником, тимлидом останется ${last.successorName}.`
+      : "";
+    return `${last.student.name} — ${where}.${back}`;
+  };
+
   const moveButton = (student, from) => !locked && (
     <button
       type="button"
@@ -289,15 +409,28 @@ const AdminBoardPage = () => {
         {" "}· цель набора: 1 курс {board.firstYearTarget}, 2 курс {board.secondYearTarget}
       </p>
 
+      {lastMove && !locked && (
+        <p className="board-undo">
+          <span>{undoNote(lastMove)}</span>
+          {!lastMove.dissolved && (
+            <button type="button" disabled={busy} onClick={undoLast}>Отменить</button>
+          )}
+        </p>
+      )}
+
       <div className="board">
-        <aside className="board-pool" aria-labelledby="board-pool-title">
+        <aside
+          className={dropClass("board-pool", "pool")}
+          aria-labelledby="board-pool-title"
+          {...dropInto("pool", null)}
+        >
           <h3 id="board-pool-title">Без команды · {board.pool.length}</h3>
           {pool.length === 0 ? (
             <p className="board-empty">{board.pool.length === 0 ? "Все студенты в командах." : "Никого не нашлось."}</p>
           ) : (
             <ul className="board-students">
               {pool.map((student) => (
-                <li key={student.id} className="board-student">
+                <li key={student.id} className={rowClass(student)} {...dragFrom(student, null)}>
                   <div className="board-student-main">
                     <span className="board-student-name">{student.name}</span>
                     <span className="board-student-meta">{studentMeta(student)}</span>
@@ -314,7 +447,11 @@ const AdminBoardPage = () => {
             <p className="board-empty">{board.teams.length === 0 ? "В наборе пока нет команд." : "Под фильтр не подходит ни одна команда."}</p>
           )}
           {teams.map((team) => (
-            <article key={team.id} className={`board-team is-${team.status.toLowerCase()}`}>
+            <article
+              key={team.id}
+              className={dropClass(`board-team is-${team.status.toLowerCase()}`, team.id)}
+              {...dropInto(team.id, team)}
+            >
               <header className="board-team-head">
                 <h3>{team.name}</h3>
                 <p className="board-team-status">
@@ -326,7 +463,7 @@ const AdminBoardPage = () => {
 
               <ul className="board-students">
                 {team.members.map((member) => (
-                  <li key={member.id} className="board-student">
+                  <li key={member.id} className={rowClass(member)} {...dragFrom(member, team)}>
                     <div className="board-student-main">
                       <span className="board-student-name">
                         {member.name}
