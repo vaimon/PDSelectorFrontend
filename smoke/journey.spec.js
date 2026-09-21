@@ -699,8 +699,8 @@ test('the organiser gives access, takes it back and reads who did what @desktop'
     for (const other of others) {
       undo.push((call) => call('POST', `/users/${other.id}/assign-role`, { name: 'ADMIN' }));
     }
-    // Arranged, not tested: the demo data of V1.002 has an ADMIN of its own, and the rule under
-    // test is about the last one.
+    // Arranged, not tested: the rule under test is about the last admin who can sign in, and the
+    // database is not the smoke's alone — any other enabled admin in it would make this one not last.
     for (const other of others) {
       await api.call('POST', `/users/${other.id}/assign-role`, { name: 'STUDENT' });
     }
