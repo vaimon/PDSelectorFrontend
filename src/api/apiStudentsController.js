@@ -13,6 +13,7 @@ export const fetchStudents = async ({
   hasTeam,
   isCaptain,
   technologies,
+  teamId,
   page = 0,
   size = 12,
   signal,
@@ -29,6 +30,8 @@ export const fetchStudents = async ({
     if (technologies && technologies.length > 0) {
       technologies.forEach((tech) => queryParams.append("technologies", tech));
     }
+    // One team's members (vaimon/team-selection#39) — the admin area's «by team».
+    if (teamId != null) queryParams.append("team_id", String(teamId));
     queryParams.set("page", String(page));
     queryParams.set("size", String(size));
 
@@ -87,6 +90,14 @@ export const createStudent = async (studentData) => {
 export const updateStudent = async (studentData, studentId) => {
   const response = await apiClient.put(`/students/${studentId}`, studentData);
   return response.data;
+};
+
+// Удаляет анкету — организатор, лишняя регистрация (#48). Уходят анкета, заявки и место в
+// команде; учётная запись остаётся, человек может войти и заполнить анкету заново
+// (vaimon/team-selection#38). Тимлида бэкенд не удаляет: сначала роль передают или команду
+// распускают.
+export const deleteStudent = async (studentId) => {
+  await apiClient.delete(`/students/${studentId}`);
 };
 
 

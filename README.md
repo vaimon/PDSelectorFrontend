@@ -37,6 +37,7 @@ npm run smoke
 - Шаги строятся друг на друге, поэтому отдельный тест через `-g` не запустить — только файл целиком.
 - `SMOKE_KEEP=1` (в PowerShell — `$env:SMOKE_KEEP=1`) оставляет стек после прогона, чтобы посмотреть лог бэкенда или базу. Каждый `npm run smoke` всё равно начинает с пустой базы: засеянные тимлид и первокурсник одноразовые. `npm run smoke:run` гоняет сценарий по уже поднятому стеку — на свежем стеке это работает один раз.
 - Браузер: по умолчанию установленный Chrome (скачивание браузера Playwright из нашей сети отваливается по таймауту). `SMOKE_BROWSER=msedge` — Edge, `SMOKE_BROWSER=bundled` — браузер из `npx playwright install chromium`.
+- Порт бэкенда: по умолчанию 8080. Windows после перезагрузки резервирует плавающие диапазоны TCP-портов (WinNAT), и 8080 может в такой попасть — тогда стек не поднимается с `bind: An attempt was made to access a socket in a way forbidden`. Занятые диапазоны видны в `netsh interface ipv4 show excludedportrange protocol=tcp`. Порт переносится двумя переменными, и они должны совпадать: `SMOKE_BACKEND_PORT=18080 SMOKE_BACKEND_URL=http://localhost:18080 npm run smoke`.
 
 # React + Vite
 

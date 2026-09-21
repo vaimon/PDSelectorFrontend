@@ -122,3 +122,9 @@ export const transferCaptaincy = async (teamId, studentId) => {
 export const disbandTeam = async (teamId) => {
   await apiClient.post(`/teams/${teamId}/disband`);
 };
+
+// Удалить команду — организатор (#48). Участники освобождаются, заявки и приглашения в неё
+// удаляются (не отменяются), ссылка для вступления перестаёт работать вместе с командой.
+export const deleteTeam = async (teamId) => {
+  await apiClient.delete(`/teams/${teamId}`);
+};

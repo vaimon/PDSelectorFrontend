@@ -48,6 +48,7 @@ export const seeded = {
   admin: { email: 'admin@smoke.test', fio: 'Админов Админ Смоукович' },
   lead: { email: 'lead@smoke.test', fio: 'Лидова Лида Смоуковна' },
   firstYear: { email: 'first@smoke.test', fio: 'Первов Пётр Смоукович' },
+  second: { email: 'second@smoke.test', fio: 'Вторая Вера Смоуковна' },
 };
 
 /** Students use this from a phone: nothing may push the page sideways at 390px. */

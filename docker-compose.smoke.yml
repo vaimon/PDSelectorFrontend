@@ -36,7 +36,9 @@ services:
       SPRING_FLYWAY_PASSWORD: "1234"
       FRONTEND_URL: http://localhost:5173
     ports:
-      - "8080:8080"
+      # The host side is a knob: Windows reserves shifting TCP ranges (WinNAT) and 8080 can land in
+      # one after a reboot. Move it with SMOKE_BACKEND_PORT and point SMOKE_BACKEND_URL at it.
+      - "${SMOKE_BACKEND_PORT:-8080}:8080"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP"]
       interval: 3s
