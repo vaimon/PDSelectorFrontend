@@ -345,3 +345,25 @@
     display: flex;
   }
 }
+
+/* The guidance link is an icon in the bar (#61): a circle the size of the other controls, so it
+   sits on the same line as the worded items instead of becoming a stray glyph. */
+.nav-links .nav-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--ctrl-h);
+  height: var(--ctrl-h);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 15px;
+}
+
+.nav-links .nav-icon-link:hover {
+  border-color: var(--border-strong);
+}
+
+.nav-links .nav-icon-link.active-link {
+  border-color: var(--accent-border);
+}

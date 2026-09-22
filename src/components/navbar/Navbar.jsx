@@ -1,7 +1,7 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import './style.css';
 import { NavLink } from 'react-router-dom';
-import { FaBars, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaChevronDown, FaRegQuestionCircle } from 'react-icons/fa';
 import { logout } from '../../api/apiAuth';
 import { useIdentity } from '../../context/identityContext';
 import { useApplications } from '../../context/applicationsContext';
@@ -27,7 +27,7 @@ const buildLinks = ({ isParticipant, isAdmin, hasActiveTrack, currentTeamId, pen
       ...CATALOG_LINKS,
       { to: currentTeamId ? `/teams/${currentTeamId}` : '/profile', label: 'Моя команда' },
       { to: '/applications', label: 'Заявки', badge: pendingApplications },
-      { to: '/how-it-works', label: 'Как проходит набор' },
+      { to: '/how-it-works', label: 'Как проходит набор', icon: true },
     );
   } else if (isAdmin) {
     links.push(...CATALOG_LINKS);
@@ -36,7 +36,7 @@ const buildLinks = ({ isParticipant, isAdmin, hasActiveTrack, currentTeamId, pen
     // The guidance comes with it: it is the answer to what the questionnaire is for.
     links.push(
       { to: '/registration', label: 'Заполнить анкету' },
-      { to: '/how-it-works', label: 'Как проходит набор' },
+      { to: '/how-it-works', label: 'Как проходит набор', icon: true },
     );
   }
 
@@ -103,19 +103,29 @@ const Navbar = () => {
     }
   };
 
-  const renderLink = ({ to, label, badge }) => (
-    <NavLink
-      key={to}
-      to={to}
-      className={({ isActive }) => (isActive ? 'active-link' : '')}
-      onClick={() => setIsMenuOpen(false)}
-    >
-      {label}
-      {badge > 0 && (
-        <span className="nav-badge" aria-label={`Ожидают ответа: ${badge}`}>{badge}</span>
-      )}
-    </NavLink>
-  );
+  /**
+   * In the bar the guidance is a «?» in a circle (#61) — it is the one item nobody navigates by
+   * name. It keeps the label as its accessible name, and in the dropdown it stays a worded item:
+   * a list of names with one bare icon in it reads as a mistake.
+   */
+  const renderLink = ({ to, label, badge, icon }, { inMenu = false } = {}) => {
+    const asIcon = icon && !inMenu;
+    return (
+      <NavLink
+        key={to}
+        to={to}
+        className={({ isActive }) => `${isActive ? 'active-link' : ''}${asIcon ? ' nav-icon-link' : ''}`.trim()}
+        onClick={() => setIsMenuOpen(false)}
+        aria-label={asIcon ? label : undefined}
+        title={asIcon ? label : undefined}
+      >
+        {asIcon ? <FaRegQuestionCircle aria-hidden="true" /> : label}
+        {badge > 0 && (
+          <span className="nav-badge" aria-label={`Ожидают ответа: ${badge}`}>{badge}</span>
+        )}
+      </NavLink>
+    );
+  };
 
   return (
     <div className="navbar">
@@ -125,7 +135,7 @@ const Navbar = () => {
         <div className="logo"><ConsoleMark /></div>
 
         <nav className="nav-links" aria-label="Основная навигация">
-          {links.map(renderLink)}
+          {links.map((link) => renderLink(link))}
         </nav>
 
         <div className="navbar-actions">
@@ -162,7 +172,7 @@ const Navbar = () => {
                     <span>{selection.note}</span>
                   </p>
                 )}
-                {links.map(renderLink)}
+                {links.map((link) => renderLink(link, { inMenu: true }))}
               </div>
             )}
           </div>
