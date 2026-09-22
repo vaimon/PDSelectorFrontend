@@ -187,7 +187,7 @@ test('a first-year asks to join, the lead accepts, and both sides see it', async
   await openOwnTeamPage(lead);
   const members = lead.locator('.team-members');
   await expect(members.getByRole('heading', { name: firstYear.fio })).toBeVisible();
-  await expect(members.getByRole('link', { name: 'Заявки в команду', exact: true })).toBeVisible();
+  await expect(members.getByRole('button', { name: 'Заявки в команду', exact: true })).toBeVisible();
   await expectNoSidewaysScroll(lead, testInfo);
 
   // And the first-year's cabinet now shows the team as theirs, with what it still needs.
@@ -212,7 +212,7 @@ test('the team says who it is still short of, and so does the catalogue', async 
   // two numbers, not one, so «есть свободные места» alone would not answer them.
   await lead.goto('/teams');
   const card = lead.locator('.card').filter({ has: lead.getByRole('heading', { name: teamName }) });
-  await expect(card.getByText('1 курс — 1 из 3 · 2 курс и старше — 1 из 3')).toBeVisible();
+  await expect(card.locator('.card-place')).toHaveText(['1 курс:1/3', '2 курс:1/3']);
   await expectNoSidewaysScroll(lead, testInfo);
 });
 
@@ -430,11 +430,11 @@ test('the admin lands on the overview and sees the team @desktop', async ({ brow
   await expect(page.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();
 });
 
-/** The team's target composition as the catalogue prints it, for the one team this run built. */
+/** The team's target composition as the catalogue prints it (#59): a row per year, «1 курс:1/3». */
 function teamComposition(page) {
   return page.locator('.card')
     .filter({ has: page.getByRole('heading', { name: teamName }) })
-    .getByText(/1 курс — [0-9]+ из [0-9]+ · 2 курс и старше — [0-9]+ из [0-9]+/);
+    .locator('.card-place');
 }
 
 /** `"2026-10-01"` shifted by whole days, via Date so the month rolls over instead of hitting -00. */
@@ -539,7 +539,7 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   expect(seededEnd, 'the seed gives the selection an end date').toBeTruthy();
   await page.goto('/teams');
   await expect(teamComposition(page), 'the target before the change')
-    .toHaveText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3');
+    .toHaveText(['1 курс:1/3', '2 курс:2/3']);
   await page.goto('/admin/settings');
 
   const movedEnd = shiftDay(seededEnd, -1);
@@ -553,7 +553,7 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   // The target is not stored on a team: it is the track's, and every team without one of its own
   // reads it on the next request. The catalogue is where that becomes visible.
   await page.goto('/teams');
-  await expect(teamComposition(page)).toHaveText('1 курс — 1 из 4 · 2 курс и старше — 2 из 3');
+  await expect(teamComposition(page)).toHaveText(['1 курс:1/4', '2 курс:2/3']);
 
   // The new deadline reaches the shell, which reads the same track the form just wrote.
   await page.goto('/admin/settings');

@@ -8,9 +8,11 @@ import { logIn, seeded } from './support/people';
 const WIDTHS = [360, 600, 780, 900, 1280, 1920];
 
 const PAGES = [
-  { path: '/teams', content: '.content-layout', hasSearch: true },
-  { path: '/profile', content: '.cabinet-page', hasSearch: false },
-  { path: '/how-it-works', content: '.how-page', hasSearch: false },
+  // Since #59 the search stands inside the content column, not across the page: it starts where
+  // the filters end and ends where the cards do, so it is the column it has to line up with.
+  { path: '/teams', content: '.content-layout', searchIn: '.main-content' },
+  { path: '/profile', content: '.cabinet-page' },
+  { path: '/how-it-works', content: '.how-page' },
 ];
 
 /** Where the content of a container actually starts and ends — its padding edges, not its box. */
@@ -33,7 +35,7 @@ test('the header, the search field and the page content share their edges @deskt
   for (const width of WIDTHS) {
     await page.setViewportSize({ width, height: 900 });
 
-    for (const { path, content, hasSearch } of PAGES) {
+    for (const { path, content, searchIn } of PAGES) {
       await page.goto(path);
       await expect(page.locator(content)).toBeVisible();
       const where = `${path} at ${width}px`;
@@ -43,9 +45,11 @@ test('the header, the search field and the page content share their edges @deskt
       const body = await contentEdges(page, content);
       expect(header, `${where}: the header and the content must share both edges`).toEqual(body);
 
-      if (hasSearch) {
+      if (searchIn) {
+        const column = await contentEdges(page, searchIn);
         const search = await contentEdges(page, '.search-bar');
-        expect(search, `${where}: the search row must share both edges too`).toEqual(body);
+        expect(search, `${where}: the search row must share the column's edges`).toEqual(column);
+        expect(column.right, `${where}: the column must end where the page does`).toEqual(body.right);
       }
 
       // Agreeing on an edge is not enough: with no container at all the three would agree on 0

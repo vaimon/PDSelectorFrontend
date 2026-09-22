@@ -9,7 +9,6 @@ import useTeamFilters from "../hooks/useTeamFilters";
 import useTeams from "../hooks/useTeams";
 import { useTeamRequests } from "../hooks/useTeamRequests";
 import { useIdentity } from "../context/identityContext";
-import { describePlaces } from "../utils/composition";
 import Pagination from "../components/pagination/Pagination";
 
 
@@ -57,7 +56,7 @@ const TeamsPage = () => {
         profileLink={`/teams/${team.id}`}
         // What actually decides whether this team is worth opening: the target is a number of
         // first-years plus a number of second-years, not one number of people.
-        note={team.composition ? describePlaces(team.composition) : undefined}
+        composition={team.composition}
         showApplyButton={Boolean(applyAction)}
         applyText={applyAction?.label}
         applyDisabled={applyAction?.disabled}
@@ -70,7 +69,6 @@ const TeamsPage = () => {
   return (
     <>
       <Navbar />
-      <SearchBar onSearch={handleSearch} />
       <main className="page-container content-layout catalog-layout">
         <Filter
           filterParams={filterParams}
@@ -78,13 +76,13 @@ const TeamsPage = () => {
           placesForCourse={placesForCourse}
         />
         <MainContent>
-          <div className="catalog-head">
-            <div>
-              <p className="catalog-kicker">Проектная деятельность</p>
-              <h1>Команды</h1>
-            </div>
-            {!loading && <span className="catalog-count">{pagination.totalElements} результатов</span>}
-          </div>
+          {/* The search stands where the heading used to (#59): «Команды» repeated the navbar item
+              that is already highlighted, and the count moved into the search row. */}
+          <SearchBar
+            onSearch={handleSearch}
+            inline
+            meta={loading ? undefined : `${pagination.totalElements} результатов`}
+          />
           <div className="cards" aria-busy={loading || identityLoading}>
             {identityLoading ? (
               <p className="loading-state">Загружаем команды…</p>

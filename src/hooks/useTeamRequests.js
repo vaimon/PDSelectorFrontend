@@ -33,8 +33,10 @@ export const useTeamRequests = () => {
 
     // Cancelling is a mutation like any other, so it follows the window — but a full team is no
     // reason to keep someone's own application alive.
-    const action = (label, request, extraReason = null) => ({
-      label,
+    // `blockedLabel` is what the button says once it is off for `extraReason`: on a card the button
+    // itself carries the answer («Нет места») and the sentence is its hover (#59).
+    const action = (label, request, extraReason = null, blockedLabel = null) => ({
+      label: extraReason && blockedLabel ? blockedLabel : label,
       disabled: !isSelectionOpen || Boolean(extraReason),
       reason: !isSelectionOpen ? closedReason : extraReason,
       onClick: () => ask(request),
@@ -61,7 +63,7 @@ export const useTeamRequests = () => {
       confirmText: 'Отправить',
       successText: 'Заявка отправлена',
       run: () => (sendAgain ? resendApplication(mine) : sendRequest(studentId, team.id)),
-    }, noPlace);
+    }, noPlace, "Нет места");
   };
 
   return { applyActionFor, confirmProps };
