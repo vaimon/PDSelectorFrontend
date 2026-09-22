@@ -1,12 +1,13 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import './style.css';
 import { NavLink } from 'react-router-dom';
-import { FaBars, FaChevronDown, FaRegQuestionCircle } from 'react-icons/fa';
+import { FaBars, FaChevronDown } from 'react-icons/fa';
 import { logout } from '../../api/apiAuth';
 import { useIdentity } from '../../context/identityContext';
 import { useApplications } from '../../context/applicationsContext';
 import { describeSelectionWindow } from '../../utils/selectionWindow';
 import ConsoleMark from '../logo/ConsoleMark';
+import QuestionMark from '../icons/QuestionMark';
 import ThemeToggle from '../header/Header';
 
 const CATALOG_LINKS = [
@@ -119,7 +120,7 @@ const Navbar = () => {
         aria-label={asIcon ? label : undefined}
         title={asIcon ? label : undefined}
       >
-        {asIcon ? <FaRegQuestionCircle aria-hidden="true" /> : label}
+        {asIcon ? <QuestionMark /> : label}
         {badge > 0 && (
           <span className="nav-badge" aria-label={`Ожидают ответа: ${badge}`}>{badge}</span>
         )}

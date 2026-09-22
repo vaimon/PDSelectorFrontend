@@ -346,24 +346,30 @@
   }
 }
 
-/* The guidance link is an icon in the bar (#61): a circle the size of the other controls, so it
-   sits on the same line as the worded items instead of becoming a stray glyph. */
-.nav-links .nav-icon-link {
+/* The guidance link is an icon in the bar (#61). The circle belongs to the icon itself, so the
+   link keeps the shape of the worded items next to it — no second ring around the first. */
+.navbar .nav-links .nav-icon-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: var(--ctrl-h);
   height: var(--ctrl-h);
+  /* The bar gives every item side padding; this one is a circle, so it keeps none — with it the
+     icon was squeezed to a sliver (10px of the 26 it asks for). */
   padding: 0;
-  border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  font-size: 15px;
+  color: var(--text-2);
 }
 
-.nav-links .nav-icon-link:hover {
-  border-color: var(--border-strong);
+.navbar .nav-links .nav-icon-link svg {
+  flex: none;
 }
 
-.nav-links .nav-icon-link.active-link {
-  border-color: var(--accent-border);
+.navbar .nav-links .nav-icon-link:hover {
+  color: var(--text);
+}
+
+.navbar .nav-links .nav-icon-link.active-link {
+  background: var(--accent-weak);
+  color: var(--accent-text);
 }
