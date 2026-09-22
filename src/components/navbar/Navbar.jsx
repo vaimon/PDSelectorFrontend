@@ -1,6 +1,6 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import './style.css';
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { FaBars, FaChevronDown } from 'react-icons/fa';
 import { logout } from '../../api/apiAuth';
 import { useIdentity } from '../../context/identityContext';
@@ -195,6 +195,18 @@ const Navbar = () => {
                   <span className="account-name">{user?.fio}</span>
                   <span className="account-email">{user?.email}</span>
                 </p>
+                {/* The only way to the questionnaire once a team exists: «Моя команда» then points
+                    at the team's own page (#64). */}
+                {isParticipant && (
+                  <Link
+                    to="/me"
+                    className="account-link"
+                    role="menuitem"
+                    onClick={closeAccount}
+                  >
+                    Мой профиль
+                  </Link>
+                )}
                 <button
                   type="button"
                   className="account-logout"

@@ -24,11 +24,12 @@ const ProfileCard = ({ studentData, onEdit, isCurrentUser }) => {
           <h2 className="profile-name">
             {studentData.user?.fio || "Имя Фамилия"}
           </h2>
-          <p className="profile-course">
-            Курс: {studentData.course || "Не указан"}
-          </p>
         </div>
         <div className="profile-details">
+          <div className="profile-detail">
+            <strong>Курс:</strong>{" "}
+            <span>{studentData.course || "Не указан"}</span>
+          </div>
           <div className="profile-detail">
             <strong>Группа:</strong>{" "}
             <span>{studentData.group_number || "Не указана"}</span>
