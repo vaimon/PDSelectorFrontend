@@ -53,10 +53,16 @@ async function navigateTo(page, label) {
     .filter({ visible: true }).click();
 }
 
-/** Opens «Моя команда» in the cabinet sidebar (the navbar has a link of the same name). */
+/** Waits for «Моя команда» on /profile — since #64 the page holds the team and nothing else. */
 async function openMyTeamSection(page) {
-  await page.locator('.sidebar').getByRole('link', { name: 'Моя команда' }).click();
   await expect(page.getByRole('heading', { name: 'Моя команда', level: 2 })).toBeVisible();
+}
+
+/** The questionnaire, the way a student reaches it: the account menu (#64). */
+async function openMyProfile(page) {
+  await page.locator('.account-menu').getByRole('button').click();
+  await page.locator('.account-dropdown').getByRole('link', { name: 'Мой профиль' }).click();
+  await expect(page).toHaveURL(/[/]me$/);
 }
 
 test('a newcomer fills the questionnaire and is told how the selection works', async ({ browser }, testInfo) => {
@@ -76,7 +82,7 @@ test('a newcomer fills the questionnaire and is told how the selection works', a
 
   // The cabinet is one click away, and the guidance stays reachable from the menu afterwards.
   await navigateTo(page, 'Моя команда');
-  await expect(page.getByRole('heading', { name: 'Личный кабинет' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Моя команда', level: 1 })).toBeVisible();
   await expect(page.getByText('@smoke_newcomer')).toBeVisible();
   await expect(page.getByText(person.fio).first()).toBeVisible();
   // The shell names the selection and its deadline — in the bar on a laptop, and behind the menu
@@ -382,8 +388,14 @@ test('a registered student opens the link signed out and is brought back to it a
 
   // The way back was used once: moving on does not bounce them to the invitation again.
   await page.goto('/profile');
-  await expect(page.getByRole('heading', { name: 'Личный кабинет' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Моя команда', level: 1 })).toBeVisible();
   await expect(page).toHaveURL(/\/profile$/);
+
+  // With a team, «Моя команда» in the bar points at the team page, so the questionnaire is only
+  // reachable from the account menu (#64) — and this person has a team by now.
+  await openMyProfile(page);
+  await expect(page.getByRole('heading', { name: 'Мой профиль', level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Редактировать' })).toBeVisible();
 });
 
 /**

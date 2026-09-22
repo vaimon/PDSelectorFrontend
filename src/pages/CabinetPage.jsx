@@ -1,15 +1,10 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUser, FaUsers } from "react-icons/fa";
 
 import Navbar from "../components/navbar/Navbar";
-import Sidebar from "../components/sidebar/Sidebar";
 import MainContent from "../components/main-section/MainSection";
 import Card from "../components/card/Card";
 import Modal from "../components/forms/modal/Modal";
 import TeamForm from "../components/forms/TeamForm";
-import ProfileCard from "../components/profile/ProfileCard";
-import ProfileEditForm from "../components/profile/ProfileEditForm";
 import useStudentData from "../hooks/useStudentData";
 import { useNewTeam } from "../hooks/useNewTeam";
 import { useModal } from "../hooks/useModal";
@@ -18,17 +13,15 @@ import { useProjectTypes } from "../hooks/useProjectTypes";
 import { useIdentity } from "../context/identityContext";
 import { useNotifications } from "../context/notificationContext";
 import { describeMissing } from "../utils/composition";
-import { updateStudent } from "../api/apiStudentsController";
 import "./CabinetPage.css";
 
-const PROFILE = "Мой профиль";
-const TEAM = "Моя команда";
-
-const sidebarItems = [
-  { name: PROFILE, icon: <FaUser aria-hidden="true" /> },
-  { name: TEAM, icon: <FaUsers aria-hidden="true" /> },
-];
-
+/**
+ * «Моя команда»: the team the student is in, or the way to start one (#64).
+ *
+ * The questionnaire used to be the other half of this page. It moved to its own page, reachable
+ * from the account menu, because this one stops being reachable as soon as a team exists — the
+ * navbar item then points at the team's own page.
+ */
 const CabinetPage = () => {
   const {
     studentId,
@@ -50,21 +43,6 @@ const CabinetPage = () => {
   const { newTeam, handleChange, submit } = useNewTeam(allTechnologies, allTypes);
   const { showModal, toggleModal } = useModal();
 
-  const [currentSection, setCurrentSection] = useState(PROFILE);
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  const handleProfileSave = async (updatedData) => {
-    try {
-      await updateStudent(updatedData, studentId);
-      setIsEditingProfile(false);
-      refresh();
-      notify({ type: "success", text: "Профиль обновлён" });
-    } catch (error) {
-      // The shared client already showed what went wrong; the form stays open.
-      console.error("Не удалось сохранить профиль:", error);
-    }
-  };
-
   const handleTeamCreate = async (event) => {
     event.preventDefault();
 
@@ -82,27 +60,6 @@ const CabinetPage = () => {
     } catch (error) {
       console.error("Не удалось создать команду:", error);
     }
-  };
-
-  const renderProfile = () => {
-    if (isEditingProfile) {
-      return (
-        <ProfileEditForm
-          studentData={studentData}
-          onSave={handleProfileSave}
-          onCancel={() => setIsEditingProfile(false)}
-          allTechnologies={allTechnologies}
-        />
-      );
-    }
-
-    return (
-      <ProfileCard
-        studentData={studentData}
-        onEdit={() => setIsEditingProfile(true)}
-        isCurrentUser
-      />
-    );
   };
 
   const renderTeam = () => {
@@ -175,32 +132,18 @@ const CabinetPage = () => {
       return <p className="loading-state">Загрузка…</p>;
     }
 
-    return currentSection === PROFILE ? renderProfile() : renderTeam();
+    return renderTeam();
   };
-
-  const showSidebar = !identityLoading && Boolean(studentId);
 
   return (
     <>
       <Navbar />
       <main className="page-container cabinet-page">
-        <header className="cabinet-heading">
-          <p>Проектная деятельность</p>
-          <h1>Личный кабинет</h1>
-        </header>
-
-        <div className={`cabinet-layout${showSidebar ? "" : " cabinet-layout--single"}`}>
-          {showSidebar && (
-            <Sidebar
-              onItemClick={setCurrentSection}
-              items={sidebarItems}
-              activeItem={currentSection}
-            />
-          )}
+        <div className="cabinet-layout cabinet-layout--single">
           <MainContent>
             <section className="cabinet-section" aria-labelledby="cabinet-section-title">
               <div className="cabinet-section-head">
-                <h2 id="cabinet-section-title">{showSidebar ? currentSection : "Кабинет"}</h2>
+                <h1 id="cabinet-section-title">Моя команда</h1>
                 {studentData?.user?.fio && (
                   <span className="cabinet-person">{studentData.user.fio}</span>
                 )}

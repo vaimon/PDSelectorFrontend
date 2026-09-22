@@ -4,6 +4,7 @@ import Registration from './pages/RegistrationPage';
 import TeamsPage from './pages/TeamsPage';
 import StudentProfilePage from "./pages/StudentProfile";
 import CabinetPage from './pages/CabinetPage';
+import MyProfilePage from './pages/MyProfilePage';
 import AdminLayout from './pages/AdminLayout';
 import AdminOverviewPage from './pages/AdminOverviewPage';
 import AdminBoardPage from './pages/AdminBoardPage';
@@ -43,6 +44,12 @@ const routes = [
   {
     path: '/teams',
     element: <RequireParticipant><TeamsPage /></RequireParticipant>
+  },
+  {
+    // The questionnaire, reached from the account menu (#64). Unguarded like /profile: an account
+    // without a questionnaire is told so here rather than bounced.
+    path: '/me',
+    element: <MyProfilePage />
   },
   {
     // Deliberately unguarded: this is where an account without a questionnaire is sent, and the
