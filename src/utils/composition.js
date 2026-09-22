@@ -46,6 +46,19 @@ export const describePlaces = (composition) => (
     .join(' · ')
 );
 
+/**
+ * The same numbers as `describePlaces`, but as rows for a card (#59): «1 курс: 2/3». The short label
+ * without «и старше» is the card's: it stands in a narrow column next to the button, and the sentence
+ * form is still what the team page and the join preview say.
+ */
+export const describeYears = (composition) => (
+  [FIRST_YEAR, SECOND_YEAR].map((year) => ({
+    label: year === FIRST_YEAR ? "1 курс" : "2 курс",
+    taken: composition[year.taken],
+    target: composition[year.target],
+  }))
+);
+
 /** The target of the selection itself: «3 первокурсника и 3 второкурсника». */
 export const describeTargets = (firstYearTarget, secondYearTarget) => (
   [[firstYearTarget, FIRST_YEAR], [secondYearTarget, SECOND_YEAR]]

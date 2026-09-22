@@ -10,6 +10,24 @@
   width: min(100%, 420px);
 }
 
+/* In a page column the search replaces the heading, so it takes the column: from the filters to
+   the edge of the page, with the result count at its right. */
+.search-bar--inline {
+  gap: var(--gap);
+  padding-block: 0 var(--gap);
+}
+
+.search-bar--inline .search-container {
+  width: 100%;
+}
+
+.search-meta {
+  flex: none;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 .search-container input {
   flex: 1;
   width: 100%;

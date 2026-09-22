@@ -35,6 +35,36 @@
   overflow-wrap: anywhere;
 }
 
+/* The name is the way into the profile (#59): the chevron says so, and it stays on the last line
+   of the name instead of floating away from it. */
+.card-name-link {
+  display: inline;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-name-link:hover .card-name-text,
+.card-name-link:focus-visible .card-name-text {
+  text-decoration: underline;
+}
+
+.card-name-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r);
+}
+
+.card-name-chevron {
+  margin-left: var(--space-4);
+  color: var(--text-3);
+  font-size: 0.7em;
+  vertical-align: baseline;
+}
+
+.card-name-link:hover .card-name-chevron {
+  color: var(--accent);
+}
+
 .card-type,
 .card-resume {
   display: flex;
@@ -152,18 +182,54 @@
 }
 
 .card-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-8);
   width: 100%;
   margin-top: auto;
 }
 
-.action-link {
-  display: inline-flex;
-  width: 100%;
-  text-decoration: none;
+/* Two short rows read down a column; in one sentence the four numbers had to be picked apart. */
+.card-places {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.card-place {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.card-place dt {
+  color: var(--text-3);
+  font-size: calc(var(--fs) - 1.5px);
+}
+
+.card-place dd {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 600;
+  letter-spacing: var(--track-num);
+}
+
+.card-action-buttons {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+.card-action-buttons .action-button {
+  width: auto;
+  min-width: 118px;
 }
 
 .action-button {
@@ -276,6 +342,25 @@
   line-height: 1.45;
 }
 
+/* What the cabinet says about the team the viewer is in: who it is still short of. */
+.card-note {
+  margin: 0;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* The apply button hover, for screens that have no hover. */
+.card-action-reason--narrow {
+  display: none;
+}
+
+@media (max-width: 599.98px) {
+  .card-action-reason--narrow {
+    display: block;
+  }
+}
+
 /* Who this person is in the team, said once and next to them. */
 .card-badge {
   align-self: flex-start;
@@ -287,14 +372,6 @@
   font-size: 11.5px;
   font-weight: 600;
   line-height: 1.4;
-}
-
-/* A fact about the card's subject that decides whether to act on it — places left, for a team. */
-.card-note {
-  margin: 0;
-  color: var(--text-2);
-  font-size: 12px;
-  line-height: 1.45;
 }
 
 @media (max-width: 599.98px) {
@@ -309,6 +386,11 @@
   }
 
   .card-actions {
-    grid-template-columns: minmax(0, 1fr);
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-action-buttons .action-button {
+    width: 100%;
   }
 }

@@ -10,11 +10,16 @@
   max-height: calc(100dvh - var(--topbar-h) - (var(--gap) * 2));
   margin: 0;
   padding: var(--pad);
+  /* Both axes stated: with only `overflow-y`, the browser treats overflow-x as auto and a long
+     technology name gave the panel a horizontal scrollbar (#59). */
+  overflow-x: hidden;
   overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   background: var(--surface);
   color: var(--text);
+  /* The page centres its text (body), which every label here inherited. */
+  text-align: left;
 }
 
 .filter-section h2 {
@@ -69,8 +74,10 @@
 
 .filter-group label {
   display: flex;
-  align-items: center;
+  /* A label that wraps keeps its box next to the first line, not in the middle of two. */
+  align-items: flex-start;
   gap: var(--space-8);
+  overflow-wrap: anywhere;
   margin: 0;
   color: var(--text-2);
   font-size: calc(var(--fs) - 0.5px);
@@ -88,7 +95,8 @@
   flex: none;
   width: 15px;
   height: 15px;
-  margin: 0;
+  /* Nudged onto the first line of a wrapping label. */
+  margin: 2px 0 0;
   accent-color: var(--accent);
 }
 

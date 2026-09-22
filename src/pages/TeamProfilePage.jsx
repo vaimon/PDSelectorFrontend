@@ -259,10 +259,14 @@ const TeamProfilePage = () => {
                     )}
                   </div>
                   {isCaptain && (
-                    <Link to="/applications" className="team-edit-toggle">
+                    <button
+                      type="button"
+                      className="team-edit-toggle"
+                      onClick={() => navigate("/applications")}
+                    >
                       Заявки в команду
                       {pendingForThisTeam > 0 && ` (${pendingForThisTeam})`}
-                    </Link>
+                    </button>
                   )}
                 </div>
                 {renderMembers()}

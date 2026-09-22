@@ -36,11 +36,6 @@ const StudentsPage = () => {
   return (
     <>
       <Navbar />
-      <SearchBar
-        onSearch={handleSearch}
-        placeholder="Поиск по ФИО или резюме"
-        label="Поиск участников"
-      />
       <main className="page-container content-layout catalog-layout">
         <Filter
           filterParams={filterParams}
@@ -48,13 +43,14 @@ const StudentsPage = () => {
           variant="students"
         />
         <MainContent>
-          <div className="catalog-head">
-            <div>
-              <p className="catalog-kicker">Проектная деятельность</p>
-              <h1>Участники</h1>
-            </div>
-            {!loading && <span className="catalog-count">{pagination.totalElements} результатов</span>}
-          </div>
+          {/* Same as the teams catalogue (#59): the search takes the place of the heading. */}
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder="Поиск по ФИО или резюме"
+            label="Поиск участников"
+            inline
+            meta={loading ? undefined : `${pagination.totalElements} результатов`}
+          />
           <div className="cards" aria-busy={loading || identityLoading}>
             {identityLoading ? (
               <p className="loading-state">Загружаем участников…</p>
