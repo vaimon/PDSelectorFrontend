@@ -101,6 +101,13 @@
   font-style: italic;
 }
 
+.profile-edit-note {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs);
+  line-height: 1.5;
+}
+
 .edit-button,
 .profile-edit-form button {
   display: inline-flex;

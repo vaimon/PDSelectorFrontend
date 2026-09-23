@@ -55,13 +55,13 @@ async function navigateTo(page, label) {
 
 /** Waits for «Моя команда» on /profile — since #64 the page holds the team and nothing else. */
 async function openMyTeamSection(page) {
-  await expect(page.getByRole('heading', { name: 'Моя команда', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Моя команда', level: 1 })).toBeVisible();
 }
 
 /** The questionnaire, the way a student reaches it: the account menu (#64). */
 async function openMyProfile(page) {
   await page.locator('.account-menu').getByRole('button').click();
-  await page.locator('.account-dropdown').getByRole('link', { name: 'Мой профиль' }).click();
+  await page.locator('.account-dropdown').getByRole('menuitem', { name: 'Мой профиль' }).click();
   await expect(page).toHaveURL(/[/]me$/);
 }
 
@@ -83,7 +83,6 @@ test('a newcomer fills the questionnaire and is told how the selection works', a
   // The cabinet is one click away, and the guidance stays reachable from the menu afterwards.
   await navigateTo(page, 'Моя команда');
   await expect(page.getByRole('heading', { name: 'Моя команда', level: 1 })).toBeVisible();
-  await expect(page.getByText('@smoke_newcomer')).toBeVisible();
   await expect(page.getByText(person.fio).first()).toBeVisible();
   // The shell names the selection and its deadline — in the bar on a laptop, and behind the menu
   // button on a phone, where the bar drops the line. Asserted on both, or the phone half of the
@@ -100,7 +99,62 @@ test('a newcomer fills the questionnaire and is told how the selection works', a
   await navigateTo(page, 'Как проходит набор');
   await expect(page.getByRole('heading', { name: 'Как проходит набор', level: 1 })).toBeVisible();
   await expectNoSidewaysScroll(page, testInfo);
+
+  // The questionnaire itself lives on «Мой профиль» since #64, not in the cabinet.
+  await openMyProfile(page);
+  await expect(page.locator('.profile-card').getByText('@smoke_newcomer')).toBeVisible();
   people.newcomer = person;
+});
+
+// #66: every student save answered 400 in prod (current_track missing), and nothing here saved the
+// questionnaire from «Мой профиль», so no step went red. Reload between saves: the form's own state
+// would show the edit whether or not the backend kept it.
+test('a student edits their questionnaire, drops a technology, and both stick', async ({ browser }, testInfo) => {
+  const person = testInfo.project.use.isMobile ? people.newcomer : seeded.firstYear;
+  expect(person, 'builds on the questionnaire step; run the whole file').toBeDefined();
+  const { page } = await signIn(browser, person);
+  await openMyProfile(page);
+  const card = page.locator('.profile-card');
+  const form = page.locator('.profile-edit-form');
+  const about = `Правка из смоука ${Date.now().toString(36)}`;
+
+  await card.getByRole('button', { name: 'Редактировать' }).click();
+  await form.getByLabel('О себе').fill(about);
+  await form.getByRole('button', { name: 'Добавить технологию' }).click();
+  const picker = page.getByRole('dialog');
+  const unchecked = picker.getByRole('checkbox', { checked: false });
+  const added = [];
+  for (let i = 0; i < 2; i += 1) {
+    const box = unchecked.first();
+    added.push(await picker.locator(`label[for="${await box.getAttribute('id')}"]`).innerText());
+    await box.check();
+  }
+  await picker.getByRole('button', { name: 'Закрыть окно' }).click();
+  await expectNoSidewaysScroll(page, testInfo);
+  await form.getByRole('button', { name: 'Сохранить' }).click();
+  await expect(page.getByRole('status')).toContainText('Профиль обновлён');
+
+  await page.reload();
+  await expect(card.getByText(about)).toBeVisible();
+  for (const name of added) {
+    await expect(card.locator('.card-tag', { hasText: name })).toHaveCount(1);
+  }
+
+  await card.getByRole('button', { name: 'Редактировать' }).click();
+  await form.getByRole('button', { name: `Удалить технологию ${added[0]}` }).click();
+  await form.getByRole('button', { name: 'Сохранить' }).click();
+  await expect(page.getByRole('status')).toContainText('Профиль обновлён');
+
+  await page.reload();
+  await expect(card.locator('.card-tag', { hasText: added[1] })).toHaveCount(1);
+  await expect(card.locator('.card-tag', { hasText: added[0] })).toHaveCount(0);
+
+  // Course, group and name are the administrator's to change: the student form offers no field
+  // for them, rather than one whose edit the backend silently drops.
+  await card.getByRole('button', { name: 'Редактировать' }).click();
+  await expect(form.getByRole('textbox', { name: /ФИО/ })).toHaveCount(0);
+  await expect(form.getByRole('spinbutton')).toHaveCount(0);
+  await expect(form.getByRole('textbox', { name: /Группа/ })).toHaveCount(0);
 });
 
 test('the team lead creates a team', async ({ browser }, testInfo) => {
