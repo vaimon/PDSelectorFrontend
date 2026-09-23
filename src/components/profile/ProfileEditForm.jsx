@@ -12,13 +12,6 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "fio") {
-      setFormData((current) => ({
-        ...current,
-        user: { ...current.user, fio: value },
-      }));
-      return;
-    }
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
@@ -34,17 +27,19 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
     setShowModal((prev) => !prev);
   };
 
+  // PUT /students/{id} validates the whole StudentUpdateDto (#66): course, group, current_track and
+  // user are required even though a student's save applies only «О себе», contacts and technologies.
+  // They go back exactly as loaded.
   const handleSave = () => {
-    const flatStudentData = {
+    onSave({
       about_self: formData.about_self,
       contacts: formData.contacts,
-      course: formData.course,
-      group_number: formData.group_number,
-      technologies: formData.technologies, 
-      user: formData.user
-    };
-    
-    onSave(flatStudentData);
+      course: studentData.course,
+      group_number: studentData.group_number,
+      current_track: { id: studentData.current_track.id },
+      technologies: formData.technologies,
+      user: studentData.user,
+    });
   };
 
   const handleTechnologyChange = (tech) => {
@@ -62,35 +57,22 @@ const ProfileEditForm = ({ studentData, onSave, onCancel, allTechnologies }) => 
       <div className="profile-edit-form">
         <h2>Редактировать профиль</h2>
 
-        <label>
-          ФИО:
-          <input
-            type="text"
-            name="fio"
-            value={formData.user?.fio || ""}
-            onChange={handleChange}
-          />
-        </label>
-
-        <label>
-          Курс:
-          <input
-            type="number"
-            name="course"
-            value={formData.course || ""}
-            onChange={handleChange}
-          />
-        </label>
-
-        <label>
-          Группа:
-          <input
-            type="text"
-            name="group_number"
-            value={formData.group_number || ""}
-            onChange={handleChange}
-          />
-        </label>
+        {/* Not inputs: the backend ignores these three from a student, and the course decides which
+            year's places they take in a team. */}
+        <div className="profile-details">
+          <div className="profile-detail">
+            <strong>ФИО:</strong> <span>{studentData.user?.fio}</span>
+          </div>
+          <div className="profile-detail">
+            <strong>Курс:</strong> <span>{studentData.course || "Не указан"}</span>
+          </div>
+          <div className="profile-detail">
+            <strong>Группа:</strong> <span>{studentData.group_number || "Не указана"}</span>
+          </div>
+        </div>
+        <p className="profile-edit-note">
+          ФИО, курс и группу меняет администратор набора — напишите организаторам, если здесь ошибка.
+        </p>
 
         <label>
           О себе:
