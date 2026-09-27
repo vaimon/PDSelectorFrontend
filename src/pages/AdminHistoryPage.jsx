@@ -1,13 +1,59 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import Pagination from "../components/pagination/Pagination";
 import { fetchActivity } from "../api/apiAdmin";
 import useAdminList from "../hooks/useAdminList";
-import { actionLabel, actorOf, formatAt, periodParams } from "../utils/activity";
+import {
+  actionLabel,
+  actorHistoryPath,
+  actorOf,
+  formatAt,
+  periodParams,
+  splitOnActor,
+} from "../utils/activity";
 
 const PAGE_SIZE = 50;
 const NO_PERIOD = { from: "", to: "" };
+
+/**
+ * One entry, naming each person once (#74). Whoever did it is a link to everything they did: inside
+ * the sentence when it already names them, in the line underneath when it does not.
+ */
+const Entry = ({ entry }) => {
+  const person = entry.actorUserId != null && entry.actorName;
+  const named = person ? splitOnActor(entry) : null;
+  const personLink = (
+    <Link className="admin-entry-person" to={actorHistoryPath(entry.actorUserId, entry.actorName)}>
+      {entry.actorName}
+    </Link>
+  );
+
+  return (
+    <li className="admin-row admin-entry">
+      <p className="admin-entry-summary">
+        {named ? (
+          <>
+            {named.before}
+            {personLink}
+            {named.after}
+          </>
+        ) : entry.summary}
+      </p>
+      <p className="admin-row-meta">
+        <span className="admin-entry-kind">{actionLabel(entry.action)}</span>
+        {!named && (
+          <>
+            {" · "}
+            {person ? personLink : actorOf(entry)}
+          </>
+        )}
+        {" · "}
+        <time dateTime={entry.at}>{formatAt(entry.at)}</time>
+      </p>
+    </li>
+  );
+};
 
 /** What the list is narrowed to, from the address a «История» button on another screen opened. */
 const subjectOf = (params) => {
@@ -85,8 +131,7 @@ const AdminHistoryPage = () => {
         </p>
       ) : (
         <p className="admin-row-reason">
-          Историю участника или команды открывают из их строки в «Участниках и командах», а в
-          «Доступе» у человека — то, что делал он сам.
+          Историю участника или команды открывают из их строки в «Участниках и командах».
         </p>
       )}
 
@@ -98,18 +143,7 @@ const AdminHistoryPage = () => {
         <p className="admin-state">Записей нет.</p>
       ) : (
         <ul className="admin-rows">
-          {entries.items.map((entry) => (
-            <li key={entry.id} className="admin-row admin-entry">
-              <p className="admin-entry-summary">{entry.summary}</p>
-              <p className="admin-row-meta">
-                <span className="admin-entry-kind">{actionLabel(entry.action)}</span>
-                {" · "}
-                {actorOf(entry)}
-                {" · "}
-                <time dateTime={entry.at}>{formatAt(entry.at)}</time>
-              </p>
-            </li>
-          ))}
+          {entries.items.map((entry) => <Entry key={entry.id} entry={entry} />)}
         </ul>
       )}
 

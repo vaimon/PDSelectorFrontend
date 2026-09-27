@@ -80,3 +80,19 @@ const NO_PERSON = {
 };
 
 export const actorOf = (entry) => entry.actorName ?? NO_PERSON[entry.action] ?? 'без участия человека';
+
+/**
+ * The entry's sentence around the name of whoever did it (#74), when it contains that name — a
+ * student's own request reads «Заявка: <они> и команда …» — or null. The page links the name there
+ * and does not repeat it in the line underneath.
+ */
+export const splitOnActor = (entry) => {
+  const name = entry.actorName;
+  const at = name ? entry.summary.indexOf(name) : -1;
+  if (at < 0) return null;
+  return { before: entry.summary.slice(0, at), name, after: entry.summary.slice(at + name.length) };
+};
+
+/** The history narrowed to what one person did — the address a name in it leads to. */
+export const actorHistoryPath = (userId, name) =>
+  `/admin/history?actor=${userId}&name=${encodeURIComponent(name)}`;

@@ -262,8 +262,8 @@ const AdminPeoplePage = () => {
 
   const renderStudent = (student) => {
     const isEditing = editing?.kind === "student" && editing.id === student.id;
-    // The hand-over is said once above the list; a row only explains what is its own.
-    const reason = !locked && student.is_captain ? LEAD_REASON : null;
+    // The hand-over is said once above the area.
+    const leadReason = !locked && student.is_captain;
     const team = student.current_team;
     return (
       <li key={student.id} className="admin-row">
@@ -286,13 +286,14 @@ const AdminPeoplePage = () => {
               type="button"
               className="admin-danger"
               disabled={locked || student.is_captain}
+              aria-describedby={leadReason ? "lead-delete-reason" : undefined}
+              title={leadReason ? LEAD_REASON : undefined}
               onClick={() => askDeleteStudent(student)}
             >
               Удалить
             </button>
           </div>
         </div>
-        {reason && <p className="admin-row-reason">{reason}</p>}
         {/* Always mounted, so that a warning arriving after a save is announced, not just drawn. */}
         <p className="admin-row-warning" aria-live="polite">{warnings[student.id] ?? ""}</p>
         {isEditing && (
@@ -425,9 +426,16 @@ const AdminPeoplePage = () => {
             ) : list.items.length === 0 ? (
               <p className="admin-state">{view === "students" ? "Никого не нашлось." : "Команд не нашлось."}</p>
             ) : (
-              <ul className="admin-rows">
-                {view === "students" ? students.items.map(renderStudent) : teams.items.map(renderTeam)}
-              </ul>
+              <>
+                {/* Said once for the list (#74), not on every lead's row; each lead's disabled
+                    «Удалить» points here, so the reason is still where the button is. */}
+                {view === "students" && !locked && students.items.some((student) => student.is_captain) && (
+                  <p className="admin-row-reason" id="lead-delete-reason">{LEAD_REASON}</p>
+                )}
+                <ul className="admin-rows">
+                  {view === "students" ? students.items.map(renderStudent) : teams.items.map(renderTeam)}
+                </ul>
+              </>
             )}
 
             <Pagination page={list.page} totalPages={list.totalPages} onPageChange={setPage} />

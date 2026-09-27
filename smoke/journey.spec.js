@@ -750,10 +750,14 @@ test('the organiser fixes a student and a team by hand @desktop', async ({ brows
   await expect(page.locator('.admin-filter')).toContainText(teamName);
   await expect(page.locator('.admin-row')).toHaveCount(3);
 
-  // The lead is not offered for deletion — the backend would refuse it — and the row says why.
+  // The lead is not offered for deletion — the backend would refuse it. Why is said once for the
+  // list (#74), and the disabled button carries it for whoever reaches it.
   const lead = adminRow(page, people.lead.fio);
   await expect(lead.getByRole('button', { name: 'Удалить' })).toBeDisabled();
-  await expect(lead).toContainText('передайте роль тимлида');
+  await expect(lead.getByRole('button', { name: 'Удалить' }))
+    .toHaveAccessibleDescription(/передайте роль тимлида/);
+  await expect(page.getByText('передайте роль тимлида')).toHaveCount(1);
+  await expect(lead.getByText('передайте роль тимлида')).toHaveCount(0);
 
   // A course is a fact: the change goes through, and the team being over its target is said in the
   // row where the change was made, as a warning rather than a refusal.
@@ -870,6 +874,13 @@ test('the organiser gives access, takes it back and reads who did what @desktop'
   await adminRow(page, seeded.firstYear.fio).getByRole('button', { name: 'История' }).click();
   await expect(page.locator('.admin-filter')).toContainText(seeded.firstYear.fio);
   await expect(page.locator('.admin-entry').filter({ hasText: teamName }).first()).toBeVisible();
+
+  // Their own request names them once (#74): the name in the sentence is the way to what they did,
+  // and the line under it does not say it again.
+  const ownRequest = page.locator('.admin-entry').filter({ hasText: `Заявка: ${seeded.firstYear.fio}` }).first();
+  await expect(ownRequest.locator('.admin-row-meta')).not.toContainText(seeded.firstYear.fio);
+  await ownRequest.getByRole('link', { name: seeded.firstYear.fio }).click();
+  await expect(page.locator('.admin-filter')).toContainText(`Действия: ${seeded.firstYear.fio}`);
 });
 
 /** A team card on the board, found by its heading. */
