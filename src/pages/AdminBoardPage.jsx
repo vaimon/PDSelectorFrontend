@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import LeadPicker from "../components/board/LeadPicker";
@@ -85,6 +86,23 @@ const AdminBoardPage = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  // Arriving from «Обзор» at one team (#69): bring its card into view and put focus on it, once —
+  // later reloads of the board must not keep yanking the page back to it.
+  const { hash } = useLocation();
+  const arrivedAt = useRef(null);
+  const [arrived, setArrived] = useState(null);
+  useEffect(() => {
+    if (state !== "ready" || !hash.startsWith("#team-") || arrivedAt.current === hash) return undefined;
+    arrivedAt.current = hash;
+    const card = document.getElementById(hash.slice(1));
+    if (!card) return undefined;
+    card.scrollIntoView({ block: "center" });
+    card.focus({ preventScroll: true });
+    setArrived(card.id);
+    const fade = window.setTimeout(() => setArrived(null), 2400);
+    return () => window.clearTimeout(fade);
+  }, [state, hash]);
 
   /**
    * Holds every action off until `work` is done, however many requests it takes. Any action ends the
@@ -445,11 +463,17 @@ const AdminBoardPage = () => {
           {teams.map((team) => (
             <article
               key={team.id}
-              className={dropClass(`board-team is-${team.status.toLowerCase()}`, team.id)}
+              id={`team-${team.id}`}
+              tabIndex={-1}
+              aria-labelledby={`team-${team.id}-name`}
+              className={dropClass(
+                `board-team is-${team.status.toLowerCase()}${arrived === `team-${team.id}` ? " is-arrived" : ""}`,
+                team.id,
+              )}
               {...dropInto(team.id, team)}
             >
               <header className="board-team-head">
-                <h3>{team.name}</h3>
+                <h3 id={`team-${team.id}-name`}>{team.name}</h3>
                 <p className="board-team-status">
                   <span className="board-status">{STATUS_LABELS[team.status]}</span>
                   {hasOwnTargets(team) && <span className="board-badge">свои цели</span>}
