@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
+import IconAction from "../components/board/IconAction";
+import { DeleteIcon, EditIcon, HistoryIcon, PeopleIcon } from "../components/icons/AdminIcons";
 import Pagination from "../components/pagination/Pagination";
+import Segmented from "../components/segmented/Segmented";
 import TeamEditForm from "../components/profile/TeamEditForm";
 import { deleteStudent, fetchStudents, updateStudent } from "../api/apiStudentsController";
 import { deleteTeam, fetchTeams, updateTeam } from "../api/apiTeamsController";
@@ -21,6 +24,7 @@ const LEAD_REASON = "Тимлида удалить нельзя: сначала 
 const NO_SELECTION = { items: [], page: 0, totalPages: 0, totalElements: 0 };
 const EMPTY_DRAFT = { input: "", course: "", group: "" };
 const EMPTY_STUDENT_QUERY = { ...EMPTY_DRAFT, page: 0, team: null };
+const VIEWS = [{ value: "students", label: "Участники" }, { value: "teams", label: "Команды" }];
 const digitsOnly = (value) => value.replace(/[^0-9]/g, "");
 
 const StudentEditor = ({ student, onSaved, onCancel }) => {
@@ -265,6 +269,7 @@ const AdminPeoplePage = () => {
     // The hand-over is said once above the area.
     const leadReason = !locked && student.is_captain;
     const team = student.current_team;
+    const fio = student.user?.fio ?? "";
     return (
       <li key={student.id} className="admin-row">
         <div className="admin-row-head">
@@ -275,23 +280,33 @@ const AdminPeoplePage = () => {
               {team ? `команда «${team.name}»${student.is_captain ? ", тимлид" : ""}` : "без команды"}
             </p>
           </div>
-          <div className="admin-row-actions">
-            <button type="button" onClick={() => showHistory("student", student.id, student.user?.fio ?? "")}>
-              История
-            </button>
-            <button type="button" disabled={locked || isEditing} onClick={() => setEditing({ kind: "student", id: student.id })}>
-              Изменить
-            </button>
-            <button
-              type="button"
-              className="admin-danger"
+          <div className="admin-row-icons">
+            <IconAction
+              label={`История: ${fio}`}
+              tip="История"
+              onClick={() => showHistory("student", student.id, fio)}
+            >
+              <HistoryIcon />
+            </IconAction>
+            <IconAction
+              label={`Изменить: ${fio}`}
+              tip="Изменить"
+              disabled={locked || isEditing}
+              onClick={() => setEditing({ kind: "student", id: student.id })}
+            >
+              <EditIcon />
+            </IconAction>
+            <IconAction
+              label={`Удалить: ${fio}`}
+              tip="Удалить"
+              className="is-danger"
               disabled={locked || student.is_captain}
               aria-describedby={leadReason ? "lead-delete-reason" : undefined}
               title={leadReason ? LEAD_REASON : undefined}
               onClick={() => askDeleteStudent(student)}
             >
-              Удалить
-            </button>
+              <DeleteIcon />
+            </IconAction>
           </div>
         </div>
         {/* Always mounted, so that a warning arriving after a save is announced, not just drawn. */}
@@ -315,15 +330,34 @@ const AdminPeoplePage = () => {
               {team.captain?.user?.fio ? ` · тимлид ${team.captain.user.fio}` : ""}
             </p>
           </div>
-          <div className="admin-row-actions">
-            <button type="button" onClick={() => showMembers(team)}>Участники</button>
-            <button type="button" onClick={() => showHistory("team", team.id, team.name)}>История</button>
-            <button type="button" disabled={locked || isEditing} onClick={() => editTeam(team)}>
-              Изменить
-            </button>
-            <button type="button" className="admin-danger" disabled={locked} onClick={() => askDeleteTeam(team)}>
-              Удалить
-            </button>
+          <div className="admin-row-icons">
+            <IconAction label={`Участники: ${team.name}`} tip="Участники" onClick={() => showMembers(team)}>
+              <PeopleIcon />
+            </IconAction>
+            <IconAction
+              label={`История: ${team.name}`}
+              tip="История"
+              onClick={() => showHistory("team", team.id, team.name)}
+            >
+              <HistoryIcon />
+            </IconAction>
+            <IconAction
+              label={`Изменить: ${team.name}`}
+              tip="Изменить"
+              disabled={locked || isEditing}
+              onClick={() => editTeam(team)}
+            >
+              <EditIcon />
+            </IconAction>
+            <IconAction
+              label={`Удалить: ${team.name}`}
+              tip="Удалить"
+              className="is-danger"
+              disabled={locked}
+              onClick={() => askDeleteTeam(team)}
+            >
+              <DeleteIcon />
+            </IconAction>
           </div>
         </div>
         {isEditing && (
@@ -362,14 +396,7 @@ const AdminPeoplePage = () => {
         ) : (
           <>
             <div className="admin-toolbar">
-              <div className="admin-toggle" role="group" aria-label="Что показать">
-                <button type="button" aria-pressed={view === "students"} onClick={() => switchTo("students")}>
-                  Участники
-                </button>
-                <button type="button" aria-pressed={view === "teams"} onClick={() => switchTo("teams")}>
-                  Команды
-                </button>
-              </div>
+              <Segmented label="Что показать" options={VIEWS} value={view} onChange={switchTo} />
               <form className="admin-search" role="search" onSubmit={search}>
                 <input
                   type="text"

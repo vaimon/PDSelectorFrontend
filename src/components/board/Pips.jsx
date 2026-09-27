@@ -2,7 +2,7 @@ import "./actions.css";
 
 /**
  * One year of one team as places: filled, open, and any taken over the target. Drawn for the eye
- * only — wherever it stands, the words next to it say the same numbers.
+ * only — `CourseSlots` around it says the same numbers in words.
  */
 const Pips = ({ have, target }) => (
   <span className="pips" aria-hidden="true">

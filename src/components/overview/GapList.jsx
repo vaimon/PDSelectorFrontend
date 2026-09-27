@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
 
-import Pips from "../board/Pips";
-import { describeNeed, gapBuckets, missingLabel, teamsLabel } from "../../utils/overview";
+import CourseSlots from "../board/CourseSlots";
+import { gapBuckets, missingLabel, teamsLabel } from "../../utils/overview";
 
 /**
  * «Кому не хватает людей» (#69): the short teams, nearest to done first, each a way into the board
- * at that team. The pips are drawn for the eye; the row's words say the same thing — «нужно 2 ×
- * 1 курс» — so nobody has to count dots.
+ * at that team. The bucket says how many people are missing; the pips say of which year (#78).
  */
 const GapList = ({ board }) => {
   const buckets = gapBuckets(board);
@@ -27,19 +26,15 @@ const GapList = ({ board }) => {
             <span className="overview-num">{teamsLabel(bucket.teams.length)}</span>
           </p>
           <ul className="gap-rows">
-            {bucket.teams.map(({ team, lead, needFirst, needSecond }) => (
+            {bucket.teams.map(({ team, lead }) => (
               <li key={team.id}>
                 <Link className="gap-row" to={`/admin/board#team-${team.id}`}>
                   <span className="gap-row-main">
                     <span className="gap-row-name">{team.name}</span>
-                    <span className="gap-row-sub">
-                      {lead ? `тимлид ${lead.name} · ` : ""}
-                      <span className="gap-need">{describeNeed(needFirst, needSecond)}</span>
-                    </span>
+                    {lead && <span className="gap-row-sub">тимлид {lead.name}</span>}
                   </span>
-                  <span className="gap-slots" aria-hidden="true">
-                    <span className="gap-slot"><em>1 к</em><Pips have={team.firstYears} target={team.firstYearTarget} /></span>
-                    <span className="gap-slot"><em>2 к</em><Pips have={team.secondYears} target={team.secondYearTarget} /></span>
+                  <span className="gap-slots">
+                    <CourseSlots team={team} />
                   </span>
                   <svg className="gap-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="m9 18 6-6-6-6" />

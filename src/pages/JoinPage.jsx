@@ -191,7 +191,7 @@ const JoinPage = () => {
         )}
         <div className="join-places" role="group" aria-label="Места в команде">
           <Places label="1 курс" taken={preview.firstYears} target={preview.firstYearTarget} />
-          <Places label="2 курс и старше" taken={preview.secondYears} target={preview.secondYearTarget} />
+          <Places label="2+ курс" taken={preview.secondYears} target={preview.secondYearTarget} />
         </div>
       </section>
       <div className="join-action">{renderAction()}</div>

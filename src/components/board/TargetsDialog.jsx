@@ -26,7 +26,7 @@ const TargetsDialog = ({ team, board, busy, onSave, onCancel }) => {
       <form className="board-dialog" onSubmit={submit}>
         <h2 className="board-dialog-title">Цели команды «{team.name}»</h2>
         <p className="board-dialog-note">
-          Пустое поле — цель набора: {board.firstYearTarget} для 1 курса и {board.secondYearTarget} для 2 курса.
+          Пустое поле — цель набора: {board.firstYearTarget} для 1 курса и {board.secondYearTarget} для 2+ курса.
         </p>
         <div className="board-targets">
           <label className="board-target">
@@ -41,7 +41,7 @@ const TargetsDialog = ({ team, board, busy, onSave, onCancel }) => {
             />
           </label>
           <label className="board-target">
-            <span>2 курс</span>
+            <span>2+ курс</span>
             <input
               type="text"
               inputMode="numeric"

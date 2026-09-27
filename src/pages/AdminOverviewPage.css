@@ -500,27 +500,9 @@
   white-space: nowrap;
 }
 
-.gap-need {
-  color: var(--warn);
-  font-weight: 500;
-}
-
 .gap-slots {
   display: flex;
   align-items: center;
-  gap: var(--gap);
-}
-
-.gap-slot {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.gap-slot em {
-  color: var(--text-2);
-  font-size: 11.5px;
-  font-style: normal;
 }
 
 .gap-chevron {

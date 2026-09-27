@@ -245,7 +245,7 @@ const AdminSettingsPage = () => {
               </div>
 
               <div className="settings-field">
-                <label htmlFor="secondYearTarget">Мест для 2 курса и старше</label>
+                <label htmlFor="secondYearTarget">Мест для 2+ курса</label>
                 <input
                   type="text"
                   inputMode="numeric"

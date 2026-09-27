@@ -205,9 +205,11 @@
   gap: var(--space-4);
 }
 
+/* A narrow column: «2+ курс» must not break between «2+» and «курс». */
 .card-place dt {
   color: var(--text-3);
   font-size: calc(var(--fs) - 1.5px);
+  white-space: nowrap;
 }
 
 .card-place dd {

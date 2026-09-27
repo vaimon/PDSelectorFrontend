@@ -15,7 +15,7 @@ const SECOND_YEAR = {
   places: 'second_year_places_left',
   taken: 'second_years',
   target: 'second_year_target',
-  label: '2 курс и старше',
+  label: '2+ курс',
   people: ['второкурсник', 'второкурсника', 'второкурсников'],
 };
 
@@ -36,24 +36,20 @@ export const placesLeftFor = (composition, course) => composition?.[yearOf(cours
 
 /** What the backend would answer, said before the click instead of after it. */
 export const noPlacesMessage = (course) => (
-  `В команде нет мест для студентов ${course === 1 ? '1 курса' : '2 курса и старше'}.`
+  `В команде нет мест для студентов ${course === 1 ? '1 курса' : '2+ курса'}.`
 );
 
-/** How full the team is: «1 курс — 2 из 3 · 2 курс и старше — 1 из 3». */
+/** How full the team is: «1 курс — 2 из 3 · 2+ курс — 1 из 3». */
 export const describePlaces = (composition) => (
   [FIRST_YEAR, SECOND_YEAR]
     .map((year) => `${year.label} — ${composition[year.taken]} из ${composition[year.target]}`)
     .join(' · ')
 );
 
-/**
- * The same numbers as `describePlaces`, but as rows for a card (#59): «1 курс: 2/3». The short label
- * without «и старше» is the card's: it stands in a narrow column next to the button, and the sentence
- * form is still what the team page and the join preview say.
- */
+/** The same numbers as `describePlaces`, but as rows for a card (#59): «1 курс: 2/3». */
 export const describeYears = (composition) => (
   [FIRST_YEAR, SECOND_YEAR].map((year) => ({
-    label: year === FIRST_YEAR ? "1 курс" : "2 курс",
+    label: year.label,
     taken: composition[year.taken],
     target: composition[year.target],
   }))

@@ -44,7 +44,7 @@ const shortYear = (board) => {
   const second = secondYear.pool < secondYear.places;
   if (first && second) return "обоих курсах";
   if (first) return "1 курсе";
-  if (second) return "2 курсе";
+  if (second) return "2+ курсе";
   return null;
 };
 

@@ -15,14 +15,10 @@ export const isFirstYear = (course) => course === 1;
  */
 export const courseLabel = (course) => (course ? `${course} курс` : 'курс не указан');
 
-/** «1 курс 2/3 · 2 курс 3/3» */
-export const countersLine = (team) =>
-  `1 курс ${team.firstYears}/${team.firstYearTarget} · 2 курс ${team.secondYears}/${team.secondYearTarget}`;
-
-/** The places a student would take, as the picker shows them: «2 курс 2/3» for anyone past the first year. */
+/** The places a student would take, as the picker shows them: «2+ курс 2/3» for anyone past the first year. */
 export const counterFor = (team, course) => (isFirstYear(course)
   ? `1 курс ${team.firstYears}/${team.firstYearTarget}`
-  : `2 курс ${team.secondYears}/${team.secondYearTarget}`);
+  : `2+ курс ${team.secondYears}/${team.secondYearTarget}`);
 
 export const canJoin = (team, course) => (isFirstYear(course)
   ? team.firstYears < team.firstYearTarget

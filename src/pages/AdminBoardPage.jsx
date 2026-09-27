@@ -5,10 +5,11 @@ import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import ActionMenu from "../components/board/ActionMenu";
 import IconAction from "../components/board/IconAction";
 import LeadPicker from "../components/board/LeadPicker";
+import CourseSlots from "../components/board/CourseSlots";
 import MovePicker from "../components/board/MovePicker";
-import Pips from "../components/board/Pips";
 import PoolPicker from "../components/board/PoolPicker";
 import TargetsDialog from "../components/board/TargetsDialog";
+import Segmented from "../components/segmented/Segmented";
 import { AddToTeamIcon, ChevronIcon } from "../components/icons/AdminIcons";
 import { changeTeamLead, dissolveTeam, fetchBoard, moveStudent, setTeamTargets } from "../api/apiBoard";
 import { useNotifications } from "../context/notificationContext";
@@ -19,7 +20,6 @@ import {
   applyMove,
   canJoin,
   counterFor,
-  countersLine,
   filterPool,
   filterTeams,
   courseLabel,
@@ -29,6 +29,7 @@ import {
 import "./AdminBoardPage.css";
 
 const EMPTY_FILTER = { text: "", shortOnly: false, placesFor: "", sort: "status" };
+const SORTS = [{ value: "status", label: "По статусу" }, { value: "name", label: "По названию" }];
 
 const studentMeta = (student) => `${courseLabel(student.course)}${student.group ? `, группа ${student.group}` : ""}`;
 
@@ -421,22 +422,20 @@ const AdminBoardPage = () => {
           <select value={filter.placesFor} onChange={(event) => setField("placesFor", event.target.value)}>
             <option value="">для любого курса</option>
             <option value="1">для 1 курса</option>
-            <option value="2">для 2 курса</option>
+            <option value="2">для 2+ курса</option>
           </select>
         </label>
-        <div className="admin-toggle" role="group" aria-label="Порядок команд">
-          <button type="button" aria-pressed={filter.sort === "status"} onClick={() => setField("sort", "status")}>
-            По статусу
-          </button>
-          <button type="button" aria-pressed={filter.sort === "name"} onClick={() => setField("sort", "name")}>
-            По названию
-          </button>
-        </div>
+        <Segmented
+          label="Порядок команд"
+          options={SORTS}
+          value={filter.sort}
+          onChange={(sort) => setField("sort", sort)}
+        />
       </div>
 
       <p className="board-summary">
         Команд: {teams.length} из {board.teams.length} · без команды: {board.pool.length}
-        {" "}· цель набора: 1 курс {board.firstYearTarget}, 2 курс {board.secondYearTarget}
+        {" "}· цель набора: 1 курс {board.firstYearTarget}, 2+ курс {board.secondYearTarget}
       </p>
 
       {lastMove && !locked && (
@@ -527,13 +526,7 @@ const AdminBoardPage = () => {
                   <span className="board-status">{STATUS_LABELS[team.status]}</span>
                   {hasOwnTargets(team) && <span className="board-badge">свои цели</span>}
                 </p>
-                <div className="board-team-places">
-                  <p className="board-counters">{countersLine(team)}</p>
-                  <span className="board-team-pips">
-                    <Pips have={team.firstYears} target={team.firstYearTarget} />
-                    <Pips have={team.secondYears} target={team.secondYearTarget} />
-                  </span>
-                </div>
+                <CourseSlots team={team} />
               </header>
 
               <ul id={`team-${team.id}-members`} className="board-students" hidden={!isOpen(team)}>

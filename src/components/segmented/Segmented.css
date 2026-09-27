@@ -1,0 +1,37 @@
+.segmented {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  border-radius: var(--r);
+  background: var(--inset);
+  gap: 2px;
+}
+
+.segmented button {
+  min-height: calc(var(--ctrl-h) - 4px);
+  padding: 0 var(--pad);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segmented button:hover:not([aria-pressed="true"]) {
+  color: var(--text);
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border);
+  color: var(--text);
+}
+
+.segmented button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
