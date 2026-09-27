@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { fetchAdminOverview } from '../api/apiAdmin';
 
@@ -10,10 +10,13 @@ import { fetchAdminOverview } from '../api/apiAdmin';
  *
  * `refreshKey` reloads it when it changes: the admin shell passes the path, so the counts it shows
  * catch up after work in another section (#68). A reload keeps the last answer on screen until the
- * new one arrives, instead of flashing «загружаем» on every section switch.
+ * new one arrives, instead of flashing «загружаем» on every section switch. `reload` does the same
+ * on demand, for a change made without leaving the page (a new selection started in Settings, #73).
  */
 export const useAdminOverview = (refreshKey) => {
   const [state, setState] = useState({ overview: null, loading: true, error: null, missing: false });
+  const [nonce, setNonce] = useState(0);
+  const reload = useCallback(() => setNonce((current) => current + 1), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,9 +44,9 @@ export const useAdminOverview = (refreshKey) => {
     return () => {
       cancelled = true;
     };
-  }, [refreshKey]);
+  }, [refreshKey, nonce]);
 
-  return state;
+  return useMemo(() => ({ ...state, reload }), [state, reload]);
 };
 
 export default useAdminOverview;

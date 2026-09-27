@@ -661,10 +661,19 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   await expect(pill).toContainText(movedEndWords);
   await expect(page.getByLabel('Окончание', { exact: true })).toHaveValue(movedEnd);
 
+  // What ends a selection stands apart (#73), under where the selection stands: the run's team is
+  // still short (1 + 2 against 4 + 3) and three people have no team. The confirmation says the same
+  // before it says what the hand-over locks.
+  const finish = page.getByRole('region', { name: 'Завершение набора' });
+  const standing = 'Собрано 0 из 1 команды, 3 человека без команды';
+  await expect(finish).toContainText(standing);
+
   // Marking it handed over closes the selection: the backend answers every change to it with 409,
   // so the form must not offer one. Starting the NEXT selection is not a change to this one and
   // stays available — the backend allows it, and that is how a year ends.
-  await page.getByRole('button', { name: 'Отметить переданным' }).click();
+  await finish.getByRole('button', { name: 'Отметить переданным' }).click();
+  await expect(page.getByRole('dialog')).toContainText(standing);
+  await expect(page.getByRole('dialog')).toContainText('включая администраторов');
   await confirm(page, 'Отметить набор переданным?', 'Отметить переданным');
   // Said once, in the pill: the window sentence gives way, since «идёт до …» next to «передан»
   // would tell the reader two different things.
