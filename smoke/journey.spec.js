@@ -458,16 +458,13 @@ test('a registered student opens the link signed out and is brought back to it a
 });
 
 /**
- * The number a stat block shows, found by the words under it.
- *
- * The label is matched exactly against its own span: a block also carries a hint, and «1 курс» is
- * a substring of the hint under «без команды» — a loose filter would match two blocks and die on
- * strict mode instead of on the number.
+ * A number on the overview (#69), by what it counts. The page marks each figure with `data-stat`
+ * because the words around them repeat — «1 курс» stands under three different groups.
  */
-async function statValue(page, label) {
-  const stat = page.locator('.admin-stat').filter({ has: page.getByText(label, { exact: true }) });
-  await expect(stat, `«${label}» is on the overview`).toBeVisible();
-  return Number(await stat.locator('.admin-stat-value').innerText());
+async function statValue(page, stat) {
+  const figure = page.locator(`[data-stat="${stat}"]`);
+  await expect(figure, `«${stat}» is on the overview`).toBeVisible();
+  return Number(await figure.innerText());
 }
 
 test('the admin lands on the overview and sees the team @desktop', async ({ browser }) => {
@@ -486,23 +483,45 @@ test('the admin lands on the overview and sees the team @desktop', async ({ brow
 
   // The cast of this run, counted: the 3 seeded students plus the 3 who filled the questionnaire
   // above — the team's lead and the friend (both 2 курс) and the invitee (1 курс); the first-year
-  // who asked to join is the seeded one on desktop. Three of them are in the one team by the end.
-  // Every number below is a different field of the answer, so a swapped pair — собраны/не хватает,
-  // в командах/без команды, 1 курс/2 курс — turns this red.
-  expect(await statValue(page, 'зарегистрировались')).toBe(6);
-  expect(await statValue(page, '1 курс')).toBe(2);
-  expect(await statValue(page, '2 курс и старше')).toBe(4);
-  expect(await statValue(page, 'в командах'), 'the team is down to three by the last step').toBe(3);
-  expect(await statValue(page, 'без команды')).toBe(3);
-  await expect(page.getByText('1 курс — 1, 2 курс и старше — 2')).toBeVisible();
+  // who asked to join is the seeded one on desktop. Three of them are in the one team by the end:
+  // the lead, the seeded second-year and one first-year. Every number below is a different field,
+  // so a swapped pair — собраны/не хватает, в командах/без команды, 1 курс/2 курс — turns this red.
+  expect(await statValue(page, 'registered')).toBe(6);
+  expect(await statValue(page, 'registered-first-year')).toBe(2);
+  expect(await statValue(page, 'registered-second-year')).toBe(4);
+  expect(await statValue(page, 'in-teams'), 'the team is down to three by the last step').toBe(3);
+  expect(await statValue(page, 'without-team')).toBe(3);
+  expect(await statValue(page, 'without-team-first-year')).toBe(1);
+  expect(await statValue(page, 'without-team-second-year')).toBe(2);
+  expect(await statValue(page, 'teams-total'), 'the team this run created').toBe(1);
+  expect(await statValue(page, 'teams-complete')).toBe(0);
+  expect(await statValue(page, 'teams-short')).toBe(1);
 
-  expect(await statValue(page, 'всего'), 'the team this run created').toBe(1);
-  expect(await statValue(page, 'собраны'), 'it is short of 2 first-years and 1 second-year').toBe(0);
-  expect(await statValue(page, 'кого-то не хватает')).toBe(1);
+  // Who is short of whom: 1 + 2 against 3 + 3 is two first-years and a second-year missing.
+  const gap = page.getByRole('region', { name: 'Кому не хватает людей' });
+  const teamRow = gap.getByRole('link', { name: new RegExp(teamName) });
+  await expect(gap.getByText('Не хватает 3 человек')).toBeVisible();
+  await expect(teamRow).toContainText('нужно 2 × 1 курс, 1 × 2 курс');
 
-  // Every application this run raised was answered, so nothing is waiting and nothing is stale.
-  expect(await statValue(page, 'заявок от студентов')).toBe(0);
-  expect(await statValue(page, 'приглашений от команд')).toBe(0);
+  // Whether the pool can fill it: one first-year for two places, two second-years for one.
+  const balance = page.getByRole('region', { name: 'Хватит ли свободных людей' });
+  expect(await statValue(page, 'pool-first-year')).toBe(1);
+  expect(await statValue(page, 'places-first-year')).toBe(2);
+  expect(await statValue(page, 'pool-second-year')).toBe(2);
+  expect(await statValue(page, 'places-second-year')).toBe(1);
+  await expect(balance).toContainText('1 место не заполнить из пула');
+  await expect(balance).toContainText('1 человеку не хватит мест в целях');
+
+  // The chart's last day is today, counted live: the table view says what the line draws.
+  await page.getByText('Таблицей').click();
+  const lastDay = page.getByRole('table', { name: 'Собранные команды по дням' }).getByRole('row').last();
+  await expect(lastDay.getByRole('cell')).toHaveText([/.+/, '1', '0', '3']);
+
+  // The row leads to the team on the board, ready to be filled from the pool beside it.
+  await teamRow.click();
+  await expect(page).toHaveURL(/[/]admin[/]board#team-\d+$/);
+  await expect(page.locator('.board-team').filter({ has: page.getByRole('heading', { name: teamName }) }))
+    .toBeFocused();
 
   await page.goto('/teams');
   await expect(page.getByRole('heading', { name: teamName, level: 3 })).toBeVisible();

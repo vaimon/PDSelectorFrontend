@@ -14,6 +14,16 @@ export const fetchAdminOverview = async () => {
 };
 
 /**
+ * The current selection day by day (vaimon/team-selection#49): from the first recorded day to
+ * today, with today counted live, ending on the window's last day once it has closed. Dates come
+ * as `"2026-10-01"` strings. 404 between selections, like the overview.
+ */
+export const fetchSelectionHistory = async ({ signal } = {}) => {
+  const { data } = await apiClient.get('/admin/overview/history', { signal });
+  return data;
+};
+
+/**
  * People by name or e-mail, or by role (#49). Enabled accounts only: the backend returns disabled
  * ones too when the flag is left out, and nobody gives access to an account that cannot sign in.
  * One search box, two backend fields — an «@» says it is an address.

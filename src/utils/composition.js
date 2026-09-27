@@ -21,7 +21,7 @@ const SECOND_YEAR = {
 
 const yearOf = (course) => (course === 1 ? FIRST_YEAR : SECOND_YEAR);
 
-const plural = (count, [one, few, many]) => {
+export const plural = (count, [one, few, many]) => {
   const tens = count % 100;
   if (tens > 10 && tens < 20) {
     return many;
