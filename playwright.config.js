@@ -34,6 +34,8 @@ export default defineConfig({
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'], channel, viewport: { width: 1280, height: 800 } },
+      // Steps about the phone layout itself — the admin drawer — have nothing to check at 1280.
+      grepInvert: /@mobile/,
     },
     {
       // Students fill the questionnaire from a phone, straight from a chat link.

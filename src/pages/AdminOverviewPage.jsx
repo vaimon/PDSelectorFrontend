@@ -1,7 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 
-import { useIdentity } from "../context/identityContext";
-import useAdminOverview from "../hooks/useAdminOverview";
 import "./AdminOverviewPage.css";
 
 const Stat = ({ value, label, hint, alert, to }) => {
@@ -23,8 +21,8 @@ const Stat = ({ value, label, hint, alert, to }) => {
  * is waiting for somebody to answer. The landing section of the admin area.
  */
 const AdminOverviewPage = () => {
-  const { activeTrack } = useIdentity();
-  const { overview, loading, error, missing } = useAdminOverview();
+  // Loaded by the shell, which needs the same answer for the «Состав» badge (#68).
+  const { overview, loading, error, missing } = useOutletContext();
 
   const renderBody = () => {
     if (loading) return <p className="admin-state">Загружаем состояние набора…</p>;
@@ -98,15 +96,7 @@ const AdminOverviewPage = () => {
   };
 
   return (
-    <section className="admin-section" aria-labelledby="admin-overview-title">
-      <div className="admin-section-head">
-        <p className="admin-section-kicker">Обзор</p>
-        {/* The name comes from the identity, not from the answer: it is already known when the
-            page opens, so the heading does not reflow a request later. */}
-        <h2 id="admin-overview-title">
-          Где сейчас набор{activeTrack ? `: ${activeTrack.name}` : ""}
-        </h2>
-      </div>
+    <section className="admin-section">
       {renderBody()}
     </section>
   );

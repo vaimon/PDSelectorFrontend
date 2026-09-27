@@ -60,11 +60,7 @@ const AdminHistoryPage = () => {
   };
 
   return (
-    <section className="admin-section" aria-labelledby="admin-history-title">
-      <div className="admin-section-head">
-        <p className="admin-section-kicker">История</p>
-        <h2 id="admin-history-title">Кто что менял</h2>
-      </div>
+    <section className="admin-section">
 
       <div className="admin-toolbar">
         <form className="admin-search" role="search" aria-label="Период" onSubmit={showPeriod}>

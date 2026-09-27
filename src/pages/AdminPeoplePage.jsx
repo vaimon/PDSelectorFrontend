@@ -352,11 +352,7 @@ const AdminPeoplePage = () => {
 
   return (
     <>
-      <section className="admin-section" aria-labelledby="admin-people-title">
-        <div className="admin-section-head">
-          <p className="admin-section-kicker">Участники и команды</p>
-          <h2 id="admin-people-title">Исправить вручную</h2>
-        </div>
+      <section className="admin-section">
 
         {!activeTrack ? (
           <p className="admin-state">

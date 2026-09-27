@@ -18,13 +18,14 @@ export const useHandOver = () => {
   const handedOverAt = activeTrack?.handedOverAt ?? null;
 
   if (!handedOverAt) {
-    return { handedOver: false, note: null };
+    return { handedOver: false, note: null, date: null };
   }
 
-  const on = new Date(handedOverAt);
+  const date = dateFormatter.format(new Date(handedOverAt));
   return {
     handedOver: true,
-    note: `Набор «${activeTrack.name}» передан в кабинет ПД ${dateFormatter.format(on)}: составы больше не меняются здесь.`,
+    note: `Набор «${activeTrack.name}» передан в кабинет ПД ${date}: составы больше не меняются здесь.`,
+    date,
   };
 };
 

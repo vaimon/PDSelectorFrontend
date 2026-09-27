@@ -1,11 +1,13 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
+import { useCallback, useState } from 'react';
+import '../../styles/menu.css';
 import './style.css';
-import { Link, NavLink } from 'react-router-dom';
-import { FaBars, FaChevronDown } from 'react-icons/fa';
-import { logout } from '../../api/apiAuth';
+import { NavLink } from 'react-router-dom';
+import { FaBars } from 'react-icons/fa';
 import { useIdentity } from '../../context/identityContext';
 import { useApplications } from '../../context/applicationsContext';
+import useDismissable from '../../hooks/useDismissable';
 import { describeSelectionWindow } from '../../utils/selectionWindow';
+import AccountMenu from '../account-menu/AccountMenu';
 import ConsoleMark from '../logo/ConsoleMark';
 import QuestionMark from '../icons/QuestionMark';
 import ThemeToggle from '../header/Header';
@@ -48,39 +50,12 @@ const buildLinks = ({ isParticipant, isAdmin, hasActiveTrack, currentTeamId, pen
   return links;
 };
 
-// Closes a dropdown on Escape and on a click outside it.
-const useDismissable = (isOpen, close) => {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    const dismiss = (event) => {
-      if (event.type === 'keydown' && event.key !== 'Escape') return;
-      if (event.type === 'pointerdown' && ref.current?.contains(event.target)) return;
-      close();
-    };
-
-    document.addEventListener('pointerdown', dismiss);
-    document.addEventListener('keydown', dismiss);
-    return () => {
-      document.removeEventListener('pointerdown', dismiss);
-      document.removeEventListener('keydown', dismiss);
-    };
-  }, [isOpen, close]);
-
-  return ref;
-};
-
 const Navbar = () => {
   const { user, isAdmin, isParticipant, activeTrack, loading } = useIdentity();
   const { total: pendingApplications } = useApplications();
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const closeAccount = useCallback(() => setIsAccountOpen(false), []);
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
-  const accountRef = useDismissable(isAccountOpen, closeAccount);
   const menuRef = useDismissable(isMenuOpen, closeMenu);
 
   const selection = describeSelectionWindow(activeTrack);
@@ -93,16 +68,6 @@ const Navbar = () => {
       currentTeamId: user?.student?.current_team_id ?? null,
       pendingApplications,
     });
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      window.location.assign('/login');
-    } catch (error) {
-      // The shared client already showed what went wrong; staying signed in is the safe outcome.
-      console.error('Не удалось выйти:', error);
-    }
-  };
 
   /**
    * In the bar the guidance is a «?» in a circle (#61) — it is the one item nobody navigates by
@@ -178,46 +143,7 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="account-menu" ref={accountRef}>
-            <button
-              type="button"
-              className={`select-icon ${isAccountOpen ? 'open' : ''}`}
-              onClick={() => setIsAccountOpen((prev) => !prev)}
-              aria-expanded={isAccountOpen}
-              aria-haspopup="menu"
-            >
-              <span>{user?.fio ?? 'Аккаунт'}</span>
-              <FaChevronDown aria-hidden="true" />
-            </button>
-            {isAccountOpen && (
-              <div className="dropdown account-dropdown" role="menu">
-                <p className="account-identity">
-                  <span className="account-name">{user?.fio}</span>
-                  <span className="account-email">{user?.email}</span>
-                </p>
-                {/* The only way to the questionnaire once a team exists: «Моя команда» then points
-                    at the team's own page (#64). */}
-                {isParticipant && (
-                  <Link
-                    to="/me"
-                    className="account-link"
-                    role="menuitem"
-                    onClick={closeAccount}
-                  >
-                    Мой профиль
-                  </Link>
-                )}
-                <button
-                  type="button"
-                  className="account-logout"
-                  role="menuitem"
-                  onClick={handleLogout}
-                >
-                  Выйти
-                </button>
-              </div>
-            )}
-          </div>
+          <AccountMenu />
 
           <ThemeToggle />
         </div>

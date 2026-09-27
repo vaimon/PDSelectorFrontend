@@ -86,7 +86,7 @@
 
 /* A disabled control says why in text: a phone has no hover, and `title` is unreachable there. */
 .settings-reason {
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: 12px;
   line-height: 1.4;
 }
