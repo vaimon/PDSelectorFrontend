@@ -7,8 +7,12 @@ import { fetchAdminOverview } from '../api/apiAdmin';
  *
  * Between two selections the endpoint answers 404, and every number the screen shows is about a
  * selection — so that case is an empty state, not an error.
+ *
+ * `refreshKey` reloads it when it changes: the admin shell passes the path, so the counts it shows
+ * catch up after work in another section (#68). A reload keeps the last answer on screen until the
+ * new one arrives, instead of flashing «загружаем» on every section switch.
  */
-export const useAdminOverview = () => {
+export const useAdminOverview = (refreshKey) => {
   const [state, setState] = useState({ overview: null, loading: true, error: null, missing: false });
 
   useEffect(() => {
@@ -37,7 +41,7 @@ export const useAdminOverview = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   return state;
 };

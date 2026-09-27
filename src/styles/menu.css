@@ -1,0 +1,62 @@
+/*
+ * The two pieces every dropdown in the app is made of: the button that opens it and the panel
+ * that hangs off it. Shared by the student bar's section menu and the account menu, which the
+ * admin shell uses too (#68) — so they live outside any one bar.
+ */
+
+.select-icon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  height: var(--ctrl-h);
+  margin: 0;
+  padding: 0 var(--gap);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--fs);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.select-icon span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.select-icon:hover,
+.select-icon.open {
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+.select-icon svg {
+  flex: none;
+  color: var(--text-3);
+  font-size: 11px;
+  transition: transform 0.2s ease;
+}
+
+.select-icon:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  z-index: 10;
+  display: block;
+  min-width: 100%;
+  overflow: hidden;
+  padding: var(--space-4) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+}

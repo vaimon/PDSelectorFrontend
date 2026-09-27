@@ -128,12 +128,9 @@ const AdminAccessPage = () => {
   return (
     <>
       <section className="admin-section" aria-labelledby="admin-access-title">
-        <div className="admin-section-head">
-          <p className="admin-section-kicker">Доступ</p>
-          <h2 id="admin-access-title">
-            {query.text ? "Найти человека" : "Кто может открывать этот раздел"}
-          </h2>
-        </div>
+        <h2 id="admin-access-title" className="admin-section-title">
+          {query.text ? "Найти человека" : "Кто может открывать этот раздел"}
+        </h2>
 
         <div className="admin-toolbar">
           <form className="admin-search" role="search" onSubmit={search}>

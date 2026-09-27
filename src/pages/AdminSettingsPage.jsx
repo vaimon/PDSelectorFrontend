@@ -137,15 +137,9 @@ const AdminSettingsPage = () => {
 
   return (
     <>
-      <section className="admin-section" aria-labelledby="admin-settings-title">
-        <div className="admin-section-head">
-          <p className="admin-section-kicker">Настройки</p>
-          {/* The name alone: the backend names a selection it generates «Набор 2027», and
-              «Набор «Набор 2027»» is what wrapping it produced. */}
-          <h2 id="admin-settings-title">
-            {activeTrack ? activeTrack.name : "Набор не настроен"}
-          </h2>
-        </div>
+      {/* No heading of its own: the page is «Настройки», and the selection it sets up is named
+          once, in the pill above. */}
+      <section className="admin-section">
 
         {!activeTrack ? (
           <p className="admin-state">
@@ -274,12 +268,9 @@ const AdminSettingsPage = () => {
       </section>
 
       <section className="admin-section" aria-labelledby="admin-next-title">
-        <div className="admin-section-head">
-          <p className="admin-section-kicker">Дальше</p>
-          <h2 id="admin-next-title">
-            {activeTrack ? "Закончить этот набор" : "Начать набор"}
-          </h2>
-        </div>
+        <h2 id="admin-next-title" className="admin-section-title">
+          {activeTrack ? "Закончить этот набор" : "Начать набор"}
+        </h2>
 
         <form className="settings-form" onSubmit={askNewSelection}>
           <p className="settings-note">

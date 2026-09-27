@@ -29,7 +29,7 @@
 
 .board-summary {
   margin: 0 0 var(--gap);
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
 }
 
@@ -184,7 +184,7 @@
 }
 
 .board-student-meta {
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
 }
 
@@ -281,7 +281,7 @@
 
 .board-empty {
   margin: var(--space-8) 0 0;
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
 }
 

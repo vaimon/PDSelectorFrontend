@@ -53,6 +53,11 @@ async function navigateTo(page, label) {
     .filter({ visible: true }).click();
 }
 
+/** The admin area's own sidebar (#68), where every section is opened from. */
+function adminNav(page) {
+  return page.getByRole('navigation', { name: 'Разделы администрирования' });
+}
+
 /** Waits for «Моя команда» on /profile — since #64 the page holds the team and nothing else. */
 async function openMyTeamSection(page) {
   await expect(page.getByRole('heading', { name: 'Моя команда', level: 1 })).toBeVisible();
@@ -469,8 +474,15 @@ test('the admin lands on the overview and sees the team @desktop', async ({ brow
   expect(teamName, 'builds on the team step; run the whole file').toBeDefined();
   const { page, redirect } = await signIn(browser, seeded.admin);
   expect(redirect).toBe('/admin');
-  await expect(page.getByRole('link', { name: 'Администрирование' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Где сейчас набор: Смоук-набор/ })).toBeVisible();
+
+  // The area has its own shell (#68): the sections in a sidebar, the page named once, and the
+  // selection said once, in the pill. The badge on «Состав» is the one team this run left short.
+  await expect(adminNav(page).getByRole('link', { name: 'Обзор' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('heading', { name: 'Обзор', level: 1 })).toBeVisible();
+  await expect(page.locator('.selection-pill')).toContainText('Смоук-набор');
+  await expect(page.locator('.selection-pill')).toContainText('идёт');
+  await expect(adminNav(page).locator('.admin-nav-count')).toHaveText('1');
+  await expect(page.locator('.navbar'), 'the student bar stays in the student app').toHaveCount(0);
 
   // The cast of this run, counted: the 3 seeded students plus the 3 who filled the questionnaire
   // above — the team's lead and the friend (both 2 курс) and the invitee (1 курс); the first-year
@@ -590,7 +602,7 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   expect(teamName, 'builds on the team step; run the whole file').toBeDefined();
   const { page } = await signIn(browser, seeded.admin);
   await page.goto('/admin');
-  await page.locator('.admin-sections').getByRole('link', { name: 'Настройки' }).click();
+  await adminNav(page).getByRole('link', { name: 'Настройки' }).click();
   await expect(page).toHaveURL(/[/]admin[/]settings$/);
 
   const firstYear = page.getByLabel('Мест для 1 курса');
@@ -623,7 +635,11 @@ test('the organiser moves the targets and the deadline, and marks the selection 
 
   // The new deadline reaches the shell, which reads the same track the form just wrote.
   await page.goto('/admin/settings');
-  await expect(page.locator('.admin-lead')).toContainText('Идёт набор');
+  const pill = page.locator('.selection-pill');
+  const movedEndWords = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' })
+    .format(new Date(`${movedEnd}T00:00:00`));
+  await expect(pill).toContainText('идёт');
+  await expect(pill).toContainText(movedEndWords);
   await expect(page.getByLabel('Окончание', { exact: true })).toHaveValue(movedEnd);
 
   // Marking it handed over closes the selection: the backend answers every change to it with 409,
@@ -631,14 +647,17 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   // stays available — the backend allows it, and that is how a year ends.
   await page.getByRole('button', { name: 'Отметить переданным' }).click();
   await confirm(page, 'Отметить набор переданным?', 'Отметить переданным');
-  await expect(page.locator('.admin-banner')).toContainText('передан в кабинет ПД');
+  // Said once, in the pill: the window sentence gives way, since «идёт до …» next to «передан»
+  // would tell the reader two different things.
+  await expect(pill).toContainText('передан в кабинет ПД');
+  await expect(pill).not.toContainText('идёт');
   await expect(page.getByRole('button', { name: 'Сохранить' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Начать новый набор' })).toBeEnabled();
-  await expect(page.locator('.admin-lead')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Снять отметку о передаче' }).click();
   await confirm(page, 'Снять отметку о передаче?', 'Снять отметку');
-  await expect(page.locator('.admin-banner')).toHaveCount(0);
+  await expect(pill).not.toContainText('передан');
+  await expect(pill).toContainText('идёт');
   await expect(page.getByRole('button', { name: 'Сохранить' })).toBeEnabled();
 });
 
@@ -686,7 +705,7 @@ test('the organiser fixes a student and a team by hand @desktop', async ({ brows
   }
 
   await page.goto('/admin');
-  await page.locator('.admin-sections').getByRole('link', { name: 'Участники и команды' }).click();
+  await adminNav(page).getByRole('link', { name: 'Участники и команды' }).click();
   await expect(page).toHaveURL(/[/]admin[/]people$/);
 
   // «By group» means course and group together — group numbers repeat across years. The seeded
@@ -776,7 +795,7 @@ test('the organiser gives access, takes it back and reads who did what @desktop'
 
   const { page } = await signIn(browser, seeded.admin);
   await page.goto('/admin');
-  await page.locator('.admin-sections').getByRole('link', { name: 'Доступ' }).click();
+  await adminNav(page).getByRole('link', { name: 'Доступ' }).click();
   await expect(page).toHaveURL(/[/]admin[/]access$/);
 
   // Alone, the admin cannot step down: nobody would be left to give access back. The row says so
@@ -817,7 +836,7 @@ test('the organiser gives access, takes it back and reads who did what @desktop'
 
   // «Who moved a student and when»: find the student, open their history. The first-year joined
   // the run's team by request, and the entry names it.
-  await page.locator('.admin-sections').getByRole('link', { name: 'Участники и команды' }).click();
+  await adminNav(page).getByRole('link', { name: 'Участники и команды' }).click();
   await page.getByLabel('Поиск участников').fill(seeded.firstYear.fio);
   await page.getByRole('search').getByRole('button', { name: 'Найти' }).click();
   await adminRow(page, seeded.firstYear.fio).getByRole('button', { name: 'История' }).click();
@@ -849,7 +868,7 @@ test('the organiser completes a team from the pool on the board, drags a student
 
   const { page } = await signIn(browser, seeded.admin);
   await page.goto('/admin');
-  await page.locator('.admin-sections').getByRole('link', { name: 'Состав' }).click();
+  await adminNav(page).getByRole('link', { name: 'Состав' }).click();
   await expect(page).toHaveURL(/[/]admin[/]board$/);
 
   // By now the run's team is its lead and the seeded second-year (2 курс) and one first-year; the
@@ -897,4 +916,21 @@ test('the organiser completes a team from the pool on the board, drags a student
   await page.reload();
   await expect(page.locator('.board-pool')).toContainText(friend.fio);
   await expect(boardTeam(page, teamName)).not.toContainText(friend.fio);
+});
+
+test('the organiser opens the sections from the drawer on a phone @mobile', async ({ browser }, testInfo) => {
+  const { page } = await signIn(browser, seeded.admin);
+  await page.goto('/admin');
+  await expect(page.getByRole('heading', { name: 'Обзор', level: 1 })).toBeVisible();
+  await expectNoSidewaysScroll(page, testInfo);
+
+  // Below 900px the sidebar is a drawer: out of sight and out of the tab order until asked for,
+  // and gone again once a section is chosen.
+  await expect(adminNav(page)).toBeHidden();
+  await page.getByRole('button', { name: 'Открыть меню разделов' }).click();
+  await adminNav(page).getByRole('link', { name: 'Настройки' }).click();
+  await expect(page).toHaveURL(/[/]admin[/]settings$/);
+  await expect(page.getByRole('heading', { name: 'Настройки', level: 1 })).toBeVisible();
+  await expect(adminNav(page)).toBeHidden();
+  await expectNoSidewaysScroll(page, testInfo);
 });

@@ -67,27 +67,8 @@
   font-weight: 600;
 }
 
-.navbar .account-link {
-  display: block;
-  padding: var(--space-8) var(--gap);
-  border-radius: var(--r);
-  color: var(--text-2);
-  font-size: calc(var(--fs) - 0.5px);
-  font-weight: 500;
-  text-align: left;
-  text-decoration: none;
-}
-
-.navbar .account-link:hover {
-  background: var(--surface-2);
-  color: var(--text);
-}
-
-.navbar .account-link:focus-visible,
 .navbar .nav-links a:focus-visible,
-.navbar .nav-menu-dropdown a:focus-visible,
-.navbar .select-icon:focus-visible,
-.navbar .account-logout:focus-visible {
+.navbar .nav-menu-dropdown a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -149,7 +130,6 @@
   white-space: nowrap;
 }
 
-.navbar .account-menu,
 .navbar .nav-menu {
   position: relative;
   min-width: 0;
@@ -160,65 +140,8 @@
   display: none;
 }
 
-.navbar .select-icon {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8);
-  height: var(--ctrl-h);
-  margin: 0;
-  padding: 0 var(--gap);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface-2);
-  color: var(--text);
-  font-size: var(--fs);
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.navbar .select-icon span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.navbar .select-icon:hover,
-.navbar .select-icon.open {
-  border-color: var(--border-strong);
-  background: var(--surface);
-}
-
-.navbar .select-icon svg {
-  flex: none;
-  color: var(--text-3);
-  font-size: 11px;
-  transition: transform 0.2s ease;
-}
-
-/* The chevron flips; the menu button's bars are not a chevron and must stay put. */
-.navbar .account-menu .select-icon.open svg {
-  transform: rotate(180deg);
-}
-
 .navbar .nav-menu-button svg {
   font-size: 14px;
-}
-
-.navbar .dropdown {
-  position: absolute;
-  top: calc(100% + var(--space-4));
-  right: 0;
-  z-index: 10;
-  display: block;
-  min-width: 100%;
-  overflow: hidden;
-  padding: var(--space-4) 0;
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  background: var(--surface);
-  box-shadow: var(--shadow-pop);
 }
 
 .navbar .nav-menu-dropdown {
@@ -230,52 +153,6 @@
 
 .navbar .nav-menu-dropdown a {
   justify-content: space-between;
-}
-
-.navbar .account-dropdown {
-  min-width: 240px;
-  padding: var(--space-4);
-}
-
-.navbar .account-identity {
-  display: grid;
-  gap: var(--space-4);
-  margin: 0;
-  padding: var(--space-8) var(--gap);
-  border-bottom: 1px solid var(--border);
-}
-
-.navbar .account-name {
-  color: var(--text);
-  font-size: var(--fs);
-  font-weight: 600;
-}
-
-.navbar .account-email {
-  overflow: hidden;
-  color: var(--text-3);
-  font-size: 12px;
-  text-overflow: ellipsis;
-}
-
-.navbar .account-logout {
-  display: block;
-  width: 100%;
-  margin-top: var(--space-4);
-  padding: var(--space-8) var(--gap);
-  border: none;
-  border-radius: var(--r);
-  background: none;
-  color: var(--text-2);
-  font-size: var(--fs);
-  text-align: left;
-  cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.navbar .account-logout:hover {
-  background: var(--surface-2);
-  color: var(--text);
 }
 
 @media (max-width: 899.98px) {

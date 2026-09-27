@@ -196,7 +196,7 @@
 /* A disabled action says why in text: a phone has no hover, and `title` is unreachable there. */
 .admin-row-reason {
   margin: var(--space-8) 0 0;
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
   line-height: 1.4;
 }
@@ -261,7 +261,7 @@
 
 .admin-locked {
   margin: 0 0 var(--gap);
-  color: var(--text-3);
+  color: var(--text-2);
   font-size: calc(var(--fs) - 1px);
   line-height: 1.4;
 }

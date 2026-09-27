@@ -361,11 +361,7 @@ const AdminBoardPage = () => {
   );
 
   return (
-    <section className="admin-section" aria-labelledby="admin-board-title">
-      <div className="admin-section-head">
-        <p className="admin-section-kicker">Состав</p>
-        <h2 id="admin-board-title">Команды набора «{board.trackName}»</h2>
-      </div>
+    <section className="admin-section">
 
       {locked && <p className="admin-locked">Набор передан — правки в кабинете ПД.</p>}
 

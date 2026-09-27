@@ -31,3 +31,6 @@ dist-ssr
 # Playwright smoke output
 test-results/
 playwright-report/
+
+# Impeccable design-critique snapshots: a local archive, not project history
+.impeccable/critique/
