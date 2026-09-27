@@ -268,10 +268,30 @@
 
 /* A history entry is a sentence, not a record with actions: the sentence leads, the rest is meta. */
 .admin-entry-summary {
+  max-width: 80ch;
   margin: 0;
   color: var(--text);
   font-size: var(--fs);
   line-height: 1.45;
+}
+
+/* A person in the history leads to what they did (#74). Underlined at rest: inside running text,
+   colour alone does not tell a link from the words around it. */
+.admin-entry-person {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-border);
+  text-underline-offset: 3px;
+}
+
+.admin-entry-person:hover {
+  text-decoration-color: currentColor;
+}
+
+.admin-entry-person:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
 }
 
 .admin-entry-kind {

@@ -8,6 +8,7 @@ import { redirectToLogin } from "../api/authRedirect";
 import { useIdentity } from "../context/identityContext";
 import useAdminList from "../hooks/useAdminList";
 import useConfirmAction from "../hooks/useConfirmAction";
+import { actorHistoryPath } from "../utils/activity";
 
 const PAGE_SIZE = 20;
 // The backend's own sentence (UserService.assertNotTheLastAdmin), said before it has to refuse.
@@ -57,7 +58,7 @@ const AdminAccessPage = () => {
   };
 
   const showHistory = (user) => {
-    navigate(`/admin/history?actor=${user.id}&name=${encodeURIComponent(user.fio)}`);
+    navigate(actorHistoryPath(user.id, user.fio));
   };
 
   const askGrant = (user) => {
