@@ -91,8 +91,57 @@
   line-height: 1.4;
 }
 
+/* Right under the summary box, which already sets it apart: spacing, no second rule. */
 .settings-handover {
+  margin-top: var(--gap);
+}
+
+/* ---- Ending the selection (#73) ----
+   Its own frame, in the warning palette the app keeps for what cannot be taken back lightly; the
+   buttons in it are outlined, so nothing here looks like «Сохранить». */
+
+.admin-section.settings-finish {
+  border-color: var(--warn-border);
+}
+
+.settings-summary {
+  margin: var(--space-8) 0 0;
+  padding: var(--space-8) var(--gap);
+  border-radius: var(--r);
+  background: var(--warn-bg);
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Only inside the zone, where something stands above it; alone under «Начать набор» it needs none. */
+.settings-finish .settings-new {
   margin-top: var(--gap);
   padding-top: var(--gap);
   border-top: 1px solid var(--hairline);
+}
+
+.settings-actions button.settings-neutral,
+.settings-actions button.settings-danger {
+  background: var(--surface);
+}
+
+.settings-actions button.settings-neutral {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.settings-actions button.settings-neutral:hover:not(:disabled) {
+  border-color: var(--text-2);
+  background: var(--surface-2);
+}
+
+.settings-actions button.settings-danger {
+  border-color: var(--bad-border);
+  color: var(--bad);
+}
+
+.settings-actions button.settings-danger:hover:not(:disabled) {
+  border-color: var(--bad);
+  background: var(--bad-bg);
 }

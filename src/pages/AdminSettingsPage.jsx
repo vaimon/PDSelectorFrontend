@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
+import SelectionSummary from "../components/admin-shell/SelectionSummary";
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
 import { useIdentity } from "../context/identityContext";
 import { useNotifications } from "../context/notificationContext";
@@ -18,6 +20,7 @@ import {
   validate,
   validateNewSelection,
 } from "../utils/trackForm";
+import { summarize } from "../utils/overview";
 import "./AdminSettingsPage.css";
 
 const EMPTY_NEW_SELECTION = { name: "", startDate: "", endDate: "" };
@@ -36,6 +39,10 @@ const AdminSettingsPage = () => {
   const { handedOver } = useHandOver();
   const { notify } = useNotifications();
   const { ask, confirmProps } = useConfirmAction(refreshIdentity);
+  // Loaded by the shell (#68); here it says where the selection stands before anything ends it (#73).
+  const { overview, reload: reloadOverview } = useOutletContext();
+  const standing = summarize(overview);
+  const opening = standing ? `${standing} ` : "";
 
   const initial = useMemo(
     () => (activeTrack ? toFormValues(activeTrack) : null),
@@ -102,13 +109,15 @@ const AdminSettingsPage = () => {
     ask({
       heading: "Начать новый набор?",
       description: activeTrack
-        ? `Набор «${activeTrack.name}» перестанет быть текущим: его команды и анкеты останутся, но изменить их будет нельзя. Цели и тип перейдут на новый набор.`
+        ? `${opening}Набор «${activeTrack.name}» перестанет быть текущим: его команды и анкеты останутся, но изменить их будет нельзя. Цели и тип перейдут на новый набор.`
         : "Новый набор станет текущим: в нём можно будет заполнять анкеты и собирать команды.",
       confirmText: "Начать новый набор",
       successText: "Новый набор начат",
       run: () => startNewSelection(toNewSelectionPayload(newSelection)),
       after: async () => {
         await refreshIdentity();
+        // The summary above was about the selection that just ended; the new one starts from zero.
+        reloadOverview();
         setNewSelection(EMPTY_NEW_SELECTION);
       },
     });
@@ -116,7 +125,7 @@ const AdminSettingsPage = () => {
 
   const askHandOver = () => ask({
     heading: "Отметить набор переданным?",
-    description: `Набор «${activeTrack.name}» будет отмечен как переданный в кабинет ПД, и здесь его больше нельзя будет изменить. Отметку можно снять.`,
+    description: `${opening}Набор «${activeTrack.name}» будет отмечен как переданный в кабинет ПД: составы здесь замораживаются для всех, включая администраторов. Отметку можно снять здесь же.`,
     confirmText: "Отметить переданным",
     successText: "Набор отмечен как переданный",
     run: () => handOverTrack(activeTrack.id),
@@ -267,12 +276,43 @@ const AdminSettingsPage = () => {
         )}
       </section>
 
-      <section className="admin-section" aria-labelledby="admin-next-title">
+      {/* What ends a selection, apart from the form that tunes it (#73): where the selection stands
+          first, then the usual next step, the hand-over, and the most drastic one last. */}
+      <section
+        className={`admin-section${activeTrack ? " settings-finish" : ""}`}
+        aria-labelledby="admin-next-title"
+      >
         <h2 id="admin-next-title" className="admin-section-title">
-          {activeTrack ? "Закончить этот набор" : "Начать набор"}
+          {activeTrack ? "Завершение набора" : "Начать набор"}
         </h2>
 
-        <form className="settings-form" onSubmit={askNewSelection}>
+        {activeTrack && <SelectionSummary overview={overview} />}
+
+        {activeTrack && (
+          <div className="settings-handover">
+            {/* Deliberately not «отправляет составы»: `handOver` writes a timestamp and nothing
+                else. Core normally marks the hand-over itself through the integration API, and
+                this button is for the case where the import happened without it. */}
+            <p className="settings-note">
+              {handedOver
+                ? "Набор отмечен как переданный: дальше с составами работают в кабинете ПД, а здесь изменить его нельзя. Отметку можно снять, пока составы там не разобрали."
+                : "Отметка ставится, когда составы забрал кабинет ПД — там этапы, защиты и оценки. После неё набор здесь только для чтения."}
+            </p>
+            <div className="settings-actions">
+              {handedOver ? (
+                <button type="button" className="settings-neutral" onClick={askCancelHandOver}>
+                  Снять отметку о передаче
+                </button>
+              ) : (
+                <button type="button" className="settings-neutral" onClick={askHandOver}>
+                  Отметить переданным
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <form className="settings-form settings-new" onSubmit={askNewSelection}>
           <p className="settings-note">
             {activeTrack
               ? "Новый набор становится текущим, а этот — архивом: его команды и анкеты остаются, но меняться перестают. Цели и тип перейдут с текущего набора."
@@ -334,31 +374,12 @@ const AdminSettingsPage = () => {
           </div>
 
           <div className="settings-actions">
-            <button type="submit">Начать новый набор</button>
+            <button type="submit" className={activeTrack ? "settings-danger" : undefined}>
+              Начать новый набор
+            </button>
           </div>
         </form>
 
-        {activeTrack && (
-          <div className="settings-handover">
-            {/* Deliberately not «отправляет составы»: `handOver` writes a timestamp and nothing
-                else. Core normally marks the hand-over itself through the integration API, and
-                this button is for the case where the import happened without it. */}
-            <p className="settings-note">
-              {handedOver
-                ? "Набор отмечен как переданный: дальше с составами работают в кабинете ПД, а здесь изменить его нельзя. Отметку можно снять, пока составы там не разобрали."
-                : "Отметка ставится, когда составы забрал кабинет ПД — там этапы, защиты и оценки. После неё набор здесь только для чтения."}
-            </p>
-            <div className="settings-actions">
-              {handedOver ? (
-                <button type="button" onClick={askCancelHandOver}>
-                  Снять отметку о передаче
-                </button>
-              ) : (
-                <button type="button" onClick={askHandOver}>Отметить переданным</button>
-              )}
-            </div>
-          </div>
-        )}
       </section>
 
       <ConfirmDialog {...confirmProps} />

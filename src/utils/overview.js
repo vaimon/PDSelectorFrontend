@@ -131,3 +131,25 @@ export const poolBalance = (board) => {
 };
 
 export const overTargetCount = (board) => board.teams.filter((team) => team.status === 'OVER_TARGET').length;
+
+/**
+ * Where the selection stands, as one sentence (#73) — what the organiser should see before anything
+ * that ends it: «Собрано 22 из 28 команд, 10 человек без команды.»
+ *
+ * Null while the overview is not there (loading, failed, no selection): a sentence made of zeros
+ * would tell the organiser everything is empty, which is the one thing not known.
+ */
+export const summarize = (overview) => {
+  if (!overview) return null;
+  const { teams, students } = overview;
+
+  if (teams.total > 0 && teams.complete === teams.total && students.withoutTeam === 0) {
+    return teams.total === 1
+      ? 'Команда собрана, без команды никого.'
+      : `Все ${teams.total} ${plural(teams.total, ['команда', 'команды', 'команд'])} собраны, без команды никого.`;
+  }
+
+  const collected = `Собрано ${teams.complete} из ${teams.total} ${plural(teams.total, ['команды', 'команд', 'команд'])}`;
+  const without = `${students.withoutTeam} ${plural(students.withoutTeam, ['человек', 'человека', 'человек'])} без команды`;
+  return `${collected}, ${without}.`;
+};
