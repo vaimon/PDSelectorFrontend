@@ -57,14 +57,6 @@ export const forecast = (history, windowOpen) => {
   return { pace, projected, endDate };
 };
 
-/** «нужно 2 × 1 курс, 1 × 2 курс» */
-export const describeNeed = (needFirst, needSecond) => {
-  const parts = [];
-  if (needFirst > 0) parts.push(`${needFirst} × 1 курс`);
-  if (needSecond > 0) parts.push(`${needSecond} × 2 курс`);
-  return `нужно ${parts.join(', ')}`;
-};
-
 /**
  * The short teams, grouped by how many people each is missing, the nearest to done first: those are
  * the ones a single placement finishes.
@@ -76,7 +68,7 @@ export const gapBuckets = (board) => {
       const needFirst = Math.max(0, team.firstYearTarget - team.firstYears);
       const needSecond = Math.max(0, team.secondYearTarget - team.secondYears);
       const lead = team.members.find((member) => member.id === team.leadId);
-      return { team, lead, needFirst, needSecond, missing: needFirst + needSecond };
+      return { team, lead, missing: needFirst + needSecond };
     })
     .sort((a, b) => a.missing - b.missing || a.team.name.localeCompare(b.team.name, 'ru'));
 

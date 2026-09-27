@@ -64,7 +64,6 @@
   display: grid;
   min-width: 0;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-  align-items: start;
   gap: var(--gap);
 }
 
@@ -163,14 +162,6 @@
   margin-left: var(--space-8);
 }
 
-.board-counters {
-  margin: 0;
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: calc(var(--fs) - 1px);
-  letter-spacing: var(--track-num);
-}
-
 .board-students {
   display: flex;
   margin: 0;
@@ -216,8 +207,10 @@
   font-size: calc(var(--fs) - 1px);
 }
 
+/* Cards of a row share its height (#78), so the one action a short team has lines up across it. */
 .board-team-actions {
   display: flex;
+  margin-top: auto;
   padding-top: var(--space-8);
   border-top: 1px solid var(--hairline);
 }
@@ -266,19 +259,6 @@
 .board-team-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-.board-team-places {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8);
-}
-
-.board-team-pips {
-  display: inline-flex;
-  gap: var(--gap);
 }
 
 @media (prefers-reduced-motion: reduce) {

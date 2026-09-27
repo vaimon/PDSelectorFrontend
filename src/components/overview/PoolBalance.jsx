@@ -57,7 +57,7 @@ const PoolBalance = ({ board }) => {
       </header>
       <div className="balance-years">
         <Year title="1 курс" stat="first-year" year={firstYear} />
-        <Year title="2 курс и старше" stat="second-year" year={secondYear} />
+        <Year title="2+ курс" stat="second-year" year={secondYear} />
       </div>
     </section>
   );

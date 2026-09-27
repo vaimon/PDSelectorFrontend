@@ -26,7 +26,7 @@ const StatsStrip = ({ overview, overTarget }) => {
         </div>
         <p className="overview-legend">
           <span><i className="is-accent" aria-hidden="true" />1 курс <Figure stat="registered-first-year">{students.firstYear}</Figure></span>
-          <span><i className="is-soft" aria-hidden="true" />2 курс и старше <Figure stat="registered-second-year">{students.secondYear}</Figure></span>
+          <span><i className="is-soft" aria-hidden="true" />2+ курс <Figure stat="registered-second-year">{students.secondYear}</Figure></span>
         </p>
       </div>
 
@@ -44,7 +44,7 @@ const StatsStrip = ({ overview, overTarget }) => {
             <i className="is-warn" aria-hidden="true" />без команды <Figure stat="without-team">{students.withoutTeam}</Figure>
           </Link>
           <span>1 курс <Figure stat="without-team-first-year">{students.firstYearWithoutTeam}</Figure></span>
-          <span>2 курс и старше <Figure stat="without-team-second-year">{students.secondYearWithoutTeam}</Figure></span>
+          <span>2+ курс <Figure stat="without-team-second-year">{students.secondYearWithoutTeam}</Figure></span>
         </p>
       </div>
 

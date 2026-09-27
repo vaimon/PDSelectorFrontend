@@ -25,6 +25,11 @@
   color: var(--text);
 }
 
+.icon-action.is-danger:hover:not(:disabled) {
+  border-color: var(--bad-border);
+  color: var(--bad);
+}
+
 .icon-action:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
@@ -41,8 +46,9 @@
 }
 
 /* The label, shown where the icon is pointed at or focused — not only on hover, as a `title` is.
-   Beside the icon, not above it: the pool scrolls, and a label above its first row would be cut. */
-.icon-action[data-tip]:hover:not(:disabled)::after,
+   Beside the icon, not above it: the pool scrolls, and a label above its first row would be cut.
+   A disabled icon still says what it is (#78); one with a `title` says why instead, natively. */
+.icon-action[data-tip]:not([title]):hover::after,
 .icon-action[data-tip]:focus-visible::after {
   content: attr(data-tip);
   position: absolute;
@@ -137,4 +143,23 @@
 
 .pip.is-over {
   background: var(--accent);
+}
+
+.course-slots {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--gap);
+}
+
+.course-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.course-slot-label {
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 2px);
+  white-space: nowrap;
 }

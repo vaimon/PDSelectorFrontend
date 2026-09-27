@@ -21,7 +21,7 @@ const PoolPicker = ({ board, team, onPick, onCancel }) => {
 
   const years = [
     { key: "first", label: "1 курс", need: Math.max(0, team.firstYearTarget - team.firstYears), first: true },
-    { key: "second", label: "2 курс", need: Math.max(0, team.secondYearTarget - team.secondYears), first: false },
+    { key: "second", label: "2+ курс", need: Math.max(0, team.secondYearTarget - team.secondYears), first: false },
   ]
     .filter((year) => year.need > 0)
     .map((year) => ({

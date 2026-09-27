@@ -268,7 +268,7 @@ test('the team says who it is still short of, and so does the catalogue', async 
 
   // Two of six places taken: the lead and the first-year who just joined.
   await openOwnTeamPage(lead);
-  await expect(lead.getByText('1 курс — 1 из 3 · 2 курс и старше — 1 из 3')).toBeVisible();
+  await expect(lead.getByText('1 курс — 1 из 3 · 2+ курс — 1 из 3')).toBeVisible();
   await expect(lead.getByText(/^Не хватает: 2 первокурсника, 2 второкурсника\. Собрать состав можно до /))
     .toBeVisible();
   await expectNoSidewaysScroll(lead, testInfo);
@@ -277,7 +277,7 @@ test('the team says who it is still short of, and so does the catalogue', async 
   // two numbers, not one, so «есть свободные места» alone would not answer them.
   await lead.goto('/teams');
   const card = lead.locator('.card').filter({ has: lead.getByRole('heading', { name: teamName }) });
-  await expect(card.locator('.card-place')).toHaveText(['1 курс:1/3', '2 курс:1/3']);
+  await expect(card.locator('.card-place')).toHaveText(['1 курс:1/3', '2+ курс:1/3']);
   await expectNoSidewaysScroll(lead, testInfo);
 });
 
@@ -386,7 +386,7 @@ test('the lead removes a member and another one leaves', async ({ browser }, tes
   await expect(members.locator('.card-badge')).toHaveText(['Тимлид']);
   await expect(lead.getByRole('button', { name: 'Выйти из команды' })).toHaveCount(0);
   await expect(lead.getByRole('button', { name: 'Распустить команду' })).toBeVisible();
-  await expect(members.getByText('1 курс — 2 из 3 · 2 курс и старше — 2 из 3')).toBeVisible();
+  await expect(members.getByText('1 курс — 2 из 3 · 2+ курс — 2 из 3')).toBeVisible();
   await expectNoSidewaysScroll(lead, testInfo);
 
   // The rest happens inside the running app: the roster has to change on its own, and a reload
@@ -399,7 +399,7 @@ test('the lead removes a member and another one leaves', async ({ browser }, tes
   await confirm(lead, 'Исключить участника?', 'Исключить');
   await expect(lead.getByRole('status')).toContainText('Участник исключён');
   await expect(inviteeCard).toHaveCount(0);
-  await expect(members.getByText('1 курс — 1 из 3 · 2 курс и старше — 2 из 3')).toBeVisible();
+  await expect(members.getByText('1 курс — 1 из 3 · 2+ курс — 2 из 3')).toBeVisible();
   expect(await lead.evaluate(() => window.__sameDocument), 'the roster changed without reloading').toBe(true);
 
   // The one who joined by the link leaves on their own — and manages nobody else on the way.
@@ -501,7 +501,10 @@ test('the admin lands on the overview and sees the team @desktop', async ({ brow
   const gap = page.getByRole('region', { name: 'Кому не хватает людей' });
   const teamRow = gap.getByRole('link', { name: new RegExp(teamName) });
   await expect(gap.getByText('Не хватает 3 человек')).toBeVisible();
-  await expect(teamRow).toContainText('нужно 2 × 1 курс, 1 × 2 курс');
+  await expectPlaces(teamRow, '1 из 3', '2 из 3');
+  await expect(teamRow, 'the dots say it; no «нужно 2 × 1 курс» beside them (#78)').not.toContainText('нужно');
+  await expect(page.getByText('2 курс и старше'), 'one term for the older years: «2+ курс»').toHaveCount(0);
+  await expect(page.locator('[data-stat="registered-second-year"]').locator('..')).toContainText('2+ курс');
 
   // Whether the pool can fill it: one first-year for two places, two second-years for one.
   const balance = page.getByRole('region', { name: 'Хватит ли свободных людей' });
@@ -636,7 +639,7 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   expect(seededEnd, 'the seed gives the selection an end date').toBeTruthy();
   await page.goto('/teams');
   await expect(teamComposition(page), 'the target before the change')
-    .toHaveText(['1 курс:1/3', '2 курс:2/3']);
+    .toHaveText(['1 курс:1/3', '2+ курс:2/3']);
   await page.goto('/admin/settings');
 
   const movedEnd = shiftDay(seededEnd, -1);
@@ -650,7 +653,7 @@ test('the organiser moves the targets and the deadline, and marks the selection 
   // The target is not stored on a team: it is the track's, and every team without one of its own
   // reads it on the next request. The catalogue is where that becomes visible.
   await page.goto('/teams');
-  await expect(teamComposition(page)).toHaveText(['1 курс:1/4', '2 курс:2/3']);
+  await expect(teamComposition(page)).toHaveText(['1 курс:1/4', '2+ курс:2/3']);
 
   // The new deadline reaches the shell, which reads the same track the form just wrote.
   await page.goto('/admin/settings');
@@ -753,9 +756,15 @@ test('the organiser fixes a student and a team by hand @desktop', async ({ brows
   // The lead is not offered for deletion — the backend would refuse it. Why is said once for the
   // list (#74), and the disabled button carries it for whoever reaches it.
   const lead = adminRow(page, people.lead.fio);
-  await expect(lead.getByRole('button', { name: 'Удалить' })).toBeDisabled();
-  await expect(lead.getByRole('button', { name: 'Удалить' }))
-    .toHaveAccessibleDescription(/передайте роль тимлида/);
+  const leadDelete = lead.getByRole('button', { name: `Удалить: ${people.lead.fio}`, exact: true });
+  await expect(leadDelete).toBeDisabled();
+  await expect(leadDelete).toHaveAccessibleDescription(/передайте роль тимлида/);
+
+  // A row's actions are icons (#78), each named after what it acts on; no row of word buttons.
+  for (const action of ['История', 'Изменить']) {
+    await expect(lead.getByRole('button', { name: `${action}: ${people.lead.fio}`, exact: true })).toHaveText('');
+  }
+  await expect(leadDelete).toHaveText('');
   await expect(page.getByText('передайте роль тимлида')).toHaveCount(1);
   await expect(lead.getByText('передайте роль тимлида')).toHaveCount(0);
 
@@ -888,6 +897,16 @@ function boardTeam(page, name) {
   return page.locator('.board-team').filter({ has: page.getByRole('heading', { name, exact: true }) });
 }
 
+/**
+ * A team's places as the admin area draws them (#78): each year a course label and its pips, the
+ * count said in words once, to assistive tech — never again as text beside the dots.
+ */
+async function expectPlaces(scope, firstYears, secondYears) {
+  await expect(scope.getByRole('img', { name: `1 курс: ${firstYears}`, exact: true })).toBeVisible();
+  await expect(scope.getByRole('img', { name: `2+ курс: ${secondYears}`, exact: true })).toBeVisible();
+  await expect(scope).not.toContainText(/\d\/\d/);
+}
+
 test('the organiser completes a team from the pool on the board, drags a student and takes a move back @desktop', async ({ browser }) => {
   expect(teamName && people.friend, 'builds on the journey; run the whole file').toBeTruthy();
   const friend = people.friend;
@@ -913,7 +932,7 @@ test('the organiser completes a team from the pool on the board, drags a student
   // By now the run's team is its lead and the seeded second-year (2 курс) and one first-year; the
   // friend (2 курс) left it and waits in the pool.
   const team = boardTeam(page, teamName);
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expectPlaces(team, '1 из 3', '2 из 3');
   const pool = page.locator('.board-pool');
   await expect(pool).toContainText(friend.fio);
 
@@ -927,10 +946,10 @@ test('the organiser completes a team from the pool on the board, drags a student
   await team.getByRole('button', { name: 'Добавить из пула' }).click();
   const picker = page.getByRole('dialog');
   await expect(picker.getByRole('group', { name: '1 курс · нужно 2' })).toBeVisible();
-  const secondYears = picker.getByRole('group', { name: '2 курс · нужен 1' });
+  const secondYears = picker.getByRole('group', { name: '2+ курс · нужен 1' });
   await secondYears.getByRole('button', { name: friend.fio }).click();
 
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+  await expectPlaces(team, '1 из 3', '3 из 3');
   await expect(team).toContainText(friend.fio);
   await expect(pool).not.toContainText(friend.fio);
 
@@ -950,7 +969,7 @@ test('the organiser completes a team from the pool on the board, drags a student
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await toggle.click();
   await expect(team.getByText(friend.fio)).toBeHidden();
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+  await expectPlaces(team, '1 из 3', '3 из 3');
   await toggle.click();
   await expect(team.getByText(friend.fio)).toBeVisible();
 
@@ -961,7 +980,7 @@ test('the organiser completes a team from the pool on the board, drags a student
   const byTheName = { sourcePosition: { x: 8, y: 8 } };
   await friendRow().dragTo(pool, byTheName);
   await expect(page.getByRole('status')).toContainText(`${friend.fio} — без команды`);
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expectPlaces(team, '1 из 3', '2 из 3');
   await expect(pool).toContainText(friend.fio);
 
   // From the pool the one action is an icon, named for the person it moves; looking and leaving
@@ -974,14 +993,14 @@ test('the organiser completes a team from the pool on the board, drags a student
 
   await friendRow().dragTo(team, byTheName);
   await expect(page.getByRole('status')).toContainText(`${friend.fio} — в команде «${teamName}»`);
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+  await expectPlaces(team, '1 из 3', '3 из 3');
 
   // The last move can be taken back; after that there is nothing left to undo.
   const undoBar = page.locator('.board-undo');
   await expect(undoBar).toContainText(friend.fio);
   await undoBar.getByRole('button', { name: 'Отменить' }).click();
   await expect(page.getByRole('status')).toContainText('Перемещение отменено');
-  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expectPlaces(team, '1 из 3', '2 из 3');
   await expect(pool).toContainText(friend.fio);
   await expect(undoBar).toHaveCount(0);
 

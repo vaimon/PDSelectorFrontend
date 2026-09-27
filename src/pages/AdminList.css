@@ -12,35 +12,6 @@
   gap: var(--gap);
 }
 
-/* Two states of one control, not two actions: the pressed one reads as the current view. */
-.admin-toggle {
-  display: inline-flex;
-  overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r);
-}
-
-.admin-toggle button {
-  min-height: var(--ctrl-h);
-  padding: 0 var(--pad);
-  border: 0;
-  background: var(--surface);
-  color: var(--text-2);
-  font: inherit;
-  font-size: var(--fs);
-  cursor: pointer;
-}
-
-.admin-toggle button + button {
-  border-left: 1px solid var(--border-strong);
-}
-
-.admin-toggle button[aria-pressed="true"] {
-  background: var(--accent-weak);
-  color: var(--accent-text);
-  font-weight: 500;
-}
-
 .admin-search {
   display: flex;
   align-items: center;
@@ -137,6 +108,12 @@
   gap: var(--space-8);
 }
 
+/* A row's actions as icons (#78): a list of rows reads by its names, not by a wall of equal buttons. */
+.admin-row-icons {
+  display: flex;
+  gap: var(--space-4);
+}
+
 /* Scoped to the row's own controls: an editor rendered inside a row (the team form and its modal)
    brings its own button styles, which a bare .admin-row button would override. */
 .admin-row-actions button,
@@ -170,7 +147,6 @@
 
 .admin-row-actions button:focus-visible,
 .admin-row-form button:focus-visible,
-.admin-toggle button:focus-visible,
 .admin-search button:focus-visible,
 .admin-filter button:focus-visible {
   outline: 2px solid var(--accent);
