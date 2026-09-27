@@ -9,8 +9,8 @@ const fromField = (value) => (value.trim() === "" ? null : Number(value));
 const digitsOnly = (value) => value.replace(/[^0-9]/g, "");
 
 /**
- * «Исключение для команды»: the team's own per-year targets. An empty field means the selection's
- * target, so clearing both takes the exception away.
+ * «Свои цели» (#72; «Исключение для команды» before it): the team's own per-year targets. An empty
+ * field means the selection's target, so clearing both takes the exception away.
  */
 const TargetsDialog = ({ team, board, busy, onSave, onCancel }) => {
   const [first, setFirst] = useState(toField(team.firstYearOverride));

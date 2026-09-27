@@ -523,27 +523,6 @@
   font-style: normal;
 }
 
-.gap-pips {
-  display: inline-flex;
-  gap: var(--space-4);
-}
-
-.gap-pip {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--text-2);
-}
-
-.gap-pip.is-open {
-  border: 1.5px dashed var(--warn);
-  background: transparent;
-}
-
-.gap-pip.is-over {
-  background: var(--accent);
-}
-
 .gap-chevron {
   width: 16px;
   height: 16px;

@@ -1,18 +1,7 @@
 import { Link } from "react-router-dom";
 
+import Pips from "../board/Pips";
 import { describeNeed, gapBuckets, missingLabel, teamsLabel } from "../../utils/overview";
-
-/** Filled places, open ones, and any taken over the target, for one year of one team. */
-const Pips = ({ have, target }) => (
-  <span className="gap-pips">
-    {Array.from({ length: Math.max(have, target) }, (_, index) => (
-      <span
-        key={index}
-        className={`gap-pip${index >= have ? " is-open" : index >= target ? " is-over" : ""}`}
-      />
-    ))}
-  </span>
-);
 
 /**
  * «Кому не хватает людей» (#69): the short teams, nearest to done first, each a way into the board

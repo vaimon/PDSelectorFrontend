@@ -897,15 +897,42 @@ test('the organiser completes a team from the pool on the board, drags a student
   const pool = page.locator('.board-pool');
   await expect(pool).toContainText(friend.fio);
 
-  await pool.locator('.board-student').filter({ hasText: friend.fio })
-    .getByRole('button', { name: 'Переместить в…' }).click();
+  // A quiet board (#72): what a card or a row can do waits behind its «⋯», and the only thing out
+  // in the open is what a short team needs — people. Nothing destructive lies on the surface.
+  await expect(page.getByRole('button', { name: 'Расформировать', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Назначить тимлидом' })).toHaveCount(0);
+
+  // The team is short of two first-years and a second-year; «Добавить из пула» offers exactly those
+  // years, and the friend is a second-year.
+  await team.getByRole('button', { name: 'Добавить из пула' }).click();
   const picker = page.getByRole('dialog');
-  await expect(picker).toContainText(friend.fio);
-  await picker.getByRole('button', { name: teamName }).click();
+  await expect(picker.getByRole('group', { name: '1 курс · нужно 2' })).toBeVisible();
+  const secondYears = picker.getByRole('group', { name: '2 курс · нужен 1' });
+  await secondYears.getByRole('button', { name: friend.fio }).click();
 
   await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
   await expect(team).toContainText(friend.fio);
   await expect(pool).not.toContainText(friend.fio);
+
+  // A member's actions, named after them, from the keyboard: the menu opens on its button and
+  // Escape puts the focus back where it came from.
+  const friendActions = team.getByRole('button', { name: `Действия: ${friend.fio}` });
+  await friendActions.click();
+  const menu = page.getByRole('menu');
+  await expect(menu.getByRole('menuitem', { name: 'Переместить в…' })).toBeVisible();
+  await expect(menu.getByRole('menuitem', { name: 'Сделать тимлидом' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(friendActions).toBeFocused();
+
+  // Still short of first-years, so the card is open; it folds to its counters and back.
+  const toggle = team.getByRole('button', { name: teamName, exact: true });
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await toggle.click();
+  await expect(team.getByText(friend.fio)).toBeHidden();
+  await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 3/3');
+  await toggle.click();
+  await expect(team.getByText(friend.fio)).toBeVisible();
 
   // The same moves by hand: dragged out of the team into the pool, and from the pool onto it again.
   // The counters change before the server answers; the toast is its answer. The row is grabbed by
@@ -915,6 +942,14 @@ test('the organiser completes a team from the pool on the board, drags a student
   await friendRow().dragTo(pool, byTheName);
   await expect(page.getByRole('status')).toContainText(`${friend.fio} — без команды`);
   await expect(team.locator('.board-counters')).toHaveText('1 курс 1/3 · 2 курс 2/3');
+  await expect(pool).toContainText(friend.fio);
+
+  // From the pool the one action is an icon, named for the person it moves; looking and leaving
+  // changes nothing.
+  await pool.getByRole('button', { name: `Переместить в команду: ${friend.fio}` }).click();
+  await expect(page.getByRole('dialog')).toContainText(`Куда переместить: ${friend.fio}`);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(pool).toContainText(friend.fio);
 
   await friendRow().dragTo(team, byTheName);

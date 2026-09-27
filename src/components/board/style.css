@@ -104,3 +104,25 @@
   flex-wrap: wrap;
   gap: var(--space-4);
 }
+
+/* «Добавить из пула» (#72): one group per year the team is short of. */
+.board-pick-year {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.board-pick-year + .board-pick-year {
+  margin-top: var(--gap);
+}
+
+.board-pick-year-title {
+  margin: 0;
+  color: var(--text-2);
+  font-size: calc(var(--fs) - 1px);
+  font-weight: 600;
+}
+
+.board-pick-year .board-destinations {
+  max-height: min(30vh, 260px);
+}

@@ -2,9 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import ConfirmDialog from "../components/confirm-dialog/ConfirmDialog";
+import ActionMenu from "../components/board/ActionMenu";
+import IconAction from "../components/board/IconAction";
 import LeadPicker from "../components/board/LeadPicker";
 import MovePicker from "../components/board/MovePicker";
+import Pips from "../components/board/Pips";
+import PoolPicker from "../components/board/PoolPicker";
 import TargetsDialog from "../components/board/TargetsDialog";
+import { AddToTeamIcon, ChevronIcon } from "../components/icons/AdminIcons";
 import { changeTeamLead, dissolveTeam, fetchBoard, moveStudent, setTeamTargets } from "../api/apiBoard";
 import { useNotifications } from "../context/notificationContext";
 import useHandOver from "../hooks/useHandOver";
@@ -19,6 +24,7 @@ import {
   filterTeams,
   courseLabel,
   hasOwnTargets,
+  isShort,
 } from "../utils/board";
 import "./AdminBoardPage.css";
 
@@ -37,7 +43,11 @@ const studentMeta = (student) => `${courseLabel(student.course)}${student.group 
  *
  * The questions a move needs (over target? who leads next? dissolve?) are asked before anything is
  * sent, from the same numbers the server will check; if it still refuses, that was a race. A move
- * starts from «Переместить в…» or from dragging a row (#56) — both end in the same `advance`.
+ * starts from «Переместить в…», from «Добавить из пула» on a short team, or from dragging a row
+ * (#56) — all end in the same `advance`.
+ *
+ * What a row or a card can do waits behind its «⋯» (#72); out in the open is only what a short team
+ * needs — people — and the pool's one action per student.
  *
  * The last move can be taken back until the next action on the board. Only a move: a dissolved
  * team, new targets or a new lead are confirmed before they happen instead.
@@ -53,6 +63,10 @@ const AdminBoardPage = () => {
   // The move being prepared: who, from where, to where, and what has been answered so far.
   const [move, setMove] = useState(null);
   const [targetsOf, setTargetsOf] = useState(null);
+  const [poolFor, setPoolFor] = useState(null);
+  // Cards the organiser opened or folded; the rest follow the default — open while there is
+  // something to do with the team, folded once it is complete.
+  const [expanded, setExpanded] = useState({});
   const [confirmation, setConfirmation] = useState(null);
   const [lastMove, setLastMove] = useState(null);
   // What is being dragged lives in a ref: the first `dragover` fires before a state update renders,
@@ -97,6 +111,8 @@ const AdminBoardPage = () => {
     arrivedAt.current = hash;
     const card = document.getElementById(hash.slice(1));
     if (!card) return undefined;
+    // Somebody came to act on this team: its members have to be in sight, folded or not.
+    setExpanded((current) => ({ ...current, [card.id.slice("team-".length)]: true }));
     card.scrollIntoView({ block: "center" });
     card.focus({ preventScroll: true });
     setArrived(card.id);
@@ -236,6 +252,9 @@ const AdminBoardPage = () => {
    */
   const advance = (next) => {
     const { student, from, to } = next;
+    // The team somebody is being put into stays open, even when that move completes it — folding
+    // the card the organiser is working on would take the result out of sight.
+    if (to) setExpanded((current) => (to.id in current ? current : { ...current, [to.id]: true }));
     setConfirmation(null);
     if (to && !next.allowOverTarget && !canJoin(to, student.course)) {
       setMove(null);
@@ -367,16 +386,13 @@ const AdminBoardPage = () => {
     return `${last.student.name} — ${where}.${back}`;
   };
 
-  const moveButton = (student, from) => !locked && (
-    <button
-      type="button"
-      className="board-action"
-      disabled={busy}
-      onClick={() => setMove({ student, from, step: "pick" })}
-    >
-      Переместить в…
-    </button>
-  );
+  const isOpen = (team) => expanded[team.id] ?? team.status !== "COMPLETE";
+
+  const addFromPool = (student) => {
+    const to = board.teams.find((team) => team.id === poolFor.id) ?? poolFor;
+    setPoolFor(null);
+    advance({ student, from: null, to });
+  };
 
   return (
     <section className="admin-section">
@@ -449,7 +465,16 @@ const AdminBoardPage = () => {
                     <span className="board-student-name">{student.name}</span>
                     <span className="board-student-meta">{studentMeta(student)}</span>
                   </div>
-                  {moveButton(student, null)}
+                  {!locked && (
+                    <IconAction
+                      label={`Переместить в команду: ${student.name}`}
+                      tip="В команду…"
+                      disabled={busy}
+                      onClick={() => setMove({ student, from: null, step: "pick" })}
+                    >
+                      <AddToTeamIcon />
+                    </IconAction>
+                  )}
                 </li>
               ))}
             </ul>
@@ -473,15 +498,45 @@ const AdminBoardPage = () => {
               {...dropInto(team.id, team)}
             >
               <header className="board-team-head">
-                <h3 id={`team-${team.id}-name`}>{team.name}</h3>
+                <div className="board-team-title">
+                  <h3 id={`team-${team.id}-name`}>
+                    <button
+                      type="button"
+                      className={`board-team-toggle${isOpen(team) ? " is-open" : ""}`}
+                      aria-expanded={isOpen(team)}
+                      aria-controls={`team-${team.id}-members`}
+                      onClick={() => setExpanded((current) => ({ ...current, [team.id]: !isOpen(team) }))}
+                    >
+                      <ChevronIcon />
+                      {team.name}
+                    </button>
+                  </h3>
+                  {!locked && (
+                    <ActionMenu
+                      label={`Действия с командой «${team.name}»`}
+                      tip="Действия с командой"
+                      disabled={busy}
+                      items={[
+                        { label: "Свои цели…", onSelect: () => setTargetsOf(team) },
+                        { label: "Расформировать…", danger: true, onSelect: () => askDissolve(team) },
+                      ]}
+                    />
+                  )}
+                </div>
                 <p className="board-team-status">
                   <span className="board-status">{STATUS_LABELS[team.status]}</span>
                   {hasOwnTargets(team) && <span className="board-badge">свои цели</span>}
                 </p>
-                <p className="board-counters">{countersLine(team)}</p>
+                <div className="board-team-places">
+                  <p className="board-counters">{countersLine(team)}</p>
+                  <span className="board-team-pips">
+                    <Pips have={team.firstYears} target={team.firstYearTarget} />
+                    <Pips have={team.secondYears} target={team.secondYearTarget} />
+                  </span>
+                </div>
               </header>
 
-              <ul className="board-students">
+              <ul id={`team-${team.id}-members`} className="board-students" hidden={!isOpen(team)}>
                 {team.members.map((member) => (
                   <li key={member.id} className={rowClass(member)} {...dragFrom(member, team)}>
                     <div className="board-student-main">
@@ -492,36 +547,36 @@ const AdminBoardPage = () => {
                       <span className="board-student-meta">{studentMeta(member)}</span>
                     </div>
                     {!locked && (
-                      <div className="board-student-actions">
-                        {moveButton(member, team)}
-                        {member.id !== team.leadId && (
-                          <button
-                            type="button"
-                            className="board-action"
-                            disabled={busy}
-                            onClick={() => askLead(team, member)}
-                          >
-                            Назначить тимлидом
-                          </button>
-                        )}
-                      </div>
+                      <ActionMenu
+                        label={`Действия: ${member.name}`}
+                        disabled={busy}
+                        items={[
+                          {
+                            label: "Переместить в…",
+                            onSelect: () => setMove({ student: member, from: team, step: "pick" }),
+                          },
+                          {
+                            label: "Сделать тимлидом",
+                            hidden: member.id === team.leadId,
+                            onSelect: () => askLead(team, member),
+                          },
+                        ]}
+                      />
                     )}
                   </li>
                 ))}
               </ul>
 
-              {!locked && (
+              {!locked && isShort(team) && (
                 <footer className="board-team-actions">
-                  <button type="button" className="board-action" disabled={busy} onClick={() => setTargetsOf(team)}>
-                    Исключение для команды
-                  </button>
                   <button
                     type="button"
-                    className="board-action board-danger"
+                    className="board-action board-primary"
                     disabled={busy}
-                    onClick={() => askDissolve(team)}
+                    onClick={() => setPoolFor(team)}
                   >
-                    Расформировать
+                    <AddToTeamIcon />
+                    Добавить из пула
                   </button>
                 </footer>
               )}
@@ -544,6 +599,14 @@ const AdminBoardPage = () => {
           leaving={move.student}
           onPick={(newLeadId) => advance({ ...move, newLeadId })}
           onCancel={() => setMove(null)}
+        />
+      )}
+      {poolFor && (
+        <PoolPicker
+          board={board}
+          team={board.teams.find((team) => team.id === poolFor.id) ?? poolFor}
+          onPick={addFromPool}
+          onCancel={() => setPoolFor(null)}
         />
       )}
       {targetsOf && (
