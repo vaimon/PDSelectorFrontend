@@ -179,6 +179,11 @@
   list-style: none;
 }
 
+/* A folded card (#72): `hidden` alone loses to the display above. */
+.board-students[hidden] {
+  display: none;
+}
+
 .board-student {
   display: flex;
   align-items: flex-start;
@@ -211,16 +216,75 @@
   font-size: calc(var(--fs) - 1px);
 }
 
-.board-student-actions,
 .board-team-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-}
-
-.board-team-actions {
   padding-top: var(--space-8);
   border-top: 1px solid var(--hairline);
+}
+
+/* The name folds and unfolds the card (#72); the team's «⋯» sits at the end of the same line. */
+.board-team-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.board-team-title h3 {
+  min-width: 0;
+  margin: 0;
+  font-size: var(--fs);
+}
+
+.board-team-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 100%;
+  padding: 2px var(--space-4) 2px 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.board-team-toggle .admin-icon {
+  flex: none;
+  color: var(--text-2);
+  transform: rotate(-90deg);
+  transition: transform 0.15s ease-out;
+}
+
+.board-team-toggle.is-open .admin-icon {
+  transform: none;
+}
+
+.board-team-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.board-team-places {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.board-team-pips {
+  display: inline-flex;
+  gap: var(--gap);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-team-toggle .admin-icon {
+    transition: none;
+  }
 }
 
 .board-action {
@@ -250,9 +314,27 @@
   cursor: progress;
 }
 
-.board-action.board-danger:not(:disabled) {
-  border-color: var(--bad-border);
-  color: var(--bad);
+/* The one action left in the open (#72): what a short team needs. */
+.board-action.board-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 30px;
+  padding: 0 var(--gap);
+  border-color: var(--accent-border);
+  background: var(--accent-weak);
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.board-action.board-primary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.board-action.board-primary .admin-icon {
+  width: 16px;
+  height: 16px;
 }
 
 /* Dragging (#56): the row is the grip; where it would land is marked while it is over it. */

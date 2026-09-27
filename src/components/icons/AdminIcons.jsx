@@ -96,3 +96,25 @@ export const CloseIcon = () => (
     <path d="M18 6 6 18M6 6l12 12" />
   </Icon>
 );
+
+export const MoreIcon = () => (
+  <Icon>
+    <circle cx="5" cy="12" r="1" />
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="19" cy="12" r="1" />
+  </Icon>
+);
+
+export const AddToTeamIcon = () => (
+  <Icon>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M19 8v6M22 11h-6" />
+  </Icon>
+);
+
+export const ChevronIcon = () => (
+  <Icon size={16}>
+    <path d="m6 9 6 6 6-6" />
+  </Icon>
+);

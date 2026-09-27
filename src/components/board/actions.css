@@ -1,0 +1,140 @@
+/*
+ * Icon actions, their tooltips and the «⋯» menus of the board (#72), plus the 3 + 3 places the
+ * board and «Обзор» both draw.
+ */
+
+.icon-action {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.icon-action:hover:not(:disabled),
+.icon-action.is-open {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.icon-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.icon-action:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.icon-action .admin-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* The label, shown where the icon is pointed at or focused — not only on hover, as a `title` is.
+   Beside the icon, not above it: the pool scrolls, and a label above its first row would be cut. */
+.icon-action[data-tip]:hover:not(:disabled)::after,
+.icon-action[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 6px);
+  transform: translateY(-50%);
+  z-index: 30;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--r-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.action-menu {
+  position: relative;
+  flex: none;
+}
+
+.action-menu-list {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  z-index: 40;
+  display: grid;
+  min-width: 200px;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+}
+
+.action-menu-list.is-up {
+  top: auto;
+  bottom: calc(100% + var(--space-4));
+}
+
+.action-menu-item {
+  padding: var(--space-8) var(--gap);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text);
+  font-size: var(--fs);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.action-menu-item:hover:not(:disabled),
+.action-menu-item:focus-visible {
+  background: var(--surface-2);
+  outline: none;
+}
+
+.action-menu-item:disabled {
+  color: var(--text-2);
+  cursor: default;
+}
+
+.action-menu-item.is-danger {
+  color: var(--bad);
+}
+
+.action-menu-rule {
+  margin: var(--space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.pips {
+  display: inline-flex;
+  gap: var(--space-4);
+}
+
+.pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-2);
+}
+
+.pip.is-open {
+  border: 1.5px dashed var(--warn);
+  background: transparent;
+}
+
+.pip.is-over {
+  background: var(--accent);
+}
